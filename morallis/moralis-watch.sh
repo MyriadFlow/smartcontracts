@@ -1,0 +1,1 @@
+moralis-admin-cli watch-cloud-folder --autoSave 1 --moralisCloudfolder cloud
