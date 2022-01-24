@@ -1,0 +1,26 @@
+specVersion: 0.0.2
+schema:
+  file: schema.graphql
+dataSources:
+  - kind: ethereum
+    name: MarketPlace
+    network: mumbai
+    source:
+      address: "0xD3fb2d7Ad6A3af5930dDC41eE03b5D499786DCb5"
+      abi: MarketPlace
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - MarketItem
+      abis:
+        - name: MarketPlace
+          file: MarketPlace/abis/MarketPlace.json
+      eventHandlers:
+        - event: MarketItemCreated(indexed uint256,indexed address,indexed
+            uint256,address,address,uint256,bool)
+          handler: handleMarketItemCreated
+        - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
+          handler: handleMarketItemSold
+      file: MarketPlace/MarketPlace.wasm
