@@ -6,8 +6,8 @@
 tasks:
   - init: |
       npm install
-      cd subgraphs/creatify && yarn install
-      cd subgraphs/marketplace && yarn install
+      cd subgraphs/creatify && yarn install && cd ../..
+      cd subgraphs/marketplace && yarn install && cd ../..
 vscode:
   extensions:
     - dbaeumer.vscode-eslint
