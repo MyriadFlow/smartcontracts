@@ -28,7 +28,14 @@ import "./@rarible/royalties/contracts/LibRoyaltiesV2.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721Burnable, ERC721Pausable, RoyaltiesV2Impl  {
+contract Creatify is
+    Context,
+    AccessControlEnumerable,
+    ERC721Enumerable,
+    ERC721Burnable,
+    ERC721Pausable,
+    RoyaltiesV2Impl
+{
     using Counters for Counters.Counter;
 
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
@@ -45,10 +52,14 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
 
     address public marketplace;
 
-    event ArtifactCreated(uint256 tokenID, address indexed creator);
+    event ArtifactCreated(
+        uint256 tokenID,
+        address indexed creator,
+        string indexed metadataHash
+    );
 
     using Strings for uint256;
-    
+
     /**
      * @dev Grants `DEFAULT_ADMIN_ROLE`, `CREATOR_ROLE` and `OPERATOR_ROLE` to the
      * account that deploys the contract.
@@ -65,13 +76,13 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
         _baseTokenURI = baseTokenURI;
 
         _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        
+
         marketplace = marketplaceAddress;
-        
+
         _setRoleAdmin(DEFAULT_ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
         _setRoleAdmin(CREATOR_ROLE, OPERATOR_ROLE);
         _setRoleAdmin(OPERATOR_ROLE, DEFAULT_ADMIN_ROLE);
-        
+
         // Royalties interface
         // _registerInterface(_INTERFACE_ID_ERC2981);
     }
@@ -91,18 +102,22 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
      *
      * - the caller must have the `CREATOR_ROLE`.
      */
-    function createArtifact(string memory metadataHash) public onlyRole(CREATOR_ROLE) returns (uint256) {
+    function createArtifact(string memory metadataHash)
+        public
+        onlyRole(CREATOR_ROLE)
+        returns (uint256)
+    {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         _tokenIdTracker.increment();
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataHash);
-        
+
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
-        
-        emit ArtifactCreated(currentTokenID, _msgSender());
+
+        emit ArtifactCreated(currentTokenID, _msgSender(), metadataHash);
         return currentTokenID;
     }
 
@@ -117,25 +132,34 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
      *
      * - the caller must have the `CREATOR_ROLE`.
      */
-    function delegateArtifactCreation(address creator, string memory metadataHash) public onlyRole(OPERATOR_ROLE) returns (uint256) {
+    function delegateArtifactCreation(
+        address creator,
+        string memory metadataHash
+    ) public onlyRole(OPERATOR_ROLE) returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         _tokenIdTracker.increment();
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(creator, currentTokenID);
         _setTokenURI(currentTokenID, metadataHash);
-        
+
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
-        
-        emit ArtifactCreated(currentTokenID, creator);
+
+        emit ArtifactCreated(currentTokenID, creator, metadataHash);
         return currentTokenID;
     }
 
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        virtual
+        override
+        returns (string memory)
+    {
         require(_exists(tokenId), "Creatify: Non-Existent Artifact");
 
         string memory _tokenURI = _tokenURIs[tokenId];
@@ -160,11 +184,14 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
      *
      * - `tokenId` must exist.
      */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI) internal virtual {
+    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
+        internal
+        virtual
+    {
         require(_exists(tokenId), "Creatify: Non-Existent Artifact");
         _tokenURIs[tokenId] = _tokenURI;
     }
-    
+
     /**
      * @dev Pauses all token transfers.
      *
@@ -178,16 +205,26 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
         _pause();
     }
 
-    function royaltyInfo(uint256 _tokenId, uint256 _salePrice) external view returns (address receiver, uint256 royaltyAmount) {
+    function royaltyInfo(uint256 _tokenId, uint256 _salePrice)
+        external
+        view
+        returns (address receiver, uint256 royaltyAmount)
+    {
         LibPart.Part[] memory _royalties = royalties[_tokenId];
-        if(_royalties.length > 0) {
-            return (_royalties[0].account, (_salePrice * _royalties[0].value)/10000);
+        if (_royalties.length > 0) {
+            return (
+                _royalties[0].account,
+                (_salePrice * _royalties[0].value) / 10000
+            );
         }
         return (address(0), 0);
-
     }
-    
-    function setRoyalties(uint _tokenId, address payable _royaltiesReceipientAddress, uint96 _percentageBasisPoints) public onlyRole(DEFAULT_ADMIN_ROLE) {
+
+    function setRoyalties(
+        uint256 _tokenId,
+        address payable _royaltiesReceipientAddress,
+        uint96 _percentageBasisPoints
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         LibPart.Part[] memory _royalties = new LibPart.Part[](1);
         _royalties[0].value = _percentageBasisPoints;
         _royalties[0].account = _royaltiesReceipientAddress;
@@ -207,18 +244,28 @@ contract Creatify is Context, AccessControlEnumerable, ERC721Enumerable, ERC721B
         _unpause();
     }
 
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal virtual override(ERC721, ERC721Enumerable, ERC721Pausable) {
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal virtual override(ERC721, ERC721Enumerable, ERC721Pausable) {
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(AccessControlEnumerable, ERC721, ERC721Enumerable) returns (bool) {
-        if(interfaceId == LibRoyaltiesV2._INTERFACE_ID_ROYALTIES) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(AccessControlEnumerable, ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        if (interfaceId == LibRoyaltiesV2._INTERFACE_ID_ROYALTIES) {
             return true;
         }
-        if(interfaceId == _INTERFACE_ID_ERC2981) {
+        if (interfaceId == _INTERFACE_ID_ERC2981) {
             return true;
         }
         return super.supportsInterface(interfaceId);
