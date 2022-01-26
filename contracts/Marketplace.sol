@@ -105,7 +105,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     }
 
     function removeFromSale(uint256 itemId) public onlySeller(itemId) {
-        IERC721(idToMarketItem[itemId].nftContract).transferFrom(
+        ERC721(idToMarketItem[itemId].nftContract).transferFrom(
             address(this),
             idToMarketItem[itemId].seller,
             idToMarketItem[itemId].tokenId
@@ -130,7 +130,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
             "Marketplace: Pay Market Price to buy the NFT"
         );
 
-        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
+        ERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
         // Calculate Payouts between seller and platform
         uint256 amountReceived = msg.value;
