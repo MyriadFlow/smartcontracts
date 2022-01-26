@@ -104,6 +104,9 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         return itemId;
     }
 
+    /*  Removes the item from marketplace
+        Transfers ownership of the item back to seller
+    */
     function removeFromSale(uint256 itemId) public onlySeller(itemId) {
         ERC721(idToMarketItem[itemId].nftContract).transferFrom(
             address(this),
