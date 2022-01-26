@@ -55,7 +55,7 @@ contract Creatify is
     event ArtifactCreated(
         uint256 tokenID,
         address indexed creator,
-        string indexed metadataHash
+        string indexed metaDataUri
     );
 
     using Strings for uint256;
@@ -117,7 +117,11 @@ contract Creatify is
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
 
-        emit ArtifactCreated(currentTokenID, _msgSender(), metadataHash);
+        emit ArtifactCreated(
+            currentTokenID,
+            _msgSender(),
+            tokenURI(currentTokenID)
+        );
         return currentTokenID;
     }
 

@@ -329,7 +329,7 @@ export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
 export type ArtifactCreatedEvent = TypedEvent<
   [BigNumber, string, string],
-  { tokenID: BigNumber; creator: string; metadataHash: string }
+  { tokenID: BigNumber; creator: string; metaDataUri: string }
 >;
 
 export type ArtifactCreatedEventFilter = TypedEventFilter<ArtifactCreatedEvent>;
@@ -926,12 +926,12 @@ export interface Creatify extends BaseContract {
     "ArtifactCreated(uint256,address,string)"(
       tokenID?: null,
       creator?: string | null,
-      metadataHash?: string | null
+      metaDataUri?: string | null
     ): ArtifactCreatedEventFilter;
     ArtifactCreated(
       tokenID?: null,
       creator?: string | null,
-      metadataHash?: string | null
+      metaDataUri?: string | null
     ): ArtifactCreatedEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;

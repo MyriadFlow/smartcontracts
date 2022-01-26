@@ -32,43 +32,110 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         address payable owner;
         uint256 price;
         bool forSale;
+        bool deleted;
     }
 
-    mapping(uint256 => MarketItem) private idToMarketItem;
+    mapping(uint256 => MarketItem) public idToMarketItem;
 
-    event MarketItemCreated(uint256 indexed itemId, address indexed nftContract, uint256 indexed tokenId, address seller, address owner, uint256 price, bool forSale);
-    event MarketItemSold(uint256 indexed itemId, address indexed nftContract, uint256 indexed tokenId, address buyer, uint256 price);
+    event MarketItemCreated(
+        uint256 indexed itemId,
+        address indexed nftContract,
+        uint256 indexed tokenId,
+        string metaDataURI,
+        address seller,
+        address owner,
+        uint256 price,
+        bool forSale
+    );
+    event MarketItemSold(
+        uint256 indexed itemId,
+        address indexed nftContract,
+        uint256 indexed tokenId,
+        address buyer,
+        uint256 price
+    );
+
+    event MarketItemRemoved(uint256 itemId);
+
+    modifier onlySeller(uint256 itemId) {
+        require(
+            idToMarketItem[itemId].seller == msg.sender,
+            "Marketplace: Sender is not seller of this item"
+        );
+        _;
+    }
 
     /*  Places an item for sale on the marketplace
         Accepts price in native asset of the blockchain network
     */
-    function createMarketItem(address nftContract, uint256 tokenId, uint256 price) public returns(uint256) {
+    function createMarketItem(
+        address nftContract,
+        uint256 tokenId,
+        uint256 price
+    ) public returns (uint256) {
         require(price > 0, "Marketplace: Price must be at least 1 wei");
 
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
 
-        idToMarketItem[itemId] = MarketItem(itemId, nftContract, tokenId, payable(msg.sender), payable(address(0)), price, true);
+        idToMarketItem[itemId] = MarketItem(
+            itemId,
+            nftContract,
+            tokenId,
+            payable(msg.sender),
+            payable(address(0)),
+            price,
+            true,
+            true
+        );
+        ERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
-        IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
-
-        emit MarketItemCreated(itemId, nftContract, tokenId, msg.sender, address(0), price, true);
+        string memory metadataURI = ERC721(nftContract).tokenURI(tokenId);
+        emit MarketItemCreated(
+            itemId,
+            nftContract,
+            tokenId,
+            metadataURI,
+            msg.sender,
+            address(0),
+            price,
+            true
+        );
         return itemId;
+    }
+
+    function removeFromSale(uint256 itemId) public onlySeller(itemId) {
+        IERC721(idToMarketItem[itemId].nftContract).transferFrom(
+            address(this),
+            idToMarketItem[itemId].seller,
+            idToMarketItem[itemId].tokenId
+        );
+        idToMarketItem[itemId].deleted = true;
+
+        emit MarketItemRemoved(itemId);
     }
 
     /*  Creates the sale of a marketplace item
         Transfers ownership of the item, as well as funds between parties
     */
-    function createMarketSale(address nftContract, uint256 itemId) public payable nonReentrant {
+    function createMarketSale(address nftContract, uint256 itemId)
+        public
+        payable
+        nonReentrant
+    {
         uint256 price = idToMarketItem[itemId].price;
         uint256 tokenId = idToMarketItem[itemId].tokenId;
-        require(msg.value == price, "Marketplace: Pay Market Price to buy the NFT");
+        require(
+            msg.value == price,
+            "Marketplace: Pay Market Price to buy the NFT"
+        );
 
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
         // Calculate Payouts between seller and platform
         uint256 amountReceived = msg.value;
-        uint256 amountToMarketplace = (amountReceived * platformFeeBasisPoint) / 1000;
+        uint256 amountToMarketplace = (amountReceived * platformFeeBasisPoint) /
+            1000;
         uint256 amountToSeller = amountReceived - amountToMarketplace;
 
         idToMarketItem[itemId].seller.transfer(amountToSeller);
@@ -83,7 +150,10 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     /*  Change the Platform fees along with the payout address
         Allows only Admins to perform this operation
     */
-    function changeFeeAndPayoutAddress(uint96 newPlatformFee, address newPayoutAddress) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    function changeFeeAndPayoutAddress(
+        uint96 newPlatformFee,
+        address newPayoutAddress
+    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
         platformFeeBasisPoint = newPlatformFee;
         payoutAddress = newPayoutAddress;
     }
