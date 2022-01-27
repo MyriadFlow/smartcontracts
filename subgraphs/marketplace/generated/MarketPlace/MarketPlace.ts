@@ -35,20 +35,42 @@ export class MarketItemCreated__Params {
     return this._event.parameters[2].value.toBigInt();
   }
 
-  get seller(): Address {
-    return this._event.parameters[3].value.toAddress();
+  get metaDataURI(): string {
+    return this._event.parameters[3].value.toString();
   }
 
-  get owner(): Address {
+  get seller(): Address {
     return this._event.parameters[4].value.toAddress();
   }
 
+  get owner(): Address {
+    return this._event.parameters[5].value.toAddress();
+  }
+
   get price(): BigInt {
-    return this._event.parameters[5].value.toBigInt();
+    return this._event.parameters[6].value.toBigInt();
   }
 
   get forSale(): boolean {
-    return this._event.parameters[6].value.toBoolean();
+    return this._event.parameters[7].value.toBoolean();
+  }
+}
+
+export class MarketItemRemoved extends ethereum.Event {
+  get params(): MarketItemRemoved__Params {
+    return new MarketItemRemoved__Params(this);
+  }
+}
+
+export class MarketItemRemoved__Params {
+  _event: MarketItemRemoved;
+
+  constructor(event: MarketItemRemoved) {
+    this._event = event;
+  }
+
+  get itemId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
   }
 }
 
@@ -161,6 +183,50 @@ export class RoleRevoked__Params {
 
   get sender(): Address {
     return this._event.parameters[2].value.toAddress();
+  }
+}
+
+export class MarketPlace__idToMarketItemResult {
+  value0: BigInt;
+  value1: Address;
+  value2: BigInt;
+  value3: Address;
+  value4: Address;
+  value5: BigInt;
+  value6: boolean;
+  value7: boolean;
+
+  constructor(
+    value0: BigInt,
+    value1: Address,
+    value2: BigInt,
+    value3: Address,
+    value4: Address,
+    value5: BigInt,
+    value6: boolean,
+    value7: boolean
+  ) {
+    this.value0 = value0;
+    this.value1 = value1;
+    this.value2 = value2;
+    this.value3 = value3;
+    this.value4 = value4;
+    this.value5 = value5;
+    this.value6 = value6;
+    this.value7 = value7;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromAddress(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
+    map.set("value3", ethereum.Value.fromAddress(this.value3));
+    map.set("value4", ethereum.Value.fromAddress(this.value4));
+    map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
+    map.set("value6", ethereum.Value.fromBoolean(this.value6));
+    map.set("value7", ethereum.Value.fromBoolean(this.value7));
+    return map;
   }
 }
 
@@ -323,6 +389,51 @@ export class MarketPlace extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  idToMarketItem(param0: BigInt): MarketPlace__idToMarketItemResult {
+    let result = super.call(
+      "idToMarketItem",
+      "idToMarketItem(uint256):(uint256,address,uint256,address,address,uint256,bool,bool)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+
+    return new MarketPlace__idToMarketItemResult(
+      result[0].toBigInt(),
+      result[1].toAddress(),
+      result[2].toBigInt(),
+      result[3].toAddress(),
+      result[4].toAddress(),
+      result[5].toBigInt(),
+      result[6].toBoolean(),
+      result[7].toBoolean()
+    );
+  }
+
+  try_idToMarketItem(
+    param0: BigInt
+  ): ethereum.CallResult<MarketPlace__idToMarketItemResult> {
+    let result = super.tryCall(
+      "idToMarketItem",
+      "idToMarketItem(uint256):(uint256,address,uint256,address,address,uint256,bool,bool)",
+      [ethereum.Value.fromUnsignedBigInt(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new MarketPlace__idToMarketItemResult(
+        value[0].toBigInt(),
+        value[1].toAddress(),
+        value[2].toBigInt(),
+        value[3].toAddress(),
+        value[4].toAddress(),
+        value[5].toBigInt(),
+        value[6].toBoolean(),
+        value[7].toBoolean()
+      )
+    );
   }
 
   payoutAddress(): Address {
@@ -561,6 +672,36 @@ export class GrantRoleCall__Outputs {
   _call: GrantRoleCall;
 
   constructor(call: GrantRoleCall) {
+    this._call = call;
+  }
+}
+
+export class RemoveFromSaleCall extends ethereum.Call {
+  get inputs(): RemoveFromSaleCall__Inputs {
+    return new RemoveFromSaleCall__Inputs(this);
+  }
+
+  get outputs(): RemoveFromSaleCall__Outputs {
+    return new RemoveFromSaleCall__Outputs(this);
+  }
+}
+
+export class RemoveFromSaleCall__Inputs {
+  _call: RemoveFromSaleCall;
+
+  constructor(call: RemoveFromSaleCall) {
+    this._call = call;
+  }
+
+  get itemId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class RemoveFromSaleCall__Outputs {
+  _call: RemoveFromSaleCall;
+
+  constructor(call: RemoveFromSaleCall) {
     this._call = call;
   }
 }

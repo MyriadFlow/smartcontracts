@@ -24,7 +24,9 @@ export class MarketItem extends Entity {
     this.set("tokenId", Value.fromBigInt(BigInt.zero()));
     this.set("forSale", Value.fromBoolean(false));
     this.set("createdAtTimestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("metaDataUri", Value.fromString(""));
     this.set("sold", Value.fromBoolean(false));
+    this.set("deleted", Value.fromBoolean(false));
   }
 
   save(): void {
@@ -125,6 +127,15 @@ export class MarketItem extends Entity {
     this.set("createdAtTimestamp", Value.fromBigInt(value));
   }
 
+  get metaDataUri(): string {
+    let value = this.get("metaDataUri");
+    return value!.toString();
+  }
+
+  set metaDataUri(value: string) {
+    this.set("metaDataUri", Value.fromString(value));
+  }
+
   get sold(): boolean {
     let value = this.get("sold");
     return value!.toBoolean();
@@ -132,5 +143,14 @@ export class MarketItem extends Entity {
 
   set sold(value: boolean) {
     this.set("sold", Value.fromBoolean(value));
+  }
+
+  get deleted(): boolean {
+    let value = this.get("deleted");
+    return value!.toBoolean();
+  }
+
+  set deleted(value: boolean) {
+    this.set("deleted", Value.fromBoolean(value));
   }
 }

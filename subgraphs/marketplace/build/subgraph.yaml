@@ -6,7 +6,7 @@ dataSources:
     name: MarketPlace
     network: mumbai
     source:
-      address: "0xD3fb2d7Ad6A3af5930dDC41eE03b5D499786DCb5"
+      address: "0x9FE3A37fC0Cf807708fd935425A8Ba5092ceA428"
       abi: MarketPlace
     mapping:
       kind: ethereum/events
@@ -19,8 +19,10 @@ dataSources:
           file: MarketPlace/abis/MarketPlace.json
       eventHandlers:
         - event: MarketItemCreated(indexed uint256,indexed address,indexed
-            uint256,address,address,uint256,bool)
+            uint256,string,address,address,uint256,bool)
           handler: handleMarketItemCreated
         - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
           handler: handleMarketItemSold
+        - event: MarketItemRemoved(uint256)
+          handler: handleMarketItemRemoved
       file: MarketPlace/MarketPlace.wasm

@@ -19,6 +19,7 @@ export class Token extends Entity {
     this.set("tokenID", Value.fromBigInt(BigInt.zero()));
     this.set("name", Value.fromString(""));
     this.set("createdAtTimestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("metaDataUri", Value.fromString(""));
     this.set("creator", Value.fromString(""));
     this.set("owner", Value.fromString(""));
   }
@@ -108,6 +109,15 @@ export class Token extends Entity {
 
   set createdAtTimestamp(value: BigInt) {
     this.set("createdAtTimestamp", Value.fromBigInt(value));
+  }
+
+  get metaDataUri(): string {
+    let value = this.get("metaDataUri");
+    return value!.toString();
+  }
+
+  set metaDataUri(value: string) {
+    this.set("metaDataUri", Value.fromString(value));
   }
 
   get creator(): string {

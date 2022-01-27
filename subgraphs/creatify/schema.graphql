@@ -5,6 +5,7 @@ type Token @entity {
   tokenIPFSPath: String
   name: String!
   createdAtTimestamp: BigInt!
+  metaDataUri: String!
   creator: User!
   owner: User!
 }

@@ -1,4 +1,5 @@
 import {
+  ArtifactCreated,
   Transfer,
 } from "../generated/Creatify/Creatify"
 
@@ -21,5 +22,12 @@ export function handleTransfer(event: Transfer): void {
   if (!user) {
     user = new User(event.params.to.toHexString());
     user.save();
+  }
+}
+
+export function handleArtifactCreated(event: ArtifactCreated): void {
+  let token = Token.load(event.params.tokenID.toString());
+  if (token) {
+    token.metaDataUri = event.params.metaDataUri.toString()
   }
 }

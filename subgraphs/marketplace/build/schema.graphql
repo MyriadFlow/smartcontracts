@@ -8,5 +8,7 @@ type MarketItem @entity {
   tokenId: BigInt!
   forSale: Boolean!
   createdAtTimestamp: BigInt!
+  metaDataUri: String!
   sold: Boolean!
+  deleted: Boolean!
 }

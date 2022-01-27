@@ -89,6 +89,12 @@
         "internalType": "address",
         "name": "creator",
         "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "metaDataUri",
+        "type": "string"
       }
     ],
     "name": "ArtifactCreated",

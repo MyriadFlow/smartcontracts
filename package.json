@@ -3,6 +3,9 @@
     "@openzeppelin/contracts": "^4.4.2",
     "web3": "^1.7.0"
   },
+  "scripts":{
+    "deploy:maticmum":"hardhat run scripts/deploy.js --network maticmum"
+  },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
     "@nomiclabs/hardhat-etherscan": "^2.1.8",

@@ -6,7 +6,7 @@ dataSources:
     name: Creatify
     network: mumbai
     source:
-      address: "0x9171021F9Dcb5f4F5b7005683a86699e3fC2DCea"
+      address: "0x8Be503bcdEd90ED42Eff31f56199399B2b0154CA"
       abi: Creatify
     mapping:
       kind: ethereum/events
@@ -20,4 +20,6 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+        - event: ArtifactCreated(uint256,indexed address,indexed string)
+          handler: artifactCreated
       file: ./src/mapping.ts
