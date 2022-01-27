@@ -3,8 +3,9 @@
     "@openzeppelin/contracts": "^4.4.2",
     "web3": "^1.7.0"
   },
-  "scripts":{
-    "deploy:maticmum":"hardhat run scripts/deploy.js --network maticmum"
+  "scripts": {
+    "deploy:maticmum": "hardhat run scripts/deploy.js --network maticmum",
+    "verify:maticmum": "npx hardhat verify --network maticmum $CREATIFY_ADDRESS Creatify CRFTY '' $MARKETPLACE_ADDRESS"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
