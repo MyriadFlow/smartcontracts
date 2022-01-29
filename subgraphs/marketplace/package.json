@@ -7,7 +7,7 @@
     "deploy": "graph auth --product hosted-service $GRAPH_TOKEN && graph deploy --node https://api.thegraph.com/deploy/ thisisommore/market-place-subgraph",
     "create-local": "graph create --node http://localhost:8020/ thisisommore/market-place-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ thisisommore/market-place-subgraph",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 thisisommore/market-place-subgraph"
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 thisisommore/market-place-subgraph subgraph.local.yaml"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.26.0",

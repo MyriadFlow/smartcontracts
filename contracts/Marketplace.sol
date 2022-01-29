@@ -17,9 +17,12 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     address public payoutAddress;
     uint96 public platformFeeBasisPoint;
 
+    bytes32 public constant MARKETPLACE_ADMIN_ROLE =
+        keccak256("MARKETPLACE_ADMIN_ROLE");
+
     constructor(uint96 _platformFee) {
-        _setupRole(DEFAULT_ADMIN_ROLE, _msgSender());
-        _setRoleAdmin(DEFAULT_ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
+        _setupRole(MARKETPLACE_ADMIN_ROLE, _msgSender());
+        _setRoleAdmin(MARKETPLACE_ADMIN_ROLE, MARKETPLACE_ADMIN_ROLE);
         platformFeeBasisPoint = _platformFee;
         payoutAddress = _msgSender();
     }
@@ -57,6 +60,24 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
 
     event MarketItemRemoved(uint256 itemId);
 
+    // Only item owner should be able to perform action
+    modifier onlyItemOwner(address nftContract, uint256 tokenId) {
+        require(
+            IERC721(nftContract).ownerOf(tokenId) == msg.sender,
+            "Marketplace: Sender does not own the item"
+        );
+        _;
+    }
+
+    // Only when item exist
+    modifier onlyWhenItemExist(uint256 itemId) {
+        require(
+            idToMarketItem[itemId].deleted == false,
+            "Marketplace: Market item doesn't exist"
+        );
+        _;
+    }
+    // Only seller should be able to perform action
     modifier onlySeller(uint256 itemId) {
         require(
             idToMarketItem[itemId].seller == msg.sender,
@@ -72,7 +93,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         address nftContract,
         uint256 tokenId,
         uint256 price
-    ) public returns (uint256) {
+    ) public onlyItemOwner(nftContract, tokenId) returns (uint256) {
         require(price > 0, "Marketplace: Price must be at least 1 wei");
 
         _itemIds.increment();
@@ -88,9 +109,11 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
             true,
             true
         );
-        ERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
+        IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
-        string memory metadataURI = ERC721(nftContract).tokenURI(tokenId);
+        string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
+            tokenId
+        );
         emit MarketItemCreated(
             itemId,
             nftContract,
@@ -108,7 +131,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         Transfers ownership of the item back to seller
     */
     function removeFromSale(uint256 itemId) public onlySeller(itemId) {
-        ERC721(idToMarketItem[itemId].nftContract).transferFrom(
+        IERC721(idToMarketItem[itemId].nftContract).transferFrom(
             address(this),
             idToMarketItem[itemId].seller,
             idToMarketItem[itemId].tokenId
@@ -125,6 +148,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         public
         payable
         nonReentrant
+        onlyWhenItemExist(itemId)
     {
         uint256 price = idToMarketItem[itemId].price;
         uint256 tokenId = idToMarketItem[itemId].tokenId;
@@ -133,7 +157,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
             "Marketplace: Pay Market Price to buy the NFT"
         );
 
-        ERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
+        IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
         // Calculate Payouts between seller and platform
         uint256 amountReceived = msg.value;
@@ -156,7 +180,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     function changeFeeAndPayoutAddress(
         uint96 newPlatformFee,
         address newPayoutAddress
-    ) public onlyRole(DEFAULT_ADMIN_ROLE) {
+    ) public onlyRole(MARKETPLACE_ADMIN_ROLE) {
         platformFeeBasisPoint = newPlatformFee;
         payoutAddress = newPayoutAddress;
     }

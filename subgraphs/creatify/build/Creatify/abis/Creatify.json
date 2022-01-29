@@ -91,7 +91,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "string",
         "name": "metaDataUri",
         "type": "string"

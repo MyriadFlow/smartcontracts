@@ -926,12 +926,12 @@ export interface Creatify extends BaseContract {
     "ArtifactCreated(uint256,address,string)"(
       tokenID?: null,
       creator?: string | null,
-      metaDataUri?: string | null
+      metaDataUri?: null
     ): ArtifactCreatedEventFilter;
     ArtifactCreated(
       tokenID?: null,
       creator?: string | null,
-      metaDataUri?: string | null
+      metaDataUri?: null
     ): ArtifactCreatedEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;

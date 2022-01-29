@@ -6,15 +6,26 @@ tasks:
       npm install
       cd subgraphs/creatify && yarn install && cd ../..
       cd subgraphs/marketplace && yarn install && cd ../..
+  - name: Smart contract
+    command: |
+      gp sync-await graphnode
+      gp await-port 8020
+      sleep 5
+      ./watch.sh
   - name: Ethereum Node
     command: ganache-cli -h 0.0.0.0 -m "$MNEMONIC"
   - name: Graph Node
     command: |
-      cd ..
-      git clone https://github.com/graphprotocol/graph-node/
-      cd graph-node/docker
-      sed -i -e "s/host.docker.internal/172.17.0.1/g" docker-compose.yml
-      docker-compose up
+      cd /graph-docker
+      docker-compose up -d
+      gp sync-done graphnode
+  - name: Create deploy
+    command: |
+      gp sync-await graphnode
+      gp await-port 8020
+      sleep 5
+      cd subgraphs/creatify && yarn create-local && cd -
+      cd subgraphs/marketplace && yarn create-local && cd -
 
 vscode:
   extensions:

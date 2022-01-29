@@ -83,8 +83,8 @@ export class ArtifactCreated__Params {
     return this._event.parameters[1].value.toAddress();
   }
 
-  get metaDataUri(): Bytes {
-    return this._event.parameters[2].value.toBytes();
+  get metaDataUri(): string {
+    return this._event.parameters[2].value.toString();
   }
 }
 
