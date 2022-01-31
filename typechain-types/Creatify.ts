@@ -29,9 +29,10 @@ export declare namespace LibPart {
 export interface CreatifyInterface extends utils.Interface {
   contractName: "Creatify";
   functions: {
-    "CREATOR_ROLE()": FunctionFragment;
+    "CREATIFY_ADMIN_ROLE()": FunctionFragment;
+    "CREATIFY_CREATOR_ROLE()": FunctionFragment;
+    "CREATIFY_OPERATOR_ROLE()": FunctionFragment;
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "OPERATOR_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
@@ -67,15 +68,19 @@ export interface CreatifyInterface extends utils.Interface {
   };
 
   encodeFunctionData(
-    functionFragment: "CREATOR_ROLE",
+    functionFragment: "CREATIFY_ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "CREATIFY_CREATOR_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "CREATIFY_OPERATOR_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "OPERATOR_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -187,15 +192,19 @@ export interface CreatifyInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
 
   decodeFunctionResult(
-    functionFragment: "CREATOR_ROLE",
+    functionFragment: "CREATIFY_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "CREATIFY_CREATOR_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "CREATIFY_OPERATOR_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "OPERATOR_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
@@ -406,11 +415,13 @@ export interface Creatify extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    CREATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
+    CREATIFY_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    CREATIFY_CREATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    CREATIFY_OPERATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    OPERATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     approve(
       to: string,
@@ -577,11 +588,13 @@ export interface Creatify extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
+  CREATIFY_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  CREATIFY_CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  CREATIFY_OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
   approve(
     to: string,
@@ -742,11 +755,13 @@ export interface Creatify extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
+    CREATIFY_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    CREATIFY_CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    CREATIFY_OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
     approve(
       to: string,
@@ -992,11 +1007,13 @@ export interface Creatify extends BaseContract {
   };
 
   estimateGas: {
-    CREATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+    CREATIFY_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    CREATIFY_CREATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    CREATIFY_OPERATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    OPERATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -1165,13 +1182,21 @@ export interface Creatify extends BaseContract {
   };
 
   populateTransaction: {
-    CREATOR_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    CREATIFY_ADMIN_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    CREATIFY_CREATOR_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    CREATIFY_OPERATOR_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     DEFAULT_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    OPERATOR_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(
       to: string,

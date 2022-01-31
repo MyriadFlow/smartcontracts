@@ -1,9 +1,5 @@
 type Token @entity {
   id: ID!
-  tokenID: BigInt!
-  contentURI: String
-  tokenIPFSPath: String
-  name: String!
   createdAtTimestamp: BigInt!
   metaDataUri: String!
   creator: User!

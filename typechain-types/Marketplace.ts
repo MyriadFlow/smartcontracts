@@ -22,6 +22,7 @@ export interface MarketplaceInterface extends utils.Interface {
   contractName: "Marketplace";
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
+    "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
     "changeFeeAndPayoutAddress(uint96,address)": FunctionFragment;
     "createMarketItem(address,uint256,uint256)": FunctionFragment;
     "createMarketSale(address,uint256)": FunctionFragment;
@@ -41,6 +42,10 @@ export interface MarketplaceInterface extends utils.Interface {
 
   encodeFunctionData(
     functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "MARKETPLACE_ADMIN_ROLE",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -106,6 +111,10 @@ export interface MarketplaceInterface extends utils.Interface {
 
   decodeFunctionResult(
     functionFragment: "DEFAULT_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "MARKETPLACE_ADMIN_ROLE",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -267,6 +276,8 @@ export interface Marketplace extends BaseContract {
   functions: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
@@ -365,6 +376,8 @@ export interface Marketplace extends BaseContract {
 
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
+  MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
   changeFeeAndPayoutAddress(
     newPlatformFee: BigNumberish,
     newPayoutAddress: string,
@@ -462,6 +475,8 @@ export interface Marketplace extends BaseContract {
 
   callStatic: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
@@ -636,6 +651,8 @@ export interface Marketplace extends BaseContract {
   estimateGas: {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
@@ -717,6 +734,10 @@ export interface Marketplace extends BaseContract {
 
   populateTransaction: {
     DEFAULT_ADMIN_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    MARKETPLACE_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

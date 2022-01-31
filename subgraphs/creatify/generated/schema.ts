@@ -16,8 +16,6 @@ export class Token extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("tokenID", Value.fromBigInt(BigInt.zero()));
-    this.set("name", Value.fromString(""));
     this.set("createdAtTimestamp", Value.fromBigInt(BigInt.zero()));
     this.set("metaDataUri", Value.fromString(""));
     this.set("creator", Value.fromString(""));
@@ -48,58 +46,6 @@ export class Token extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
-  }
-
-  get tokenID(): BigInt {
-    let value = this.get("tokenID");
-    return value!.toBigInt();
-  }
-
-  set tokenID(value: BigInt) {
-    this.set("tokenID", Value.fromBigInt(value));
-  }
-
-  get contentURI(): string | null {
-    let value = this.get("contentURI");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set contentURI(value: string | null) {
-    if (!value) {
-      this.unset("contentURI");
-    } else {
-      this.set("contentURI", Value.fromString(<string>value));
-    }
-  }
-
-  get tokenIPFSPath(): string | null {
-    let value = this.get("tokenIPFSPath");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toString();
-    }
-  }
-
-  set tokenIPFSPath(value: string | null) {
-    if (!value) {
-      this.unset("tokenIPFSPath");
-    } else {
-      this.set("tokenIPFSPath", Value.fromString(<string>value));
-    }
-  }
-
-  get name(): string {
-    let value = this.get("name");
-    return value!.toString();
-  }
-
-  set name(value: string) {
-    this.set("name", Value.fromString(value));
   }
 
   get createdAtTimestamp(): BigInt {

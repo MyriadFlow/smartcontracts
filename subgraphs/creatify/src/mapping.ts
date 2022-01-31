@@ -12,7 +12,6 @@ export function handleTransfer(event: Transfer): void {
   let token = Token.load(event.params.tokenId.toString());
   if (token) {
     token.creator = event.params.to.toHexString()
-    token.tokenID = event.params.tokenId
     token.createdAtTimestamp = event.block.timestamp
     token.owner = event.params.to.toHexString();
     token.save();
@@ -27,13 +26,10 @@ export function handleTransfer(event: Transfer): void {
 }
 
 export function handleArtifactCreated(event: ArtifactCreated): void {
-  log.info("Event metadatauri {}", [event.params.metaDataUri])
   let token = Token.load(event.params.tokenID.toString());
-  log.info("token exist {}", [!!token ? "true" : "false"])
   if (!token) {
     token = new Token(event.params.tokenID.toString())
     token.creator = event.params.creator.toHexString()
-    token.tokenID = event.params.tokenID
     token.createdAtTimestamp = event.block.timestamp
     token.owner = event.params.creator.toHexString();
     token.metaDataUri = event.params.metaDataUri

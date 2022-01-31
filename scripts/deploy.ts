@@ -33,9 +33,9 @@ async function main() {
 
 
     if (hre.network.name == "localhost") {
-        await creatify.grantRole(await creatify.OPERATOR_ROLE(), await creatify.signer.getAddress())
-        await creatify.grantRole(await creatify.CREATOR_ROLE(), await creatify.signer.getAddress())
-        await creatify.grantRole(await creatify.CREATOR_ROLE(), await buyer.getAddress())
+        await creatify.grantRole(await creatify.CREATIFY_OPERATOR_ROLE(), await creatify.signer.getAddress())
+        await creatify.grantRole(await creatify.CREATIFY_CREATOR_ROLE(), await creatify.signer.getAddress())
+        await creatify.grantRole(await creatify.CREATIFY_CREATOR_ROLE(), await buyer.getAddress())
         await creatify.createArtifact("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF")
         await marketplace.createMarketItem(creatify.address, 1, 1)
         await marketplace.connect(buyer).createMarketSale(creatify.address, 1, { value: 1 })

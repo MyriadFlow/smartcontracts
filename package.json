@@ -7,7 +7,9 @@
   "scripts": {
     "deploy:maticmum": "hardhat run scripts/deploy.ts --network maticmum",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
-    "verify:maticmum": "npx hardhat verify --network maticmum $CREATIFY_ADDRESS Creatify CRFTY '' $MARKETPLACE_ADDRESS"
+    "verify:maticmum": "npm run verify:creatify:maticmum && npm run verify:marketplace:maticmum",
+    "verify:creatify:maticmum": "npx hardhat verify --network maticmum $CREATIFY_ADDRESS Creatify CRFTY '' $MARKETPLACE_ADDRESS",
+    "verify:marketplace:maticmum": "npx hardhat verify --network maticmum $MARKETPLACE_ADDRESS 30"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",

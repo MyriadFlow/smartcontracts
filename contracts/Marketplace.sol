@@ -107,7 +107,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
             payable(address(0)),
             price,
             true,
-            true
+            false
         );
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
 
