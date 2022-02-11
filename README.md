@@ -50,9 +50,9 @@ Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we 
 ```shell
 npx hardhat run --network maticmum scripts/deploy.js
 ```
-> `Marketplace Deployed to: 0xF69a40d54771EaF6AdbdFe89eC6e4A88039f8304`
+> `Marketplace Deployed to: 0xA3c64851558D85449B9C8aA88b217BE7Af9d7eFB`
 
-> `Creatify Deployed to: 0xcA6355c6212e2CA40D4d73AEa7f82BeF97981a7C`
+> `Creatify Deployed to: 0x975362c36b6842d48d02DBD3A077745Fc1C64175`
 
 ## Etherscan verification
 
