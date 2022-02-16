@@ -37,6 +37,7 @@ export function handleMarketItemRemoved(event: MarketItemRemoved): void {
   let marketItem = MarketItem.load(event.params.itemId.toString())
   if (marketItem) {
     marketItem.deleted = true
+    marketItem.save()
   }
 }
 

@@ -6,7 +6,7 @@ tasks:
       npm install
       cd subgraphs/creatify && yarn install && cd ../..
       cd subgraphs/marketplace && yarn install && cd ../..
-      gp sync-done depinit
+    command: gp sync-done depinit
   - name: Ethereum Node
     command: ganache-cli -h 0.0.0.0 -m "$MNEMONIC"
   - name: Graph Node
