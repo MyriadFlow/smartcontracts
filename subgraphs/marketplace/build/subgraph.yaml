@@ -6,7 +6,7 @@ dataSources:
     name: MarketPlace
     network: mumbai
     source:
-      address: "0xA3c64851558D85449B9C8aA88b217BE7Af9d7eFB"
+      address: "0x8E3a69e094C72Aaca55191A91BAEbE9F800bD908"
       abi: MarketPlace
     mapping:
       kind: ethereum/events

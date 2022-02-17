@@ -6,7 +6,7 @@ dataSources:
     name: Creatify
     network: mumbai
     source:
-      address: "0x975362c36b6842d48d02DBD3A077745Fc1C64175"
+      address: "0xA34D5022e7fa813F460eB9eF8E59c3386faCE489"
       abi: Creatify
     mapping:
       kind: ethereum/events
