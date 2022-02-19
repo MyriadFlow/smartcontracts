@@ -294,14 +294,68 @@ export class Creatify extends ethereum.SmartContract {
     return new Creatify("Creatify", address);
   }
 
-  CREATOR_ROLE(): Bytes {
-    let result = super.call("CREATOR_ROLE", "CREATOR_ROLE():(bytes32)", []);
+  CREATIFY_ADMIN_ROLE(): Bytes {
+    let result = super.call(
+      "CREATIFY_ADMIN_ROLE",
+      "CREATIFY_ADMIN_ROLE():(bytes32)",
+      []
+    );
 
     return result[0].toBytes();
   }
 
-  try_CREATOR_ROLE(): ethereum.CallResult<Bytes> {
-    let result = super.tryCall("CREATOR_ROLE", "CREATOR_ROLE():(bytes32)", []);
+  try_CREATIFY_ADMIN_ROLE(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "CREATIFY_ADMIN_ROLE",
+      "CREATIFY_ADMIN_ROLE():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  CREATIFY_CREATOR_ROLE(): Bytes {
+    let result = super.call(
+      "CREATIFY_CREATOR_ROLE",
+      "CREATIFY_CREATOR_ROLE():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_CREATIFY_CREATOR_ROLE(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "CREATIFY_CREATOR_ROLE",
+      "CREATIFY_CREATOR_ROLE():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
+  CREATIFY_OPERATOR_ROLE(): Bytes {
+    let result = super.call(
+      "CREATIFY_OPERATOR_ROLE",
+      "CREATIFY_OPERATOR_ROLE():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_CREATIFY_OPERATOR_ROLE(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "CREATIFY_OPERATOR_ROLE",
+      "CREATIFY_OPERATOR_ROLE():(bytes32)",
+      []
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -323,25 +377,6 @@ export class Creatify extends ethereum.SmartContract {
     let result = super.tryCall(
       "DEFAULT_ADMIN_ROLE",
       "DEFAULT_ADMIN_ROLE():(bytes32)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBytes());
-  }
-
-  OPERATOR_ROLE(): Bytes {
-    let result = super.call("OPERATOR_ROLE", "OPERATOR_ROLE():(bytes32)", []);
-
-    return result[0].toBytes();
-  }
-
-  try_OPERATOR_ROLE(): ethereum.CallResult<Bytes> {
-    let result = super.tryCall(
-      "OPERATOR_ROLE",
-      "OPERATOR_ROLE():(bytes32)",
       []
     );
     if (result.reverted) {

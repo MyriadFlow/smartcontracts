@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum
     name: Creatify
-    network: mumbai
+    network: mainnet
     source:
-      address: "0xA34D5022e7fa813F460eB9eF8E59c3386faCE489"
+      address: "0xAf3f71E5d6D0811e70d0086245A9A035cE60A30d"
       abi: Creatify
     mapping:
       kind: ethereum/events
@@ -22,4 +22,8 @@ dataSources:
           handler: handleTransfer
         - event: ArtifactCreated(uint256,indexed address,string)
           handler: handleArtifactCreated
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
       file: Creatify/Creatify.wasm

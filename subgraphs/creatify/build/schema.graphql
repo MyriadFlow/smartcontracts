@@ -10,4 +10,5 @@ type User @entity {
   id: ID!
   tokens: [Token!]! @derivedFrom(field: "owner")
   created: [Token!]! @derivedFrom(field: "creator")
+  roles: [String!]!
 }

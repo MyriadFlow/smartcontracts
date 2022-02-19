@@ -6,7 +6,7 @@ dataSources:
     name: MarketPlace
     network: mainnet
     source:
-      address: '0x41273b9a02f4eBF731Ea029E507623D37f534022'
+      address: '0xC308652315b8f201fBAA55D6c0e5ECeD60354454'
       abi: MarketPlace
     mapping:
       kind: ethereum/events

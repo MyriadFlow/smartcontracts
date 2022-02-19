@@ -1,7 +1,8 @@
-import { log } from '@graphprotocol/graph-ts'
 import {
   ArtifactCreated,
   Transfer,
+  RoleGranted,
+  RoleRevoked,
 } from "../generated/Creatify/Creatify"
 
 import {
@@ -39,5 +40,35 @@ export function handleArtifactCreated(event: ArtifactCreated): void {
       user = new User(event.params.creator.toHexString());
       user.save();
     }
+  }
+}
+
+
+export function handleRoleGranted(event: RoleGranted): void {
+  let user = User.load(event.params.account.toHexString());
+  if (!user) {
+    user = new User(event.params.account.toHexString());
+  }
+  let userHasRole = user.roles.includes(event.params.role.toHexString())
+  if (!userHasRole) {
+    let updatedRoles = user.roles
+    updatedRoles.push(event.params.role.toHexString())
+    user.roles = updatedRoles
+  }
+  user.save();
+}
+
+export function handleRoleRevoked(event: RoleRevoked): void {
+  let user = User.load(event.params.account.toHexString());
+  if (!user) {
+    user = new User(event.params.account.toHexString());
+  }
+
+  let idx = user.roles.indexOf(event.params.role.toHexString())
+  if (idx >= 0) {
+    let updatedRoles = user.roles;
+    updatedRoles.splice(idx, 1)
+    user.roles = updatedRoles
+    user.save();
   }
 }

@@ -22,4 +22,8 @@ dataSources:
           handler: handleTransfer
         - event: ArtifactCreated(uint256,indexed address,string)
           handler: handleArtifactCreated
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
       file: ./src/mapping.ts

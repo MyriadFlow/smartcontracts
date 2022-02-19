@@ -39,7 +39,7 @@ async function main() {
         await creatify.createArtifact("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF")
         await marketplace.createMarketItem(creatify.address, 1, 1)
         await marketplace.connect(buyer).createMarketSale(creatify.address, 1, { value: 1 })
-
+        await creatify.revokeRole(await creatify.CREATIFY_CREATOR_ROLE(), await buyer.getAddress())
         const graphs: ["marketplace", "creatify"] = ["marketplace", "creatify"]
         graphs.forEach(g => {
             const urlSubgraphLocal = `subgraphs/${g}/subgraph.local.yaml`
