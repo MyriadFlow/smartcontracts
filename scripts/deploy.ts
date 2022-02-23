@@ -31,6 +31,15 @@ async function main() {
     await creatify.deployed();
     console.log("Creatify Deployed to:", creatify.address);
 
+    if (process.env.script == "true") {
+        //Print for processing in deployment script
+
+        //Marketplace address 
+        console.log(marketplace.address);
+
+        //Creatify address 
+        console.log(creatify.address);
+    }
 
     if (hre.network.name == "localhost") {
         await creatify.grantRole(await creatify.CREATIFY_OPERATOR_ROLE(), await creatify.signer.getAddress())
@@ -46,6 +55,14 @@ async function main() {
             const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
             umlSubgraphLocal.dataSources[0].source.address = g == "marketplace" ? marketplace.address : creatify.address
 
+            fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
+        })
+    } else {
+        const graphs: ["marketplace", "creatify"] = ["marketplace", "creatify"]
+        graphs.forEach(g => {
+            const urlSubgraphLocal = `subgraphs/${g}/subgraph.yaml`
+            const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
+            umlSubgraphLocal.dataSources[0].source.address = g == "marketplace" ? marketplace.address : creatify.address
             fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
         })
     }

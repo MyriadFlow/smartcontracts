@@ -5,8 +5,12 @@
     "web3": "^1.7.0"
   },
   "scripts": {
+    "deploy:mainnet": "hardhat run scripts/deploy.ts --network ethereum",
     "deploy:maticmum": "hardhat run scripts/deploy.ts --network maticmum",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+    "verify:mainnet": "npm run verify:creatify:mainnet && npm run verify:marketplace:mainnet",
+    "verify:creatify:mainnet":"npx hardhat verify --network ethereum $CREATIFY_ADDRESS Creatify CRFTY '' $MARKETPLACE_ADDRESS",
+    "verify:marketplace:mainnet":"npx hardhat verify --network ethereum $MARKETPLACE_ADDRESS 30",
     "verify:maticmum": "npm run verify:creatify:maticmum && npm run verify:marketplace:maticmum",
     "verify:creatify:maticmum": "npx hardhat verify --network maticmum $CREATIFY_ADDRESS Creatify CRFTY '' $MARKETPLACE_ADDRESS",
     "verify:marketplace:maticmum": "npx hardhat verify --network maticmum $MARKETPLACE_ADDRESS 30"

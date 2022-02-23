@@ -26,9 +26,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 const ROPSTEN_RPC_URL = process.env.ROPSTEN_RPC_URL || "https://eth-ropsten.alchemyapi.io/v2/your-api-key"
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "https://eth-rinkeby.alchemyapi.io/v2/your-api-key"
 const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://rpc-mumbai.maticvigil.com"
+const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL
 const MNEMONIC = process.env.MNEMONIC || "mnemonic"
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "PolygonScan API key"
-// const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
 
 
 // You need to export an object to set up your config
@@ -72,13 +73,21 @@ module.exports = {
         mnemonic: MNEMONIC,
       },
     },
+    ethereum: {
+      //TODO
+      networkId: 80001,
+      url: ETHEREUM_RPC_URL,
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
+    }
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
     currency: "USD",
   },
   etherscan: {
-    apiKey: POLYGONSCAN_API_KEY,
+    apiKey: POLYGONSCAN_API_KEY || ETHERSCAN_API_KEY,
   },
   paths: {
     sources: "./contracts",
