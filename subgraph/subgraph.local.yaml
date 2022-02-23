@@ -8,6 +8,7 @@ dataSources:
     source:
       address: '0xe8865310f2219C5ae2F4AB7E6F8E052e81C32d25'
       abi: Creatify
+      startBlock: 19
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -33,6 +34,7 @@ dataSources:
     source:
       address: '0xc9D78517E340E1800c9d29844e86Da108F5119cb'
       abi: MarketPlace
+      startBlock: 19
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5

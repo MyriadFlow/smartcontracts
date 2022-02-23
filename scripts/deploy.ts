@@ -49,17 +49,22 @@ async function main() {
         await marketplace.createMarketItem(creatify.address, 1, 1)
         await marketplace.connect(buyer).createMarketSale(creatify.address, 1, { value: 1 })
         await creatify.revokeRole(await creatify.CREATIFY_CREATOR_ROLE(), await buyer.getAddress())
-        updateGraphAddres(creatify.address, marketplace.address, true)
+        updateGraphAddress(creatify.address, marketplace.address, marketplace.deployTransaction.blockNumber, true)
     } else {
-        updateGraphAddres(creatify.address, marketplace.address, false)
+        updateGraphAddress(creatify.address, marketplace.address, marketplace.deployTransaction.blockNumber, false)
     }
 }
 
-function updateGraphAddres(creatifyAddr: string, marketPlaceAddr: string, local: boolean) {
+function updateGraphAddress(creatifyAddr: string, marketPlaceAddr: string, startBlock: number | undefined, local: boolean) {
     const urlSubgraphLocal = local ? `subgraph/subgraph.local.yaml` : `subgraph/subgraph.yaml`
     const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
     umlSubgraphLocal.dataSources[0].source.address = creatifyAddr
     umlSubgraphLocal.dataSources[1].source.address = marketPlaceAddr
+
+    if (startBlock) {
+        umlSubgraphLocal.dataSources[0].source.startBlock = startBlock
+        umlSubgraphLocal.dataSources[1].source.startBlock = startBlock
+    }
     fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
 }
 // We recommend this pattern to be able to use async/await everywhere
