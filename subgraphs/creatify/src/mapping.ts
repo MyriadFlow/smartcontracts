@@ -12,7 +12,6 @@ import {
 export function handleTransfer(event: Transfer): void {
   let token = Token.load(event.params.tokenId.toString());
   if (token) {
-    token.creator = event.params.to.toHexString()
     token.createdAtTimestamp = event.block.timestamp
     token.owner = event.params.to.toHexString();
     token.save();
