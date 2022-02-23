@@ -26,4 +26,27 @@ dataSources:
           handler: handleRoleGranted
         - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
           handler: handleRoleRevoked
-      file: ./src/mapping.ts
+      file: ./src/creatify-mapping.ts
+  - kind: ethereum
+    name: MarketPlace
+    network: mumbai
+    source:
+      address: "0x8E3a69e094C72Aaca55191A91BAEbE9F800bD908"
+      abi: MarketPlace
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - MarketItem
+      abis:
+        - name: MarketPlace
+          file: ./abis/MarketPlace.json
+      eventHandlers:
+        - event: MarketItemCreated(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool)
+          handler: handleMarketItemCreated
+        - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
+          handler: handleMarketItemSold
+        - event: MarketItemRemoved(uint256)
+          handler: handleMarketItemRemoved
+      file: ./src/marketplace-mapping.ts

@@ -15,6 +15,7 @@ echo $MARKETPLACE_ADDRESS
 sleep 4
 npm run verify:mainnet
 
-cd subgraphs
-./deploy.sh
+cd subgraph
+npm run create:hosted
+npm run deploy:hosted
 cd -

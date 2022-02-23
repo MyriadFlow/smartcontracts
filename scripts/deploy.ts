@@ -49,25 +49,19 @@ async function main() {
         await marketplace.createMarketItem(creatify.address, 1, 1)
         await marketplace.connect(buyer).createMarketSale(creatify.address, 1, { value: 1 })
         await creatify.revokeRole(await creatify.CREATIFY_CREATOR_ROLE(), await buyer.getAddress())
-        const graphs: ["marketplace", "creatify"] = ["marketplace", "creatify"]
-        graphs.forEach(g => {
-            const urlSubgraphLocal = `subgraphs/${g}/subgraph.local.yaml`
-            const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
-            umlSubgraphLocal.dataSources[0].source.address = g == "marketplace" ? marketplace.address : creatify.address
-
-            fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
-        })
+        updateGraphAddres(creatify.address, marketplace.address, true)
     } else {
-        const graphs: ["marketplace", "creatify"] = ["marketplace", "creatify"]
-        graphs.forEach(g => {
-            const urlSubgraphLocal = `subgraphs/${g}/subgraph.yaml`
-            const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
-            umlSubgraphLocal.dataSources[0].source.address = g == "marketplace" ? marketplace.address : creatify.address
-            fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
-        })
+        updateGraphAddres(creatify.address, marketplace.address, false)
     }
 }
 
+function updateGraphAddres(creatifyAddr: string, marketPlaceAddr: string, local: boolean) {
+    const urlSubgraphLocal = local ? `subgraph/subgraph.local.yaml` : `subgraph/subgraph.yaml`
+    const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
+    umlSubgraphLocal.dataSources[0].source.address = creatifyAddr
+    umlSubgraphLocal.dataSources[1].source.address = marketPlaceAddr
+    fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
+}
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
 main()

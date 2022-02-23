@@ -258,6 +258,29 @@ export class MarketPlace extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
+  MARKETPLACE_ADMIN_ROLE(): Bytes {
+    let result = super.call(
+      "MARKETPLACE_ADMIN_ROLE",
+      "MARKETPLACE_ADMIN_ROLE():(bytes32)",
+      []
+    );
+
+    return result[0].toBytes();
+  }
+
+  try_MARKETPLACE_ADMIN_ROLE(): ethereum.CallResult<Bytes> {
+    let result = super.tryCall(
+      "MARKETPLACE_ADMIN_ROLE",
+      "MARKETPLACE_ADMIN_ROLE():(bytes32)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBytes());
+  }
+
   createMarketItem(
     nftContract: Address,
     tokenId: BigInt,

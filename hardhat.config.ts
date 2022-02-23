@@ -74,8 +74,7 @@ module.exports = {
       },
     },
     ethereum: {
-      //TODO
-      networkId: 80001,
+      networkId: 1,
       url: ETHEREUM_RPC_URL,
       accounts: {
         mnemonic: MNEMONIC,

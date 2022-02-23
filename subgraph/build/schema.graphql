@@ -1,3 +1,18 @@
+type Token @entity {
+  id: ID!
+  createdAtTimestamp: BigInt!
+  metaDataUri: String!
+  creator: User!
+  owner: User!
+}
+
+type User @entity {
+  id: ID!
+  tokens: [Token!]! @derivedFrom(field: "owner")
+  created: [Token!]! @derivedFrom(field: "creator")
+  roles: [String!]!
+}
+
 type MarketItem @entity {
   id: ID!
   itemId: BigInt! # uint256

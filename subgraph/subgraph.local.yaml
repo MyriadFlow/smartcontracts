@@ -1,0 +1,56 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: Creatify
+    network: mainnet
+    source:
+      address: '0xe8865310f2219C5ae2F4AB7E6F8E052e81C32d25'
+      abi: Creatify
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Token
+      abis:
+        - name: Creatify
+          file: ./abis/Creatify.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,indexed uint256)
+          handler: handleTransfer
+        - event: ArtifactCreated(uint256,indexed address,string)
+          handler: handleArtifactCreated
+        - event: RoleGranted(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleGranted
+        - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
+          handler: handleRoleRevoked
+      file: ./src/creatify-mapping.ts
+  - kind: ethereum
+    name: MarketPlace
+    network: mainnet
+    source:
+      address: '0xc9D78517E340E1800c9d29844e86Da108F5119cb'
+      abi: MarketPlace
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - MarketItem
+      abis:
+        - name: MarketPlace
+          file: ./abis/MarketPlace.json
+      eventHandlers:
+        - event: >-
+            MarketItemCreated(indexed uint256,indexed address,indexed
+            uint256,string,address,address,uint256,bool)
+          handler: handleMarketItemCreated
+        - event: >-
+            MarketItemSold(indexed uint256,indexed address,indexed
+            uint256,address,uint256)
+          handler: handleMarketItemSold
+        - event: MarketItemRemoved(uint256)
+          handler: handleMarketItemRemoved
+      file: ./src/marketplace-mapping.ts

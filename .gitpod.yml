@@ -4,8 +4,7 @@ image:
 tasks:
   - init: |
       npm install
-      cd subgraphs/creatify && yarn install && cd ../..
-      cd subgraphs/marketplace && yarn install && cd ../..
+      cd subgraph && yarn install && cd -
     command: gp sync-done depinit
   - name: Ethereum Node
     command: ganache-cli -h 0.0.0.0 -m "$MNEMONIC"
@@ -20,8 +19,7 @@ tasks:
       gp sync-await depinit
       gp sync-await graphnode
       gp await-port 8020
-      cd subgraphs/creatify && yarn create-local && cd -
-      cd subgraphs/marketplace && yarn create-local && cd -
+      cd subgraph && yarn create-local && cd -
       gp sync-done graphdeploy
   - name: Smart contract
     command: |

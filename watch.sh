@@ -1,8 +1,7 @@
 #!/bin/bash
 task () {
-	yarn deploy:local;
-	cd subgraphs/creatify && yarn deploy-local -l v0.0.1 && cd ../..
-	cd subgraphs/marketplace && yarn deploy-local -l v0.0.1 && cd ../..
+	ETHEREUM_RPC_URL="" yarn deploy:local;
+	cd subgraph && yarn deploy-local -l v0.0.1 && cd -
 }
 
 task
