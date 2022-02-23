@@ -84,3 +84,14 @@ where `MarketplaceArguments.js` & `CreatifyArguments.js` is a javascript module 
 > `https://mumbai.polygonscan.com/address/0xD3fb2d7Ad6A3af5930dDC41eE03b5D499786DCb5#code` > `https://mumbai.polygonscan.com/address/0x9171021F9Dcb5f4F5b7005683a86699e3fC2DCea#code`
 
 Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and interact with the smart contract at section `Read Contract` and `Write Contract`
+
+# Quick deployment
+
+Run
+
+```bash
+GRAPH_NODE_URL=https://xyz/ \
+GRAPH_DEPLOY_VERSION=vx.y.z \
+GRAPH_IPFS_URL=https://xyz/ \
+./deploy.sh
+```
