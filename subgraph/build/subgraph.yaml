@@ -6,9 +6,9 @@ dataSources:
     name: Creatify
     network: mainnet
     source:
-      address: "0xe8865310f2219C5ae2F4AB7E6F8E052e81C32d25"
+      address: "0x23c3F72F80F06D01216a874AFF16E004d05a4f28"
       abi: Creatify
-      startBlock: 19
+      startBlock: 1
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -32,9 +32,9 @@ dataSources:
     name: MarketPlace
     network: mainnet
     source:
-      address: "0xc9D78517E340E1800c9d29844e86Da108F5119cb"
+      address: "0x67a58a08Da8B385813FE1Ab35230F2A71a3bCC32"
       abi: MarketPlace
-      startBlock: 19
+      startBlock: 1
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
