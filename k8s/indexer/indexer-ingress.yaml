@@ -1,0 +1,53 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: indexer-graph
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    alb.ingress.kubernetes.io/group.name: lazarus-network-alb
+  labels:
+    name: indexer-graph
+spec:
+  tls:
+    - hosts:
+        - main.graph.lazarus.network
+      secretName: main.graph.lazarus.network-tls-secret
+    - hosts:
+        - ipfs.graph.lazarus.network
+      secretName: ipfs.graph.lazarus.network-tls-secret
+    - hosts:
+        - query.graph.lazarus.network
+      secretName: query.graph.lazarus.network-tls-secret
+  rules:
+    - host: main.graph.lazarus.network
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: graph-service
+                port:
+                  number: 8020
+
+    - host: ipfs.graph.lazarus.network
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: ipfs-service
+                port:
+                  number: 5001
+    - host: query.graph.lazarus.network
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: graph-service
+                port:
+                  number: 8000

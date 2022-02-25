@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ipfs-node
+  labels:
+    name: ipfs-node
+spec:
+  containers:
+    - name: ipfs-node
+      image: ipfs/go-ipfs:v0.4.23
+      resources:
+        limits:
+          memory: "328Mi"
+          cpu: "500m"
+      ports:
+        - containerPort: 5001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipfs-service
+spec:
+  type: NodePort
+  selector:
+    name: ipfs-node
+  ports:
+    - port: 5001
+      targetPort: 5001

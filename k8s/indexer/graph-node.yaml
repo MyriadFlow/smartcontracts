@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: graph-node
+  labels:
+    name: graph-node
+spec:
+  containers:
+    - name: graph-node
+      image: graphprotocol/graph-node
+      resources:
+        limits:
+          memory: "327Mi"
+          cpu: "200m"
+      ports:
+        - containerPort: 8000
+        - containerPort: 8001
+        - containerPort: 8020
+        - containerPort: 8030
+        - containerPort: 8040
+      env:
+        - name: "ipfs"
+          value: "ipfs-service:5001"
+        - name: "ethereum"
+          valueFrom:
+            secretKeyRef:
+              name: graph-secret
+              key: ethereum
+        - name: "GRAPH_LOG"
+          value: info
+        - name: "postgres_host"
+          value: postgres-graph-service
+        - name: "postgres_user"
+          value: graph-node
+        - name: "postgres_pass"
+          value: let-me-in
+        - name: "postgres_db"
+          value: graph-node
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graph-service
+spec:
+  type: NodePort
+  selector:
+    name: graph-node
+  ports:
+    - name: "rpc"
+      port: 8020
+      targetPort: 8020
+    - name: "http-query"
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: graph-postgres-app
+  labels:
+    name: graph-postgres-app
+spec:
+  containers:
+    - name: graph-postgres-app
+      image: postgres
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+      ports:
+        - containerPort: 5432
+      env:
+        - name: "POSTGRES_USER"
+          value: graph-node
+        - name: "POSTGRES_PASSWORD"
+          value: let-me-in
+        - name: "POSTGRES_DB"
+          value: graph-node
+      volumeMounts:
+        - mountPath: "/var/lib/postgresql/data"
+          name: postgres-pv-storage
+  volumes:
+    - name: postgres-pv-storage
+      persistentVolumeClaim:
+        claimName: indexer-postgres-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-graph-service
+spec:
+  selector:
+    name: graph-postgres-app
+  ports:
+    - port: 5432
+      targetPort: 5432
