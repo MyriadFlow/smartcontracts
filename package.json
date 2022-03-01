@@ -5,6 +5,7 @@
     "web3": "^1.7.0"
   },
   "scripts": {
+    "test":"hardhat test",
     "deploy:mainnet": "hardhat run scripts/deploy.ts --network ethereum",
     "deploy:maticmum": "hardhat run scripts/deploy.ts --network maticmum",
     "deploy:local": "hardhat run scripts/deploy.ts --network localhost",

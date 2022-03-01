@@ -10,10 +10,10 @@ describe("MarketPlace", function () {
         let MarketPlace = await marketPlaceFac.deploy(10)
         const creatifyFac = await ethers.getContractFactory("Creatify")
         let Creatify = await creatifyFac.deploy("Creatify", "creatify", "test", MarketPlace.address)
-        await Creatify.grantRole(await Creatify.OPERATOR_ROLE(), operator.address)
+        await Creatify.grantRole(await Creatify.CREATIFY_OPERATOR_ROLE(), operator.address)
         Creatify = Creatify.connect(operator)
 
-        await Creatify.grantRole(await Creatify.CREATOR_ROLE(), creator.address)
+        await Creatify.grantRole(await Creatify.CREATIFY_CREATOR_ROLE(), creator.address)
         Creatify = Creatify.connect(creator)
 
         await Creatify.createArtifact("testmetadatahashabc")
