@@ -61,10 +61,15 @@ describe("creatify contract", () => {
         expect(hasRole).to.be.true
 
     })
+    const metaDataHash = "ipfs://QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF"
 
     it("Should delegate artifact creation", async () => {
-        const metaDataHash = "ipfs://QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF"
-        await creatify.connect(operator).delegateArtifactCreation(creator2.address, metaDataHash)
+        expect(
+            await creatify.connect(operator).delegateArtifactCreation(creator2.address, metaDataHash)
+        )
+            .to.emit(creatify, "ArtifactCreated")
+            .withArgs(1, creator2.address, metaDataHash)
+
         const tokenURI = await creatify.tokenURI(1)
         expect(tokenURI).to.equal(metaDataHash)
     })
@@ -72,8 +77,18 @@ describe("creatify contract", () => {
     const salePrice = ethers.utils.parseUnits("1", "ether");
 
     it("Should create marketitem", async () => {
-        await creatify.connect(creator2).approve(marketplace.address, 1)
-        await marketplace.connect(creator2).createMarketItem(creatify.address, 1, salePrice);
+        expect(
+            await creatify.connect(creator2).approve(marketplace.address, 1)
+        )
+            .to.emit(creatify, "Approval")
+            .withArgs(creator2.address, marketplace.address, 1)
+
+        expect(
+            await marketplace.connect(creator2).createMarketItem(creatify.address, 1, salePrice)
+        )
+            .to.emit(marketplace, "MarketItemCreated")
+            .withArgs(1, creatify.address, 1, metaDataHash, creator2.address, "0x0000000000000000000000000000000000000000", salePrice, true)
+
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.itemId).to.equal(1)
         expect(marketItem.tokenId).to.equal(1)
@@ -86,13 +101,11 @@ describe("creatify contract", () => {
 
     it("Should be able to create market sale", async () => {
         await marketplace.connect(buyer).createMarketSale(creatify.address, 1, {
-            value: ethers.utils.parseUnits("1", "ether")
+            value: salePrice
         })
 
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.owner).to.equal(buyer.address)
         expect(marketItem.forSale).to.equal(false)
-        // expect(marketItem.deleted).to.equal(true)
-
     })
 })
