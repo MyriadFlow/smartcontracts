@@ -6,7 +6,7 @@ dataSources:
     name: Creatify
     network: mumbai
     source:
-      address: "0xA34D5022e7fa813F460eB9eF8E59c3386faCE489"
+      address: '0xA5024E93fbc9015fa60F0b72F531aD5f0e6d7e16'
       abi: Creatify
       startBlock: 25030899
     mapping:
@@ -32,7 +32,7 @@ dataSources:
     name: MarketPlace
     network: mumbai
     source:
-      address: "0x8E3a69e094C72Aaca55191A91BAEbE9F800bD908"
+      address: '0x899dEf33857C491Ce61346f6e95b3a5Ee4acd24a'
       abi: MarketPlace
       startBlock: 25030899
     mapping:
@@ -45,9 +45,13 @@ dataSources:
         - name: MarketPlace
           file: ./abis/MarketPlace.json
       eventHandlers:
-        - event: MarketItemCreated(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool)
+        - event: >-
+            MarketItemCreated(indexed uint256,indexed address,indexed
+            uint256,string,address,address,uint256,bool)
           handler: handleMarketItemCreated
-        - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
+        - event: >-
+            MarketItemSold(indexed uint256,indexed address,indexed
+            uint256,address,uint256)
           handler: handleMarketItemSold
         - event: MarketItemRemoved(uint256)
           handler: handleMarketItemRemoved

@@ -108,4 +108,11 @@ describe("creatify contract", () => {
         expect(marketItem.owner).to.equal(buyer.address)
         expect(marketItem.forSale).to.equal(false)
     })
+
+    it("Should not be able to create market sale if item is not for sale", async () => {
+        const marketplaceBuyer = await marketplace.connect(buyer)
+        await expect(marketplaceBuyer.createMarketSale(creatify.address, 91, {
+            value: salePrice
+        })).to.be.revertedWith("Marketplace: Market item is not for sale")
+    })
 })

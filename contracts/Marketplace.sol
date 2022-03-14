@@ -77,6 +77,16 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         );
         _;
     }
+
+    // Only when item is is for sale
+    modifier onlyWhenItemIsForSale(uint256 itemId){
+        require(
+            idToMarketItem[itemId].forSale == true,
+            "Marketplace: Market item is not for sale"
+        );
+        _;
+    }
+
     // Only seller should be able to perform action
     modifier onlySeller(uint256 itemId) {
         require(
@@ -149,6 +159,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         payable
         nonReentrant
         onlyWhenItemExist(itemId)
+        onlyWhenItemIsForSale(itemId)
     {
         uint256 price = idToMarketItem[itemId].price;
         uint256 tokenId = idToMarketItem[itemId].tokenId;

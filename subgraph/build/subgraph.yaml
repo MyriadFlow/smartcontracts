@@ -4,11 +4,11 @@ schema:
 dataSources:
   - kind: ethereum
     name: Creatify
-    network: mainnet
+    network: mumbai
     source:
-      address: "0x23c3F72F80F06D01216a874AFF16E004d05a4f28"
+      address: "0xA5024E93fbc9015fa60F0b72F531aD5f0e6d7e16"
       abi: Creatify
-      startBlock: 1
+      startBlock: 25030899
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -30,11 +30,11 @@ dataSources:
       file: Creatify/Creatify.wasm
   - kind: ethereum
     name: MarketPlace
-    network: mainnet
+    network: mumbai
     source:
-      address: "0x67a58a08Da8B385813FE1Ab35230F2A71a3bCC32"
+      address: "0x899dEf33857C491Ce61346f6e95b3a5Ee4acd24a"
       abi: MarketPlace
-      startBlock: 1
+      startBlock: 25030899
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
