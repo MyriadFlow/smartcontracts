@@ -109,9 +109,28 @@ describe("creatify contract", () => {
         expect(marketItem.forSale).to.equal(false)
     })
 
+    it("Should be able to delete market item", async () => {
+        // Create artifact
+        await creatify.connect(creator).createArtifact("ipfs://QmTiQKxZoVMvDahqVUzvkJhAjF9C1MzytpDEocxUT3oBde")
+        marketplace = marketplace.connect(creator)
+
+        // Create Market Item
+        await marketplace.createMarketItem(creatify.address.toString(), 2, 1)
+
+        // Remove that item market item and expect it to emit MarketItemRemoved and Transfer
+        expect(await marketplace.removeFromSale(2))
+            .to.emit(marketplace, "MarketItemRemoved").withArgs(2)
+            .and
+            .to.emit(creatify, "Transfer").withArgs(marketplace.address, creator.address, 2)
+
+        // Get that market item and expect it to be soft deleted
+        const res = await marketplace.idToMarketItem(2)
+        expect(res.deleted).to.true
+    })
+
     it("Should not be able to create market sale if item is not for sale", async () => {
         const marketplaceBuyer = await marketplace.connect(buyer)
-        await expect(marketplaceBuyer.createMarketSale(creatify.address, 91, {
+        await expect(marketplaceBuyer.createMarketSale(creatify.address, 1, {
             value: salePrice
         })).to.be.revertedWith("Marketplace: Market item is not for sale")
     })
