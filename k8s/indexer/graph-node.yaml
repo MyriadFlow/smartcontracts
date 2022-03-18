@@ -1,41 +1,47 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: graph-node
-  labels:
-    name: graph-node
 spec:
-  containers:
-    - name: graph-node
-      image: graphprotocol/graph-node
-      resources:
-        limits:
-          memory: "327Mi"
-          cpu: "200m"
-      ports:
-        - containerPort: 8000
-        - containerPort: 8001
-        - containerPort: 8020
-        - containerPort: 8030
-        - containerPort: 8040
-      env:
-        - name: "ipfs"
-          value: "ipfs-service:5001"
-        - name: "ethereum"
-          valueFrom:
-            secretKeyRef:
-              name: graph-secret
-              key: ethereum
-        - name: "GRAPH_LOG"
-          value: info
-        - name: "postgres_host"
-          value: postgres-graph-service
-        - name: "postgres_user"
-          value: graph-node
-        - name: "postgres_pass"
-          value: let-me-in
-        - name: "postgres_db"
-          value: graph-node
+  selector:
+    matchLabels:
+      name: graph-node
+  template:
+    metadata:
+      labels:
+        name: graph-node
+    spec:
+      containers:
+      - name: graph-node
+        image: graphprotocol/graph-node
+        resources:
+          limits:
+            memory: "327Mi"
+            cpu: "200m"
+        ports:
+          - containerPort: 8000
+          - containerPort: 8001
+          - containerPort: 8020
+          - containerPort: 8030
+          - containerPort: 8040
+        env:
+          - name: "ipfs"
+            value: "ipfs-service:5001"
+          - name: "ethereum"
+            valueFrom:
+              secretKeyRef:
+                name: graph-secret
+                key: ethereum
+          - name: "GRAPH_LOG"
+            value: info
+          - name: "postgres_host"
+            value: postgres-graph-service
+          - name: "postgres_user"
+            value: graph-node
+          - name: "postgres_pass"
+            value: let-me-in
+          - name: "postgres_db"
+            value: graph-node
 ---
 apiVersion: v1
 kind: Service
@@ -65,8 +71,8 @@ spec:
       image: postgres
       resources:
         limits:
-          memory: "128Mi"
-          cpu: "100m"
+          memory: "328Mi"
+          cpu: "140m"
       ports:
         - containerPort: 5432
       env:
