@@ -29,6 +29,7 @@ export function handleMarketItemSold(event: MarketItemSold): void {
   if (!marketItem) {
     marketItem = new MarketItem(event.params.itemId.toString());
   }
+  marketItem.owner = event.params.buyer;
   marketItem.sold = true;
   marketItem.save()
 }
@@ -37,6 +38,7 @@ export function handleMarketItemRemoved(event: MarketItemRemoved): void {
   let marketItem = MarketItem.load(event.params.itemId.toString())
   if (marketItem) {
     marketItem.deleted = true
+    marketItem.owner = marketItem.seller;
     marketItem.save()
   }
 }
