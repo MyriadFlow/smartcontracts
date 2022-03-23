@@ -14,6 +14,13 @@ spec:
           cpu: "500m"
       ports:
         - containerPort: 5001
+      volumeMounts:
+        - mountPath: "/data/ipfs"
+          name: ipfs-pv-storage
+  volumes:
+    - name: ipfs-pv-storage
+      persistentVolumeClaim:
+        claimName: indexer-ipfs-pv-claim
 ---
 apiVersion: v1
 kind: Service
