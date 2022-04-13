@@ -3,9 +3,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: indexer-ipfs-pv-claim
 spec:
-  storageClassName: manual
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 2Gi
+      storage: 20Gi
