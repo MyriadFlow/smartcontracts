@@ -88,9 +88,10 @@ spec:
               value: let-me-in
             - name: "POSTGRES_DB"
               value: graph-node
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           volumeMounts:
-            - mountPath: "/var/lib/postgresql/"
-              subPath: "data"
+            - mountPath: "/var/lib/postgresql/data"
               name: postgres-pv-storage
       volumes:
         - name: postgres-pv-storage
