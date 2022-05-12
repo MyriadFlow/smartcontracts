@@ -27,7 +27,7 @@ async function main() {
     const txReceipt = await hre.ethers.provider.waitForTransaction(txHash);
     console.log("Confirming Marketplace Address:", txReceipt.contractAddress);
     const Creatify = await hre.ethers.getContractFactory("Creatify");
-    const creatify = await Creatify.deploy("Creatify", "CRFTY", "", txReceipt.contractAddress);
+    const creatify = await Creatify.deploy("Creatify", "CRFTY", txReceipt.contractAddress);
     await creatify.deployed();
     console.log("Creatify Deployed to:", creatify.address);
 
