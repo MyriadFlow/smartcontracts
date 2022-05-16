@@ -7,5 +7,6 @@ COPY package.json .
 COPY yarn.lock .
 
 RUN apk add git && yarn --frozen-lockfile && apk del git
+RUN apk add yq
 COPY . .
-CMD yarn create:hosted && yarn deploy:hosted 
+CMD ./deploy.sh
