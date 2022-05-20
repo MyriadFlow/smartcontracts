@@ -17,7 +17,7 @@ spec:
           resources:
             limits:
               memory: "327Mi"
-              cpu: "200m"
+              cpu: "400m"
           ports:
             - containerPort: 8000
             - containerPort: 8001
@@ -74,7 +74,8 @@ spec:
     spec:
       containers:
         - name: graph-postgres
-          image: postgres
+          image: postgres:14
+          args: ["-cshared_preload_libraries=pg_stat_statements"]
           resources:
             limits:
               memory: "328Mi"
