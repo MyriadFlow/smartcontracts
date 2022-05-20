@@ -22,7 +22,7 @@ describe("creatify contract", () => {
         marketplace = await marketplaceFactory.deploy(300)
 
         let creatifyFactory = await ethers.getContractFactory("Creatify")
-        creatify = await creatifyFactory.deploy(metadata.name, metadata.symbol, metadata.baseTokenURI, marketplace.address)
+        creatify = await creatifyFactory.deploy(metadata.name, metadata.symbol, marketplace.address)
     })
     it("Should return the right name and symbol of the token once Creatify is deployed", async () => {
         expect(await creatify.name()).to.equal(metadata.name)

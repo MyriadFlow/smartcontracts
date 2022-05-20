@@ -45,8 +45,6 @@ contract Creatify is
 
     Counters.Counter private _tokenIdTracker;
 
-    string private _baseTokenURI;
-
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
@@ -70,10 +68,8 @@ contract Creatify is
     constructor(
         string memory name,
         string memory symbol,
-        string memory baseTokenURI,
         address marketplaceAddress
     ) ERC721(name, symbol) {
-        _baseTokenURI = baseTokenURI;
 
         _setupRole(CREATIFY_ADMIN_ROLE, _msgSender());
 
@@ -83,10 +79,6 @@ contract Creatify is
         _setRoleAdmin(CREATIFY_CREATOR_ROLE, CREATIFY_OPERATOR_ROLE);
         _setRoleAdmin(CREATIFY_OPERATOR_ROLE, CREATIFY_ADMIN_ROLE);
 
-    }
-
-    function _baseURI() internal view virtual override returns (string memory) {
-        return _baseTokenURI;
     }
 
     /**
@@ -163,20 +155,9 @@ contract Creatify is
         returns (string memory)
     {
         require(_exists(tokenId), "Creatify: Non-Existent Artifact");
-
         string memory _tokenURI = _tokenURIs[tokenId];
-        string memory base = _baseURI();
 
-        // If there is no base URI, return the token URI.
-        if (bytes(base).length == 0) {
-            return _tokenURI;
-        }
-        // If both are set, concatenate the baseURI and tokenURI (via abi.encodePacked).
-        if (bytes(_tokenURI).length > 0) {
-            return string(abi.encodePacked(base, _tokenURI));
-        }
-
-        return super.tokenURI(tokenId);
+        return _tokenURI;       
     }
 
     /**

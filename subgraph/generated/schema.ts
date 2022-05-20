@@ -83,6 +83,15 @@ export class Token extends Entity {
   set owner(value: string) {
     this.set("owner", Value.fromString(value));
   }
+
+  get marketItems(): Array<string> {
+    let value = this.get("marketItems");
+    return value!.toStringArray();
+  }
+
+  set marketItems(value: Array<string>) {
+    this.set("marketItems", Value.fromStringArray(value));
+  }
 }
 
 export class User extends Entity {
@@ -157,7 +166,7 @@ export class MarketItem extends Entity {
     this.set("owner", Value.fromBytes(Bytes.empty()));
     this.set("price", Value.fromBigInt(BigInt.zero()));
     this.set("seller", Value.fromBytes(Bytes.empty()));
-    this.set("tokenId", Value.fromBigInt(BigInt.zero()));
+    this.set("token", Value.fromString(""));
     this.set("forSale", Value.fromBoolean(false));
     this.set("createdAtTimestamp", Value.fromBigInt(BigInt.zero()));
     this.set("metaDataUri", Value.fromString(""));
@@ -236,13 +245,13 @@ export class MarketItem extends Entity {
     this.set("seller", Value.fromBytes(value));
   }
 
-  get tokenId(): BigInt {
-    let value = this.get("tokenId");
-    return value!.toBigInt();
+  get token(): string {
+    let value = this.get("token");
+    return value!.toString();
   }
 
-  set tokenId(value: BigInt) {
-    this.set("tokenId", Value.fromBigInt(value));
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
   }
 
   get forSale(): boolean {

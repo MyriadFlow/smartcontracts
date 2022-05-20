@@ -4,6 +4,7 @@ type Token @entity {
   metaDataUri: String!
   creator: User!
   owner: User!
+  marketItems: [MarketItem!]! @derivedFrom(field: "token")
 }
 
 type User @entity {
@@ -20,7 +21,7 @@ type MarketItem @entity {
   owner: Bytes!
   price: BigInt!
   seller: Bytes!
-  tokenId: BigInt!
+  token: Token!
   forSale: Boolean!
   createdAtTimestamp: BigInt!
   metaDataUri: String!
