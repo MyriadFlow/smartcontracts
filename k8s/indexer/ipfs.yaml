@@ -1,26 +1,32 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: ipfs-node
-  labels:
-    name: ipfs-node
 spec:
-  containers:
-    - name: ipfs-node
-      image: ipfs/go-ipfs:v0.4.23
-      resources:
-        limits:
-          memory: "328Mi"
-          cpu: "500m"
-      ports:
-        - containerPort: 5001
-      volumeMounts:
-        - mountPath: "/data/ipfs"
-          name: ipfs-pv-storage
-  volumes:
-    - name: ipfs-pv-storage
-      persistentVolumeClaim:
-        claimName: indexer-ipfs-pv-claim
+  selector:
+    matchLabels:
+      name: ipfs-node
+  template:
+    metadata:
+      labels:
+        name: ipfs-node
+    spec:
+      containers:
+        - name: ipfs-node
+          image: ipfs/go-ipfs:v0.4.23
+          resources:
+            limits:
+              memory: "328Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5001
+          volumeMounts:
+            - mountPath: "/data/ipfs"
+              name: ipfs-pv-storage
+      volumes:
+        - name: ipfs-pv-storage
+          persistentVolumeClaim:
+            claimName: indexer-ipfs-pv-claim
 ---
 apiVersion: v1
 kind: Service
