@@ -34,14 +34,27 @@ spec:
                   key: ethereum
             - name: "GRAPH_LOG"
               value: info
+
             - name: "postgres_host"
-              value: postgres-graph-service
+              valueFrom:
+                secretKeyRef:
+                  name: graph-secret
+                  key: postgres_host
             - name: "postgres_user"
-              value: graph-node
+              valueFrom:
+                secretKeyRef:
+                  name: graph-secret
+                  key: postgres_user
             - name: "postgres_pass"
-              value: let-me-in
+              valueFrom:
+                secretKeyRef:
+                  name: graph-secret
+                  key: postgres_pass
             - name: "postgres_db"
-              value: graph-node
+              valueFrom:
+                secretKeyRef:
+                  name: graph-secret
+                  key: postgres_db
 ---
 apiVersion: v1
 kind: Service
@@ -58,54 +71,3 @@ spec:
     - name: "http-query"
       port: 8000
       targetPort: 8000
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: graph-postgres
-spec:
-  selector:
-    matchLabels:
-      app: graph-postgres
-  template:
-    metadata:
-      labels:
-        app: graph-postgres
-    spec:
-      containers:
-        - name: graph-postgres
-          image: postgres:14
-          args: ["-cshared_preload_libraries=pg_stat_statements"]
-          resources:
-            limits:
-              memory: "328Mi"
-              cpu: "500m"
-          ports:
-            - containerPort: 5432
-          env:
-            - name: "POSTGRES_USER"
-              value: graph-node
-            - name: "POSTGRES_PASSWORD"
-              value: let-me-in
-            - name: "POSTGRES_DB"
-              value: graph-node
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
-          volumeMounts:
-            - mountPath: "/var/lib/postgresql/data"
-              name: postgres-pv-storage
-      volumes:
-        - name: postgres-pv-storage
-          persistentVolumeClaim:
-            claimName: indexer-postgres-pv-claim
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postgres-graph-service
-spec:
-  selector:
-    app: graph-postgres
-  ports:
-    - port: 5432
-      targetPort: 5432
