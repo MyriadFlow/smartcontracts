@@ -5,6 +5,6 @@ task () {
 }
 
 task
-while inotifywait -e modify ./contracts; do
+while inotifywait -e modify ./contracts ./scripts ./subgraph; do
 	task
 done
