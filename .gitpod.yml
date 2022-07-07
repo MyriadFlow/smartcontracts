@@ -1,6 +1,12 @@
 ---
 image:
   file: .gitpod.Dockerfile
+ports:
+  - name: Graph query
+    port: 8000
+    visibility: private
+    onOpen: open-browser
+
 tasks:
   - init: |
       npm install
