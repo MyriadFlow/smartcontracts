@@ -5,6 +5,7 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph auth --product hosted-service $GRAPH_TOKEN && graph deploy --node https://api.thegraph.com/deploy/ thisisommore/myriad-flow",
+    "remove:hosted": "graph remove --node $GRAPH_NODE_URL MyriadFlow",
     "create:hosted": "graph create --node $GRAPH_NODE_URL MyriadFlow",
     "deploy:hosted": "graph deploy --node $GRAPH_NODE_URL --ipfs $GRAPH_IPFS_URL -l $GRAPH_DEPLOY_VERSION MyriadFlow",
     "create-local": "graph create --node http://localhost:8020/ TheLazarusNetwork/MyriadFlow",
