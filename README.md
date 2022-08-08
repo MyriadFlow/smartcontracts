@@ -65,9 +65,9 @@ Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we 
 npx hardhat run --network maticmum scripts/deploy.js
 ```
 
-> `Marketplace Deployed to: 0x899dEf33857C491Ce61346f6e95b3a5Ee4acd24a`
+> `Marketplace Deployed to: 0x16225998d1A6C0826DE1Ba8070B76762E2aCc452`
 
-> `Creatify Deployed to: 0xA5024E93fbc9015fa60F0b72F531aD5f0e6d7e16`
+> `Creatify Deployed to: 0xEAdb190d193B545B74139fD5dc2dDF5CEEAbac00`
 
 ## Etherscan verification
 
@@ -81,7 +81,9 @@ npx hardhat verify --network maticmum --constructor-args CreatifyArguments.js DE
 
 where `MarketplaceArguments.js` & `CreatifyArguments.js` is a javascript module that exports the argument list.
 
-> `https://mumbai.polygonscan.com/address/0xD3fb2d7Ad6A3af5930dDC41eE03b5D499786DCb5#code` > `https://mumbai.polygonscan.com/address/0x9171021F9Dcb5f4F5b7005683a86699e3fC2DCea#code`
+[Creatify contract](https://mumbai.polygonscan.com/address/0xEAdb190d193B545B74139fD5dc2dDF5CEEAbac00#code)
+
+[Marketplace contract](https://mumbai.polygonscan.com/address/0x16225998d1A6C0826DE1Ba8070B76762E2aCc452#code)
 
 Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and interact with the smart contract at section `Read Contract` and `Write Contract`
 
