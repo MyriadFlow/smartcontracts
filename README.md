@@ -65,6 +65,8 @@ Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we 
 npx hardhat run --network maticmum scripts/deploy.js
 ```
 
+## Contract deployments
+
 > `Marketplace Deployed to: 0x16225998d1A6C0826DE1Ba8070B76762E2aCc452`
 
 > `Creatify Deployed to: 0xEAdb190d193B545B74139fD5dc2dDF5CEEAbac00`
