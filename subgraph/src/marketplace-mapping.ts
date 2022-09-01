@@ -21,6 +21,7 @@ export function handleMarketItemCreated(event: MarketItemCreated): void {
     marketItem.seller = event.params.seller
     marketItem.token = event.params.tokenId.toString()
     marketItem.forSale = event.params.forSale
+    marketItem.sold = false
     marketItem.price = event.params.price
     marketItem.metaDataUri = event.params.metaDataURI
     marketItem.deleted = false
