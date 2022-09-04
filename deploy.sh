@@ -1,6 +1,7 @@
 #!/bin/sh
 export script=true
-res=$(npm run deploy:mainnet)
+export NETWORK=mainnet
+res=$(npm run deploy)
 
 CREATIFY_ADDRESS=$(echo -e "$res" | tail -1)
 MARKETPLACE_ADDRESS=$(echo -e "$res" | tail -2 | head -1)
@@ -13,7 +14,7 @@ echo "marketplace address is"
 echo $MARKETPLACE_ADDRESS
 
 sleep 4
-npm run verify:mainnet
+npm run verify
 
 cd subgraph
 npm run create:hosted

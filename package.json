@@ -6,15 +6,10 @@
   },
   "scripts": {
     "test": "hardhat test",
-    "deploy:mainnet": "hardhat run scripts/deploy.ts --network ethereum",
-    "deploy:maticmum": "hardhat run scripts/deploy.ts --network maticmum",
-    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
-    "verify:mainnet": "npm run verify:creatify:mainnet && npm run verify:marketplace:mainnet",
-    "verify:creatify:mainnet": "npx hardhat verify --network ethereum $CREATIFY_ADDRESS Creatify CRFTY $MARKETPLACE_ADDRESS",
-    "verify:marketplace:mainnet": "npx hardhat verify --network ethereum $MARKETPLACE_ADDRESS 30",
-    "verify:maticmum": "npm run verify:creatify:maticmum && npm run verify:marketplace:maticmum",
-    "verify:creatify:maticmum": "npx hardhat verify --network maticmum $CREATIFY_ADDRESS Creatify CRFTY $MARKETPLACE_ADDRESS",
-    "verify:marketplace:maticmum": "npx hardhat verify --network maticmum $MARKETPLACE_ADDRESS 30"
+    "deploy": "hardhat run scripts/deploy.ts --network $NETWORK",
+    "verify": "npm run verify:creatify && npm run verify:marketplace",
+    "verify:creatify": "npx hardhat verify --network $NETWORK $CREATIFY_ADDRESS Creatify CRFTY $MARKETPLACE_ADDRESS",
+    "verify:marketplace": "npx hardhat verify --network $NETWORK $MARKETPLACE_ADDRESS 30"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
