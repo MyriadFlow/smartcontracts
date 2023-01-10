@@ -73,25 +73,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "RoyaltiesV2Impl",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.RoyaltiesV2Impl__factory>;
-    getContractFactory(
-      name: "LibPart",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.LibPart__factory>;
-    getContractFactory(
-      name: "RoyaltiesV2",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.RoyaltiesV2__factory>;
-    getContractFactory(
-      name: "Creatify",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Creatify__factory>;
-    getContractFactory(
       name: "Marketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Marketplace__factory>;
+    getContractFactory(
+      name: "StoreFront",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.StoreFront__factory>;
 
     getContractAt(
       name: "AccessControl",
@@ -169,30 +157,15 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "RoyaltiesV2Impl",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.RoyaltiesV2Impl>;
-    getContractAt(
-      name: "LibPart",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.LibPart>;
-    getContractAt(
-      name: "RoyaltiesV2",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.RoyaltiesV2>;
-    getContractAt(
-      name: "Creatify",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Creatify>;
-    getContractAt(
       name: "Marketplace",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Marketplace>;
+    getContractAt(
+      name: "StoreFront",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.StoreFront>;
 
     // default types
     getContractFactory(

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.9;
+pragma solidity 0.8.15;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -17,8 +17,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     address public payoutAddress;
     uint96 public platformFeeBasisPoint;
 
-    bytes32 public constant MARKETPLACE_ADMIN_ROLE =
-        keccak256("MARKETPLACE_ADMIN_ROLE");
+    bytes32 public constant MARKETPLACE_ADMIN_ROLE = keccak256("MARKETPLACE_ADMIN_ROLE");
 
     constructor(uint96 _platformFee) {
         _setupRole(MARKETPLACE_ADMIN_ROLE, _msgSender());

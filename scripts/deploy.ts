@@ -26,10 +26,10 @@ async function main() {
     console.log(`Tx hash: ${txHash}\nWaiting for transaction to be mined...`);
     const txReceipt = await hre.ethers.provider.waitForTransaction(txHash);
     console.log("Confirming Marketplace Address:", txReceipt.contractAddress);
-    const Creatify = await hre.ethers.getContractFactory("Creatify");
-    const creatify = await Creatify.deploy("Creatify", "CRFTY", txReceipt.contractAddress);
-    await creatify.deployed();
-    console.log("Creatify Deployed to:", creatify.address);
+    const StoreFront = await hre.ethers.getContractFactory("StoreFront");
+    const storefront = await StoreFront.deploy("StoreFront V1", "SFv1", txReceipt.contractAddress);
+    await storefront.deployed();
+    console.log("StoreFront Deployed to:", storefront.address);
 
     if (process.env.script == "true") {
         //Print for processing in deployment script
@@ -37,28 +37,28 @@ async function main() {
         //Marketplace address 
         console.log(marketplace.address);
 
-        //Creatify address 
-        console.log(creatify.address);
+        //StoreFront address 
+        console.log(storefront.address);
     }
 
     if (hre.network.name == "localhost") {
-        await creatify.grantRole(await creatify.CREATIFY_OPERATOR_ROLE(), await creatify.signer.getAddress())
-        await creatify.grantRole(await creatify.CREATIFY_CREATOR_ROLE(), await creatify.signer.getAddress())
-        await creatify.grantRole(await creatify.CREATIFY_CREATOR_ROLE(), await buyer.getAddress())
-        await creatify.createArtifact("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF")
-        await marketplace.createMarketItem(creatify.address, 1, 1)
-        await marketplace.connect(buyer).createMarketSale(creatify.address, 1, { value: 1 })
-        await creatify.revokeRole(await creatify.CREATIFY_CREATOR_ROLE(), await buyer.getAddress())
-        updateGraphAddress(creatify.address, marketplace.address, marketplace.deployTransaction.blockNumber, true)
+        await storefront.grantRole(await storefront.STOREFRONT_OPERATOR_ROLE(), await storefront.signer.getAddress())
+        await storefront.grantRole(await storefront.STOREFRONT_CREATOR_ROLE(), await storefront.signer.getAddress())
+        await storefront.grantRole(await storefront.STOREFRONT_CREATOR_ROLE(), await buyer.getAddress())
+        await storefront.createAsset("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF")
+        await marketplace.createMarketItem(storefront.address, 1, 1)
+        await marketplace.connect(buyer).createMarketSale(storefront.address, 1, { value: 1 })
+        await storefront.revokeRole(await storefront.STOREFRONT_CREATOR_ROLE(), await buyer.getAddress())
+        updateGraphAddress(storefront.address, marketplace.address, marketplace.deployTransaction.blockNumber, true)
     } else {
-        updateGraphAddress(creatify.address, marketplace.address, marketplace.deployTransaction.blockNumber, false)
+        updateGraphAddress(storefront.address, marketplace.address, marketplace.deployTransaction.blockNumber, false)
     }
 }
 
-function updateGraphAddress(creatifyAddr: string, marketPlaceAddr: string, startBlock: number | undefined, local: boolean) {
+function updateGraphAddress(storefrontAddr: string, marketPlaceAddr: string, startBlock: number | undefined, local: boolean) {
     const urlSubgraphLocal = local ? `subgraph/subgraph.local.yaml` : `subgraph/subgraph.yaml`
     const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
-    umlSubgraphLocal.dataSources[0].source.address = creatifyAddr
+    umlSubgraphLocal.dataSources[0].source.address = storefrontAddr
     umlSubgraphLocal.dataSources[1].source.address = marketPlaceAddr
 
     if (startBlock) {

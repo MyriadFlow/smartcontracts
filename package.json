@@ -1,14 +1,15 @@
 {
   "dependencies": {
-    "@openzeppelin/contracts": "^4.4.2",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@openzeppelin/contracts": "^4.8.0",
     "js-yaml": "^4.1.0",
     "web3": "^1.7.0"
   },
   "scripts": {
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.ts --network $NETWORK",
-    "verify": "npm run verify:creatify && npm run verify:marketplace",
-    "verify:creatify": "npx hardhat verify --network $NETWORK $CREATIFY_ADDRESS Creatify CRFTY $MARKETPLACE_ADDRESS",
+    "verify": "npm run verify:storefront && npm run verify:marketplace",
+    "verify:storefront": "npx hardhat verify --network $NETWORK $STOREFRONT_ADDRESS 'StoreFront V1' SFv1 $MARKETPLACE_ADDRESS",
     "verify:marketplace": "npx hardhat verify --network $NETWORK $MARKETPLACE_ADDRESS 30"
   },
   "devDependencies": {

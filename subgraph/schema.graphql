@@ -1,30 +1,64 @@
-type Token @entity {
-  id: ID!
-  createdAtTimestamp: BigInt!
-  metaDataUri: String!
-  creator: User!
-  owner: User!
-  marketItems: [MarketItem!]! @derivedFrom(field: "token")
-}
-
-type User @entity {
-  id: ID!
-  tokens: [Token!]! @derivedFrom(field: "owner")
-  created: [Token!]! @derivedFrom(field: "creator")
-  roles: [String!]!
-}
-
-type MarketItem @entity {
-  id: ID!
+type MarketItemCreated @entity(immutable: true) {
+  id: Bytes!
   itemId: BigInt! # uint256
   nftContract: Bytes! # address
-  owner: Bytes!
-  price: BigInt!
-  seller: Bytes!
-  token: Token!
-  forSale: Boolean!
-  createdAtTimestamp: BigInt!
-  metaDataUri: String!
-  sold: Boolean!
-  deleted: Boolean!
+  tokenId: BigInt! # uint256
+  metaDataURI: String! # string
+  seller: Bytes! # address
+  owner: Bytes! # address
+  price: BigInt! # uint256
+  forSale: Boolean! # bool
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MarketItemRemoved @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type MarketItemSold @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  buyer: Bytes! # address
+  price: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleAdminChanged @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  previousAdminRole: Bytes! # bytes32
+  newAdminRole: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleGranted @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleRevoked @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }

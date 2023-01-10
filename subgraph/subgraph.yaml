@@ -1,58 +1,38 @@
-specVersion: 0.0.2
+specVersion: 0.0.5
 schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: Creatify
+    name: Marketplace
     network: mumbai
     source:
-      address: '0xEAdb190d193B545B74139fD5dc2dDF5CEEAbac00'
-      abi: Creatify
-      startBlock: 27529928
+      address: "0x22981fbfC0d1AFeaBB43Dfe44c7B03e7A32a2203"
+      abi: Marketplace
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.5
+      apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Token
+        - MarketItemCreated
+        - MarketItemRemoved
+        - MarketItemSold
+        - RoleAdminChanged
+        - RoleGranted
+        - RoleRevoked
       abis:
-        - name: Creatify
-          file: ./abis/Creatify.json
+        - name: Marketplace
+          file: ./abis/Marketplace.json
       eventHandlers:
-        - event: Transfer(indexed address,indexed address,indexed uint256)
-          handler: handleTransfer
-        - event: ArtifactCreated(uint256,indexed address,string)
-          handler: handleArtifactCreated
+        - event: MarketItemCreated(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool)
+          handler: handleMarketItemCreated
+        - event: MarketItemRemoved(uint256)
+          handler: handleMarketItemRemoved
+        - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
+          handler: handleMarketItemSold
+        - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
+          handler: handleRoleAdminChanged
         - event: RoleGranted(indexed bytes32,indexed address,indexed address)
           handler: handleRoleGranted
         - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
           handler: handleRoleRevoked
-      file: ./src/creatify-mapping.ts
-  - kind: ethereum
-    name: MarketPlace
-    network: mumbai
-    source:
-      address: '0x16225998d1A6C0826DE1Ba8070B76762E2aCc452'
-      abi: MarketPlace
-      startBlock: 27529928
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - MarketItem
-      abis:
-        - name: MarketPlace
-          file: ./abis/MarketPlace.json
-      eventHandlers:
-        - event: >-
-            MarketItemCreated(indexed uint256,indexed address,indexed
-            uint256,string,address,address,uint256,bool)
-          handler: handleMarketItemCreated
-        - event: >-
-            MarketItemSold(indexed uint256,indexed address,indexed
-            uint256,address,uint256)
-          handler: handleMarketItemSold
-        - event: MarketItemRemoved(uint256)
-          handler: handleMarketItemRemoved
-      file: ./src/marketplace-mapping.ts
+      file: ./src/marketplace.ts
