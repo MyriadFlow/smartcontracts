@@ -24,7 +24,8 @@ dataSources:
         - name: Marketplace
           file: ./abis/Marketplace.json
       eventHandlers:
-        - event: MarketItemCreated(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool)
+        - event: MarketItemCreated(indexed uint256,indexed address,indexed
+            uint256,string,address,address,uint256,bool)
           handler: handleMarketItemCreated
         - event: MarketItemRemoved(uint256)
           handler: handleMarketItemRemoved

@@ -1,6 +1,6 @@
 specVersion: 0.0.5
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum
     name: Marketplace
@@ -22,9 +22,10 @@ dataSources:
         - RoleRevoked
       abis:
         - name: Marketplace
-          file: ./abis/Marketplace.json
+          file: Marketplace/abis/Marketplace.json
       eventHandlers:
-        - event: MarketItemCreated(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool)
+        - event: MarketItemCreated(indexed uint256,indexed address,indexed
+            uint256,string,address,address,uint256,bool)
           handler: handleMarketItemCreated
         - event: MarketItemRemoved(uint256)
           handler: handleMarketItemRemoved
@@ -36,7 +37,7 @@ dataSources:
           handler: handleRoleGranted
         - event: RoleRevoked(indexed bytes32,indexed address,indexed address)
           handler: handleRoleRevoked
-      file: ./src/marketplace.ts
+      file: Marketplace/Marketplace.wasm
   - kind: ethereum
     name: StoreFront
     network: mumbai
@@ -60,7 +61,7 @@ dataSources:
         - Unpaused
       abis:
         - name: StoreFront
-          file: ./abis/StoreFront.json
+          file: StoreFront/abis/StoreFront.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,indexed uint256)
           handler: handleApproval
@@ -80,4 +81,4 @@ dataSources:
           handler: handleTransfer
         - event: Unpaused(address)
           handler: handleUnpaused
-      file: ./src/store-front.ts
+      file: StoreFront/StoreFront.wasm

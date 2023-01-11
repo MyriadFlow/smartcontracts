@@ -2,6 +2,9 @@
   "mumbai": {
     "Marketplace": {
       "address": "0x22981fbfC0d1AFeaBB43Dfe44c7B03e7A32a2203"
+    },
+    "StoreFront": {
+      "address": "0x013EFF13a04b7882eAd886D78F4FdB9D02502300"
     }
   }
 }

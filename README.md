@@ -93,8 +93,17 @@ Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and
 
 ```bash
 graph init --index-events
-
+graph codegen && graph build
+graph auth --product hosted-service $GRAPH_TOKEN
+graph deploy --product hosted-service myriadflow/storefront-v1
 ```
+
+Build completed: QmXw7vd5aRHAjFJGr4bV1SNMAct4YgY4YDoGjBq177BVmR
+
+Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1
+
+Subgraph endpoints:
+Queries (HTTP):     https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v1
 
 # Quick deployment
 
