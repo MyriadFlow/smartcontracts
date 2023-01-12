@@ -83,7 +83,7 @@ export class AssetCreated__Params {
     return this._event.parameters[1].value.toAddress();
   }
 
-  get metaDataUri(): string {
+  get metaDataURI(): string {
     return this._event.parameters[2].value.toString();
   }
 }
@@ -344,17 +344,17 @@ export class StoreFront extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  createAsset(metadataHash: string): BigInt {
+  createAsset(metadataURI: string): BigInt {
     let result = super.call("createAsset", "createAsset(string):(uint256)", [
-      ethereum.Value.fromString(metadataHash)
+      ethereum.Value.fromString(metadataURI)
     ]);
 
     return result[0].toBigInt();
   }
 
-  try_createAsset(metadataHash: string): ethereum.CallResult<BigInt> {
+  try_createAsset(metadataURI: string): ethereum.CallResult<BigInt> {
     let result = super.tryCall("createAsset", "createAsset(string):(uint256)", [
-      ethereum.Value.fromString(metadataHash)
+      ethereum.Value.fromString(metadataURI)
     ]);
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -363,13 +363,13 @@ export class StoreFront extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  delegateAssetCreation(creator: Address, metadataHash: string): BigInt {
+  delegateAssetCreation(creator: Address, metadataURI: string): BigInt {
     let result = super.call(
       "delegateAssetCreation",
       "delegateAssetCreation(address,string):(uint256)",
       [
         ethereum.Value.fromAddress(creator),
-        ethereum.Value.fromString(metadataHash)
+        ethereum.Value.fromString(metadataURI)
       ]
     );
 
@@ -378,14 +378,14 @@ export class StoreFront extends ethereum.SmartContract {
 
   try_delegateAssetCreation(
     creator: Address,
-    metadataHash: string
+    metadataURI: string
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "delegateAssetCreation",
       "delegateAssetCreation(address,string):(uint256)",
       [
         ethereum.Value.fromAddress(creator),
-        ethereum.Value.fromString(metadataHash)
+        ethereum.Value.fromString(metadataURI)
       ]
     );
     if (result.reverted) {
@@ -845,7 +845,7 @@ export class CreateAssetCall__Inputs {
     this._call = call;
   }
 
-  get metadataHash(): string {
+  get metadataURI(): string {
     return this._call.inputValues[0].value.toString();
   }
 }
@@ -883,7 +883,7 @@ export class DelegateAssetCreationCall__Inputs {
     return this._call.inputValues[0].value.toAddress();
   }
 
-  get metadataHash(): string {
+  get metadataURI(): string {
     return this._call.inputValues[1].value.toString();
   }
 }

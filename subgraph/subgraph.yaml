@@ -6,9 +6,9 @@ dataSources:
     name: Marketplace
     network: mumbai
     source:
-      address: "0x22981fbfC0d1AFeaBB43Dfe44c7B03e7A32a2203"
+      address: "0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988"
       abi: Marketplace
-      startBlock: 30769447
+      startBlock: 30863357
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -41,9 +41,9 @@ dataSources:
     name: StoreFront
     network: mumbai
     source:
-      address: "0x013EFF13a04b7882eAd886D78F4FdB9D02502300"
+      address: "0x6ACe19E59680514A02ae8D558183d5C3Ce55B866"
       abi: StoreFront
-      startBlock: 30769453
+      startBlock: 30863361
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

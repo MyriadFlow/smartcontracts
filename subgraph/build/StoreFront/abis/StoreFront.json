@@ -88,7 +88,7 @@
       {
         "indexed": false,
         "internalType": "string",
-        "name": "metaDataUri",
+        "name": "metaDataURI",
         "type": "string"
       }
     ],
@@ -327,7 +327,7 @@
     "inputs": [
       {
         "internalType": "string",
-        "name": "metadataHash",
+        "name": "metadataURI",
         "type": "string"
       }
     ],
@@ -351,7 +351,7 @@
       },
       {
         "internalType": "string",
-        "name": "metadataHash",
+        "name": "metadataURI",
         "type": "string"
       }
     ],

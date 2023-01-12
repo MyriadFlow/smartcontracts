@@ -40,7 +40,7 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
  */
 module.exports = {
   solidity: {
-    version: "0.8.15",
+    version: "0.8.17",
     settings: {
       optimizer: {
         enabled: true,

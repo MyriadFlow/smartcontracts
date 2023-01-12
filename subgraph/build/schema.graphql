@@ -86,7 +86,7 @@ type AssetCreated @entity(immutable: true) {
   id: Bytes!
   tokenID: BigInt! # uint256
   creator: Bytes! # address
-  metaDataUri: String! # string
+  metaDataURI: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

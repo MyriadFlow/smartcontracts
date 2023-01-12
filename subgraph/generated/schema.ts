@@ -809,13 +809,13 @@ export class AssetCreated extends Entity {
     this.set("creator", Value.fromBytes(value));
   }
 
-  get metaDataUri(): string {
-    let value = this.get("metaDataUri");
+  get metaDataURI(): string {
+    let value = this.get("metaDataURI");
     return value!.toString();
   }
 
-  set metaDataUri(value: string) {
-    this.set("metaDataUri", Value.fromString(value));
+  set metaDataURI(value: string) {
+    this.set("metaDataURI", Value.fromString(value));
   }
 
   get blockNumber(): BigInt {

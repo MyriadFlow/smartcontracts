@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -34,7 +34,6 @@ contract StoreFront is
 {
     using Counters for Counters.Counter;
 
-    bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
     bytes32 public constant STOREFRONT_ADMIN_ROLE = keccak256("STOREFRONT_ADMIN_ROLE");
     bytes32 public constant STOREFRONT_OPERATOR_ROLE = keccak256("STOREFRONT_OPERATOR_ROLE");
     bytes32 public constant STOREFRONT_CREATOR_ROLE = keccak256("STOREFRONT_CREATOR_ROLE");
@@ -46,11 +45,7 @@ contract StoreFront is
 
     address public marketplace;
 
-    event AssetCreated(
-        uint256 tokenID,
-        address indexed creator,
-        string metaDataUri
-    );
+    event AssetCreated(uint256 tokenID, address indexed creator, string metaDataURI);
 
     using Strings for uint256;
 
@@ -88,7 +83,7 @@ contract StoreFront is
      *
      * - the caller must have the `STOREFRONT_CREATOR_ROLE`.
      */
-    function createAsset(string memory metadataHash)
+    function createAsset(string memory metadataURI)
         public
         onlyRole(STOREFRONT_CREATOR_ROLE)
         returns (uint256)
@@ -98,16 +93,12 @@ contract StoreFront is
         _tokenIdTracker.increment();
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(_msgSender(), currentTokenID);
-        _setTokenURI(currentTokenID, metadataHash);
+        _setTokenURI(currentTokenID, metadataURI);
 
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
 
-        emit AssetCreated(
-            currentTokenID,
-            _msgSender(),
-            tokenURI(currentTokenID)
-        );
+        emit AssetCreated(currentTokenID, _msgSender(), metadataURI);
         return currentTokenID;
     }
 
@@ -124,19 +115,19 @@ contract StoreFront is
      */
     function delegateAssetCreation(
         address creator,
-        string memory metadataHash
+        string memory metadataURI
     ) public onlyRole(STOREFRONT_OPERATOR_ROLE) returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         _tokenIdTracker.increment();
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(creator, currentTokenID);
-        _setTokenURI(currentTokenID, metadataHash);
+        _setTokenURI(currentTokenID, metadataURI);
 
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
 
-        emit AssetCreated(currentTokenID, creator, metadataHash);
+        emit AssetCreated(currentTokenID, creator, metadataURI);
         return currentTokenID;
     }
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.15;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -171,8 +171,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
 
         // Calculate Payouts between seller and platform
         uint256 amountReceived = msg.value;
-        uint256 amountToMarketplace = (amountReceived * platformFeeBasisPoint) /
-            1000;
+        uint256 amountToMarketplace = (amountReceived * platformFeeBasisPoint) / 1000;
         uint256 amountToSeller = amountReceived - amountToMarketplace;
 
         idToMarketItem[itemId].seller.transfer(amountToSeller);

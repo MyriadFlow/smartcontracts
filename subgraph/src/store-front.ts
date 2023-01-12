@@ -57,7 +57,7 @@ export function handleAssetCreated(event: AssetCreatedEvent): void {
   )
   entity.tokenID = event.params.tokenID
   entity.creator = event.params.creator
-  entity.metaDataUri = event.params.metaDataUri
+  entity.metaDataURI = event.params.metaDataURI
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

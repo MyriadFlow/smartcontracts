@@ -62,7 +62,7 @@ export function createApprovalForAllEvent(
 export function createAssetCreatedEvent(
   tokenID: BigInt,
   creator: Address,
-  metaDataUri: string
+  metaDataURI: string
 ): AssetCreated {
   let assetCreatedEvent = changetype<AssetCreated>(newMockEvent())
 
@@ -79,8 +79,8 @@ export function createAssetCreatedEvent(
   )
   assetCreatedEvent.parameters.push(
     new ethereum.EventParam(
-      "metaDataUri",
-      ethereum.Value.fromString(metaDataUri)
+      "metaDataURI",
+      ethereum.Value.fromString(metaDataURI)
     )
   )
 

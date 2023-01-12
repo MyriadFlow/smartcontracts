@@ -297,7 +297,7 @@ export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
 export type AssetCreatedEvent = TypedEvent<
   [BigNumber, string, string],
-  { tokenID: BigNumber; creator: string; metaDataUri: string }
+  { tokenID: BigNumber; creator: string; metaDataURI: string }
 >;
 
 export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
@@ -389,13 +389,13 @@ export interface StoreFront extends BaseContract {
     ): Promise<ContractTransaction>;
 
     createAsset(
-      metadataHash: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     delegateAssetCreation(
       creator: string,
-      metadataHash: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -542,13 +542,13 @@ export interface StoreFront extends BaseContract {
   ): Promise<ContractTransaction>;
 
   createAsset(
-    metadataHash: string,
+    metadataURI: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   delegateAssetCreation(
     creator: string,
-    metadataHash: string,
+    metadataURI: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -686,13 +686,13 @@ export interface StoreFront extends BaseContract {
     burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     createAsset(
-      metadataHash: string,
+      metadataURI: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     delegateAssetCreation(
       creator: string,
-      metadataHash: string,
+      metadataURI: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -833,12 +833,12 @@ export interface StoreFront extends BaseContract {
     "AssetCreated(uint256,address,string)"(
       tokenID?: null,
       creator?: string | null,
-      metaDataUri?: null
+      metaDataURI?: null
     ): AssetCreatedEventFilter;
     AssetCreated(
       tokenID?: null,
       creator?: string | null,
-      metaDataUri?: null
+      metaDataURI?: null
     ): AssetCreatedEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;
@@ -915,13 +915,13 @@ export interface StoreFront extends BaseContract {
     ): Promise<BigNumber>;
 
     createAsset(
-      metadataHash: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     delegateAssetCreation(
       creator: string,
-      metadataHash: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1083,13 +1083,13 @@ export interface StoreFront extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     createAsset(
-      metadataHash: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     delegateAssetCreation(
       creator: string,
-      metadataHash: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

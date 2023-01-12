@@ -1,13 +1,13 @@
 {
-  "name": "storefront_v1",
+  "name": "storefront-v1",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph auth --product hosted-service $GRAPH_TOKEN && graph deploy --node https://api.thegraph.com/deploy/ myriadflow/storefront_v1",
-    "create-local": "graph create --node http://localhost:8020/ myriadflow/storefront_v1",
-    "remove-local": "graph remove --node http://localhost:8020/ myriadflow/storefront_v1",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 myriadflow/storefront_v1",
+    "deploy": "graph auth --product hosted-service $GRAPH_TOKEN && graph deploy --node https://api.thegraph.com/deploy/ myriadflow/storefront-v1",
+    "create-local": "graph create --node http://localhost:8020/ myriadflow/storefront-v1",
+    "remove-local": "graph remove --node http://localhost:8020/ myriadflow/storefront-v1",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 myriadflow/storefront-v1",
     "test": "graph test"
   },
   "dependencies": {
