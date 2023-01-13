@@ -60,59 +60,15 @@
         "internalType": "bool",
         "name": "forSale",
         "type": "bool"
-      }
-    ],
-    "name": "MarketItemCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "itemId",
-        "type": "uint256"
-      }
-    ],
-    "name": "MarketItemRemoved",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "itemId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "nftContract",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "buyer",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "price",
-        "type": "uint256"
+        "internalType": "string",
+        "name": "activity",
+        "type": "string"
       }
     ],
-    "name": "MarketItemSold",
+    "name": "MarketplaceItem",
     "type": "event"
   },
   {
@@ -265,11 +221,6 @@
   },
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "nftContract",
-        "type": "address"
-      },
       {
         "internalType": "uint256",
         "name": "itemId",

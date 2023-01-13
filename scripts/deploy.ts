@@ -47,7 +47,7 @@ async function main() {
         await storefront.grantRole(await storefront.STOREFRONT_CREATOR_ROLE(), await buyer.getAddress())
         await storefront.createAsset("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF")
         await marketplace.createMarketItem(storefront.address, 1, 1)
-        await marketplace.connect(buyer).createMarketSale(storefront.address, 1, { value: 1 })
+        await marketplace.connect(buyer).createMarketSale(1, { value: 1 })
         await storefront.revokeRole(await storefront.STOREFRONT_CREATOR_ROLE(), await buyer.getAddress())
         updateGraphAddress(storefront.address, marketplace.address, marketplace.deployTransaction.blockNumber, true)
     } else {

@@ -1,22 +1,18 @@
 import {
-  MarketItemCreated as MarketItemCreatedEvent,
-  MarketItemRemoved as MarketItemRemovedEvent,
-  MarketItemSold as MarketItemSoldEvent,
+  MarketplaceItem as MarketplaceItemEvent,
   RoleAdminChanged as RoleAdminChangedEvent,
   RoleGranted as RoleGrantedEvent,
   RoleRevoked as RoleRevokedEvent
 } from "../generated/Marketplace/Marketplace"
 import {
-  MarketItemCreated,
-  MarketItemRemoved,
-  MarketItemSold,
+  MarketplaceItem,
   RoleAdminChanged,
   RoleGranted,
   RoleRevoked
 } from "../generated/schema"
 
-export function handleMarketItemCreated(event: MarketItemCreatedEvent): void {
-  let entity = new MarketItemCreated(
+export function handleMarketplaceItem(event: MarketplaceItemEvent): void {
+  let entity = new MarketplaceItem(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.itemId = event.params.itemId
@@ -27,36 +23,7 @@ export function handleMarketItemCreated(event: MarketItemCreatedEvent): void {
   entity.owner = event.params.owner
   entity.price = event.params.price
   entity.forSale = event.params.forSale
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleMarketItemRemoved(event: MarketItemRemovedEvent): void {
-  let entity = new MarketItemRemoved(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.itemId = event.params.itemId
-
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
-}
-
-export function handleMarketItemSold(event: MarketItemSoldEvent): void {
-  let entity = new MarketItemSold(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
-  entity.itemId = event.params.itemId
-  entity.nftContract = event.params.nftContract
-  entity.tokenId = event.params.tokenId
-  entity.buyer = event.params.buyer
-  entity.price = event.params.price
+  entity.activity = event.params.activity
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

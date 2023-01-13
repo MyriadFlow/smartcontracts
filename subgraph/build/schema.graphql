@@ -1,4 +1,4 @@
-type MarketItemCreated @entity(immutable: true) {
+type MarketplaceItem @entity(immutable: true) {
   id: Bytes!
   itemId: BigInt! # uint256
   nftContract: Bytes! # address
@@ -8,26 +8,7 @@ type MarketItemCreated @entity(immutable: true) {
   owner: Bytes! # address
   price: BigInt! # uint256
   forSale: Boolean! # bool
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type MarketItemRemoved @entity(immutable: true) {
-  id: Bytes!
-  itemId: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type MarketItemSold @entity(immutable: true) {
-  id: Bytes!
-  itemId: BigInt! # uint256
-  nftContract: Bytes! # address
-  tokenId: BigInt! # uint256
-  buyer: Bytes! # address
-  price: BigInt! # uint256
+  activity: String! # string
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

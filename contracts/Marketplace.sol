@@ -39,7 +39,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
 
     mapping(uint256 => MarketItem) public idToMarketItem;
 
-    event MarketItemCreated(
+    event MarketplaceItem(
         uint256 indexed itemId,
         address indexed nftContract,
         uint256 indexed tokenId,
@@ -47,17 +47,9 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         address seller,
         address owner,
         uint256 price,
-        bool forSale
+        bool forSale,
+        string activity
     );
-    event MarketItemSold(
-        uint256 indexed itemId,
-        address indexed nftContract,
-        uint256 indexed tokenId,
-        address buyer,
-        uint256 price
-    );
-
-    event MarketItemRemoved(uint256 itemId);
 
     // Only item owner should be able to perform action
     modifier onlyItemOwner(address nftContract, uint256 tokenId) {
@@ -123,7 +115,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
             tokenId
         );
-        emit MarketItemCreated(
+        emit MarketplaceItem(
             itemId,
             nftContract,
             tokenId,
@@ -131,7 +123,8 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
             msg.sender,
             address(0),
             price,
-            true
+            true,
+            "itemListed"
         );
         return itemId;
     }
@@ -147,13 +140,17 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         );
         idToMarketItem[itemId].deleted = true;
 
-        emit MarketItemRemoved(itemId);
+        string memory metadataURI = IERC721Metadata(idToMarketItem[itemId].nftContract).tokenURI(
+            idToMarketItem[itemId].tokenId
+        );
+
+        emit MarketplaceItem(itemId, idToMarketItem[itemId].nftContract, idToMarketItem[itemId].tokenId, metadataURI, msg.sender, msg.sender, 0, false, "itemRemoved");
     }
 
     /*  Creates the sale of a marketplace item
         Transfers ownership of the item, as well as funds between parties
     */
-    function createMarketSale(address nftContract, uint256 itemId)
+    function createMarketSale(uint256 itemId)
         public
         payable
         nonReentrant
@@ -161,11 +158,16 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         onlyWhenItemIsForSale(itemId)
     {
         uint256 price = idToMarketItem[itemId].price;
+        address nftContract = idToMarketItem[itemId].nftContract;
         uint256 tokenId = idToMarketItem[itemId].tokenId;
-        require(
-            msg.value == price,
-            "Marketplace: Pay Market Price to buy the NFT"
+        string memory metadataURI = IERC721Metadata(idToMarketItem[itemId].nftContract).tokenURI(
+            idToMarketItem[itemId].tokenId
         );
+        address seller = idToMarketItem[itemId].seller;
+        require(msg.value == price, "Marketplace: Pay Market Price to buy the NFT");
+
+        idToMarketItem[itemId].owner = payable(msg.sender);
+        idToMarketItem[itemId].forSale = false;
 
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
@@ -176,11 +178,9 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
 
         idToMarketItem[itemId].seller.transfer(amountToSeller);
         payable(address(payoutAddress)).transfer(amountToMarketplace);
-
-        idToMarketItem[itemId].owner = payable(msg.sender);
-        idToMarketItem[itemId].forSale = false;
+        
         _itemsSold.increment();
-        emit MarketItemSold(itemId, nftContract, tokenId, msg.sender, price);
+        emit MarketplaceItem(itemId, nftContract, tokenId, metadataURI, seller, msg.sender, price, false, "itemSale");
     }
 
     /*  Change the Platform fees along with the payout address

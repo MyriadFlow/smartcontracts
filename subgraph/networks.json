@@ -1,10 +1,10 @@
 {
   "mumbai": {
     "Marketplace": {
-      "address": "0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988"
+      "address": "0x736a6Fe1c85CAa697875cDD535DFe89f4C6E17f5"
     },
     "StoreFront": {
-      "address": "0x6ACe19E59680514A02ae8D558183d5C3Ce55B866"
+      "address": "0xA4D93689237BC130fAC97d512dc4A71fDbfCEAD9"
     }
   }
 }

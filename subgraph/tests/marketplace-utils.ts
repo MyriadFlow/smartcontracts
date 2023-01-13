@@ -1,15 +1,13 @@
 import { newMockEvent } from "matchstick-as"
 import { ethereum, BigInt, Address, Bytes } from "@graphprotocol/graph-ts"
 import {
-  MarketItemCreated,
-  MarketItemRemoved,
-  MarketItemSold,
+  MarketplaceItem,
   RoleAdminChanged,
   RoleGranted,
   RoleRevoked
 } from "../generated/Marketplace/Marketplace"
 
-export function createMarketItemCreatedEvent(
+export function createMarketplaceItemEvent(
   itemId: BigInt,
   nftContract: Address,
   tokenId: BigInt,
@@ -17,97 +15,51 @@ export function createMarketItemCreatedEvent(
   seller: Address,
   owner: Address,
   price: BigInt,
-  forSale: boolean
-): MarketItemCreated {
-  let marketItemCreatedEvent = changetype<MarketItemCreated>(newMockEvent())
+  forSale: boolean,
+  activity: string
+): MarketplaceItem {
+  let marketplaceItemEvent = changetype<MarketplaceItem>(newMockEvent())
 
-  marketItemCreatedEvent.parameters = new Array()
+  marketplaceItemEvent.parameters = new Array()
 
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam("itemId", ethereum.Value.fromUnsignedBigInt(itemId))
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam(
       "nftContract",
       ethereum.Value.fromAddress(nftContract)
     )
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam(
       "tokenId",
       ethereum.Value.fromUnsignedBigInt(tokenId)
     )
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam(
       "metaDataURI",
       ethereum.Value.fromString(metaDataURI)
     )
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam("seller", ethereum.Value.fromAddress(seller))
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam("owner", ethereum.Value.fromAddress(owner))
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam("price", ethereum.Value.fromUnsignedBigInt(price))
   )
-  marketItemCreatedEvent.parameters.push(
+  marketplaceItemEvent.parameters.push(
     new ethereum.EventParam("forSale", ethereum.Value.fromBoolean(forSale))
   )
-
-  return marketItemCreatedEvent
-}
-
-export function createMarketItemRemovedEvent(
-  itemId: BigInt
-): MarketItemRemoved {
-  let marketItemRemovedEvent = changetype<MarketItemRemoved>(newMockEvent())
-
-  marketItemRemovedEvent.parameters = new Array()
-
-  marketItemRemovedEvent.parameters.push(
-    new ethereum.EventParam("itemId", ethereum.Value.fromUnsignedBigInt(itemId))
+  marketplaceItemEvent.parameters.push(
+    new ethereum.EventParam("activity", ethereum.Value.fromString(activity))
   )
 
-  return marketItemRemovedEvent
-}
-
-export function createMarketItemSoldEvent(
-  itemId: BigInt,
-  nftContract: Address,
-  tokenId: BigInt,
-  buyer: Address,
-  price: BigInt
-): MarketItemSold {
-  let marketItemSoldEvent = changetype<MarketItemSold>(newMockEvent())
-
-  marketItemSoldEvent.parameters = new Array()
-
-  marketItemSoldEvent.parameters.push(
-    new ethereum.EventParam("itemId", ethereum.Value.fromUnsignedBigInt(itemId))
-  )
-  marketItemSoldEvent.parameters.push(
-    new ethereum.EventParam(
-      "nftContract",
-      ethereum.Value.fromAddress(nftContract)
-    )
-  )
-  marketItemSoldEvent.parameters.push(
-    new ethereum.EventParam(
-      "tokenId",
-      ethereum.Value.fromUnsignedBigInt(tokenId)
-    )
-  )
-  marketItemSoldEvent.parameters.push(
-    new ethereum.EventParam("buyer", ethereum.Value.fromAddress(buyer))
-  )
-  marketItemSoldEvent.parameters.push(
-    new ethereum.EventParam("price", ethereum.Value.fromUnsignedBigInt(price))
-  )
-
-  return marketItemSoldEvent
+  return marketplaceItemEvent
 }
 
 export function createRoleAdminChangedEvent(

@@ -10,16 +10,16 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class MarketItemCreated extends ethereum.Event {
-  get params(): MarketItemCreated__Params {
-    return new MarketItemCreated__Params(this);
+export class MarketplaceItem extends ethereum.Event {
+  get params(): MarketplaceItem__Params {
+    return new MarketplaceItem__Params(this);
   }
 }
 
-export class MarketItemCreated__Params {
-  _event: MarketItemCreated;
+export class MarketplaceItem__Params {
+  _event: MarketplaceItem;
 
-  constructor(event: MarketItemCreated) {
+  constructor(event: MarketplaceItem) {
     this._event = event;
   }
 
@@ -54,57 +54,9 @@ export class MarketItemCreated__Params {
   get forSale(): boolean {
     return this._event.parameters[7].value.toBoolean();
   }
-}
 
-export class MarketItemRemoved extends ethereum.Event {
-  get params(): MarketItemRemoved__Params {
-    return new MarketItemRemoved__Params(this);
-  }
-}
-
-export class MarketItemRemoved__Params {
-  _event: MarketItemRemoved;
-
-  constructor(event: MarketItemRemoved) {
-    this._event = event;
-  }
-
-  get itemId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class MarketItemSold extends ethereum.Event {
-  get params(): MarketItemSold__Params {
-    return new MarketItemSold__Params(this);
-  }
-}
-
-export class MarketItemSold__Params {
-  _event: MarketItemSold;
-
-  constructor(event: MarketItemSold) {
-    this._event = event;
-  }
-
-  get itemId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-
-  get nftContract(): Address {
-    return this._event.parameters[1].value.toAddress();
-  }
-
-  get tokenId(): BigInt {
-    return this._event.parameters[2].value.toBigInt();
-  }
-
-  get buyer(): Address {
-    return this._event.parameters[3].value.toAddress();
-  }
-
-  get price(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
+  get activity(): string {
+    return this._event.parameters[8].value.toString();
   }
 }
 
@@ -680,12 +632,8 @@ export class CreateMarketSaleCall__Inputs {
     this._call = call;
   }
 
-  get nftContract(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
   get itemId(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
+    return this._call.inputValues[0].value.toBigInt();
   }
 }
 

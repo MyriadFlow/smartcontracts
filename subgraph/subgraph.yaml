@@ -6,17 +6,15 @@ dataSources:
     name: Marketplace
     network: mumbai
     source:
-      address: "0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988"
+      address: "0x736a6Fe1c85CAa697875cDD535DFe89f4C6E17f5"
       abi: Marketplace
-      startBlock: 30863357
+      startBlock: 30885726
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - MarketItemCreated
-        - MarketItemRemoved
-        - MarketItemSold
+        - MarketplaceItem
         - RoleAdminChanged
         - RoleGranted
         - RoleRevoked
@@ -24,12 +22,8 @@ dataSources:
         - name: Marketplace
           file: ./abis/Marketplace.json
       eventHandlers:
-        - event: MarketItemCreated(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool)
-          handler: handleMarketItemCreated
-        - event: MarketItemRemoved(uint256)
-          handler: handleMarketItemRemoved
-        - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
-          handler: handleMarketItemSold
+        - event: MarketplaceItem(indexed uint256,indexed address,indexed uint256,string,address,address,uint256,bool,string)
+          handler: handleMarketplaceItem
         - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
           handler: handleRoleAdminChanged
         - event: RoleGranted(indexed bytes32,indexed address,indexed address)
@@ -41,9 +35,9 @@ dataSources:
     name: StoreFront
     network: mumbai
     source:
-      address: "0x6ACe19E59680514A02ae8D558183d5C3Ce55B866"
+      address: "0xA4D93689237BC130fAC97d512dc4A71fDbfCEAD9"
       abi: StoreFront
-      startBlock: 30863361
+      startBlock: 30885729
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

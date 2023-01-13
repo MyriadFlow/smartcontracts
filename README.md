@@ -67,9 +67,9 @@ yarn deploy maticmum
 
 ## Contract deployments
 
-> `Marketplace Deployed to: 0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988`
+> `Marketplace Deployed to: 0x736a6Fe1c85CAa697875cDD535DFe89f4C6E17f5`
 
-> `StoreFront Deployed to: 0x6ACe19E59680514A02ae8D558183d5C3Ce55B866`
+> `StoreFront Deployed to: 0xA4D93689237BC130fAC97d512dc4A71fDbfCEAD9`
 
 ## Etherscan verification
 
@@ -83,9 +83,9 @@ npx hardhat verify --network maticmum --constructor-args StoreFrontArguments.js 
 
 where `MarketplaceArguments.js` & `StoreFrontArguments.js` is a javascript module that exports the argument list.
 
-[Marketplace Contract](https://mumbai.polygonscan.com/address/0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988#code)
+[Marketplace Contract](https://mumbai.polygonscan.com/address/0x736a6Fe1c85CAa697875cDD535DFe89f4C6E17f5#code)
 
-[StoreFront Contract](https://mumbai.polygonscan.com/address/0x6ACe19E59680514A02ae8D558183d5C3Ce55B866#code)
+[StoreFront Contract](https://mumbai.polygonscan.com/address/0xA4D93689237BC130fAC97d512dc4A71fDbfCEAD9#code)
 
 Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and interact with the smart contract at section `Read Contract` and `Write Contract`
 
@@ -98,7 +98,7 @@ graph auth --product hosted-service $GRAPH_TOKEN
 graph deploy --product hosted-service myriadflow/storefront-v1
 ```
 
-Build completed: QmWFXH6aKGV8AS9wWqJdp7NoYBsYksAAL9X7hXTmxncfyQ
+Build completed: QmfHr5mQr5HZGE3b3ENvJKCnpr9VKwcJXVhxmqVrpFsfq6
 
 Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1
 

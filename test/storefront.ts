@@ -98,7 +98,7 @@ describe("storefront contract", () => {
     })
 
     it("Should be able to create market sale", async () => {
-        await marketplace.connect(buyer).createMarketSale(storefront.address, 1, {
+        await marketplace.connect(buyer).createMarketSale(1, {
             value: salePrice
         })
 
@@ -128,7 +128,7 @@ describe("storefront contract", () => {
 
     it("Should not be able to create market sale if item is not for sale", async () => {
         const marketplaceBuyer = await marketplace.connect(buyer)
-        await expect(marketplaceBuyer.createMarketSale(storefront.address, 1, {
+        await expect(marketplaceBuyer.createMarketSale(1, {
             value: salePrice
         })).to.be.revertedWith("Marketplace: Market item is not for sale")
     })
