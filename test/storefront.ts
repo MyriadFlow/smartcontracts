@@ -132,4 +132,46 @@ describe("storefront contract", () => {
             value: salePrice
         })).to.be.revertedWith("Marketplace: Market item is not for sale")
     })
+    describe('Royalty', () => {
+        beforeEach(async () => {
+            const STOREFRONT_OPERATOR_ROLE = await storefront.STOREFRONT_OPERATOR_ROLE()
+            await storefront.grantRole(STOREFRONT_OPERATOR_ROLE, operator.address)
+            let hasRole = await storefront.hasRole(STOREFRONT_OPERATOR_ROLE, operator.address)
+            const STOREFRONT_CREATOR_ROLE = await storefront.STOREFRONT_CREATOR_ROLE()
+            await storefront.connect(operator).grantRole(STOREFRONT_CREATOR_ROLE, creator.address)
+            hasRole = await storefront.hasRole(STOREFRONT_CREATOR_ROLE, creator.address)
+            const metaDataHash = "ipfs://QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF"
+            await storefront.connect(operator).delegateAssetCreation(creator.address, metaDataHash)
+            await storefront.connect(buyer).transferFrom(buyer.address,creator2.address,1)
+        })
+        it("It should check royalty ",async () => { 
+            let value , balance1 , balance2 , percentage
+            const accounts = ethers.getSigners() 
+            value = ethers.utils.formatEther(salePrice)
+
+          
+            
+            
+            
+            await storefront.connect(creator2).approve(marketplace.address, 1)
+            
+            await marketplace.connect(creator2).createMarketItem(storefront.address, 1, salePrice)
+            await marketplace.connect(creator).createMarketSale(3, {
+                value: salePrice})
+            //getting the value
+            const val1 = await marketplace.provider.getBalance(creator2.address)
+
+            await storefront.connect(creator).setApprovalForAll(marketplace.address, true)
+            await marketplace.connect(creator).createMarketItem(storefront.address, 1, salePrice)
+            await marketplace.connect(buyer).createMarketSale(4, {
+                value: salePrice})
+            const val2 = await marketplace.provider.getBalance(creator2.address)
+            balance1 = ethers.utils.formatEther(val1)
+            balance2 = ethers.utils.formatEther(val2)
+
+            percentage = ( (Number(balance2) - Number(balance1)) / Number(value) ) * 100
+            // console.log(` the percantage is ${Math.floor(percentage)} %`)
+            expect(Math.floor(percentage)).to.be.equal(5)
+        })
+     })
 })

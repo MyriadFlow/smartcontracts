@@ -7,8 +7,18 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
+import "hardhat/console.sol";
 
-contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
+contract Marketplace is
+    Context,
+    AccessControlEnumerable,
+    ReentrancyGuard,
+    ERC2981
+{
+    // Set Constants for Interface ID and Roles
+    bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
+
     using Counters for Counters.Counter;
 
     Counters.Counter private _itemIds;
@@ -17,13 +27,18 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     address public payoutAddress;
     uint96 public platformFeeBasisPoint;
 
-    bytes32 public constant MARKETPLACE_ADMIN_ROLE = keccak256("MARKETPLACE_ADMIN_ROLE");
+    bytes32 public constant MARKETPLACE_ADMIN_ROLE =
+        keccak256("MARKETPLACE_ADMIN_ROLE");
+
+    event NFTBurnt(uint tokenId, address indexed owner);
 
     constructor(uint96 _platformFee) {
         _setupRole(MARKETPLACE_ADMIN_ROLE, _msgSender());
         _setRoleAdmin(MARKETPLACE_ADMIN_ROLE, MARKETPLACE_ADMIN_ROLE);
         platformFeeBasisPoint = _platformFee;
         payoutAddress = _msgSender();
+        // Setting default royalty to 5%
+        _setDefaultRoyalty(_msgSender(), 500);
     }
 
     struct MarketItem {
@@ -38,6 +53,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     }
 
     mapping(uint256 => MarketItem) public idToMarketItem;
+    mapping(address => mapping(uint => address)) public creator;
 
     event MarketplaceItem(
         uint256 indexed itemId,
@@ -70,7 +86,7 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     }
 
     // Only when item is is for sale
-    modifier onlyWhenItemIsForSale(uint256 itemId){
+    modifier onlyWhenItemIsForSale(uint256 itemId) {
         require(
             idToMarketItem[itemId].forSale == true,
             "Marketplace: Market item is not for sale"
@@ -99,6 +115,9 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
 
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
+        if (creator[nftContract][tokenId] == address(0)) {
+            creator[nftContract][tokenId] = _msgSender();
+        }
 
         idToMarketItem[itemId] = MarketItem(
             itemId,
@@ -111,7 +130,6 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
             false
         );
         IERC721(nftContract).transferFrom(msg.sender, address(this), tokenId);
-
         string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
             tokenId
         );
@@ -140,47 +158,81 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
         );
         idToMarketItem[itemId].deleted = true;
 
-        string memory metadataURI = IERC721Metadata(idToMarketItem[itemId].nftContract).tokenURI(
-            idToMarketItem[itemId].tokenId
-        );
+        string memory metadataURI = IERC721Metadata(
+            idToMarketItem[itemId].nftContract
+        ).tokenURI(idToMarketItem[itemId].tokenId);
 
-        emit MarketplaceItem(itemId, idToMarketItem[itemId].nftContract, idToMarketItem[itemId].tokenId, metadataURI, msg.sender, msg.sender, 0, false, "itemRemoved");
+        emit MarketplaceItem(
+            itemId,
+            idToMarketItem[itemId].nftContract,
+            idToMarketItem[itemId].tokenId,
+            metadataURI,
+            msg.sender,
+            msg.sender,
+            0,
+            false,
+            "itemRemoved"
+        );
     }
 
     /*  Creates the sale of a marketplace item
         Transfers ownership of the item, as well as funds between parties
     */
-    function createMarketSale(uint256 itemId)
+    //TO check the function for royalty
+    function createMarketSale(
+        uint256 itemId
+    )
         public
         payable
         nonReentrant
         onlyWhenItemExist(itemId)
         onlyWhenItemIsForSale(itemId)
     {
-        uint256 price = idToMarketItem[itemId].price;
+        // uint256 price = idToMarketItem[itemId].price;
         address nftContract = idToMarketItem[itemId].nftContract;
         uint256 tokenId = idToMarketItem[itemId].tokenId;
-        string memory metadataURI = IERC721Metadata(idToMarketItem[itemId].nftContract).tokenURI(
-            idToMarketItem[itemId].tokenId
-        );
+        string memory metadataURI = IERC721Metadata(
+            idToMarketItem[itemId].nftContract
+        ).tokenURI(idToMarketItem[itemId].tokenId);
         address seller = idToMarketItem[itemId].seller;
-        require(msg.value == price, "Marketplace: Pay Market Price to buy the NFT");
+        require(
+            msg.value == idToMarketItem[itemId].price,
+            "Marketplace: Pay Market Price to buy the NFT"
+        );
 
         idToMarketItem[itemId].owner = payable(msg.sender);
         idToMarketItem[itemId].forSale = false;
 
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
-        // Calculate Payouts between seller and platform
-        uint256 amountReceived = msg.value;
-        uint256 amountToMarketplace = (amountReceived * platformFeeBasisPoint) / 1000;
-        uint256 amountToSeller = amountReceived - amountToMarketplace;
+        address nft_creator = creator[nftContract][tokenId];
 
+        //Calculating royalty info
+        (, uint _royaltyAmount) = royaltyInfo(itemId, msg.value);
+        uint amountAvailable = msg.value - _royaltyAmount;
+
+        // Calculate Payouts between seller and platform
+        uint256 amountToMarketplace = (amountAvailable *
+            platformFeeBasisPoint) / 1000;
+        uint256 amountToSeller = amountAvailable - amountToMarketplace;
+
+        //transfering royalty
+        payable(nft_creator).transfer(_royaltyAmount);
         idToMarketItem[itemId].seller.transfer(amountToSeller);
         payable(address(payoutAddress)).transfer(amountToMarketplace);
-        
+
         _itemsSold.increment();
-        emit MarketplaceItem(itemId, nftContract, tokenId, metadataURI, seller, msg.sender, price, false, "itemSale");
+        emit MarketplaceItem(
+            itemId,
+            nftContract,
+            tokenId,
+            metadataURI,
+            seller,
+            msg.sender,
+            msg.value,
+            false,
+            "itemSale"
+        );
     }
 
     /*  Change the Platform fees along with the payout address
@@ -192,5 +244,29 @@ contract Marketplace is Context, AccessControlEnumerable, ReentrancyGuard {
     ) public onlyRole(MARKETPLACE_ADMIN_ROLE) {
         platformFeeBasisPoint = newPlatformFee;
         payoutAddress = newPayoutAddress;
+    }
+
+    // function burnNFT(uint256 tokenId) public {
+    //     require(
+    //         _isApprovedOrOwner(_msgSender(), tokenId),
+    //         "Erebrus: caller is not token owner or approved"
+    //     );
+    //     _burn(tokenId);
+    //     _resetTokenRoyalty(tokenId);
+    //     emit NFTBurnt(tokenId, _msgSender());
+    //     _resetTokenRoyalty(tokenId);
+    // }
+
+    function supportsInterface(
+        bytes4 interfaceId
+    )
+        public
+        view
+        virtual
+        override(AccessControlEnumerable, ERC2981)
+        returns (bool)
+    {
+        if (interfaceId == _INTERFACE_ID_ERC2981) return true;
+        return super.supportsInterface(interfaceId);
     }
 }
