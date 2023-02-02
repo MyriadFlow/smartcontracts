@@ -7,8 +7,8 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
+import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 /**
  * @dev {ERC721} token, including:
@@ -29,8 +29,8 @@ contract StoreFront is
     Context,
     AccessControlEnumerable,
     ERC721Enumerable,
-    ERC721Burnable,
-    ERC721Pausable
+    ERC721Pausable,
+    ERC2981
 {
     using Counters for Counters.Counter;
 
@@ -46,6 +46,7 @@ contract StoreFront is
     address public marketplace;
 
     event AssetCreated(uint256 tokenID, address indexed creator, string metaDataURI);
+    event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
     using Strings for uint256;
 
@@ -69,7 +70,6 @@ contract StoreFront is
         _setRoleAdmin(STOREFRONT_ADMIN_ROLE, STOREFRONT_ADMIN_ROLE);
         _setRoleAdmin(STOREFRONT_CREATOR_ROLE, STOREFRONT_OPERATOR_ROLE);
         _setRoleAdmin(STOREFRONT_OPERATOR_ROLE, STOREFRONT_ADMIN_ROLE);
-
     }
 
     /**
@@ -83,7 +83,7 @@ contract StoreFront is
      *
      * - the caller must have the `STOREFRONT_CREATOR_ROLE`.
      */
-    function createAsset(string memory metadataURI)
+    function createAsset(string memory metadataURI, uint96 royaltyPercentBasisPoint)
         public
         onlyRole(STOREFRONT_CREATOR_ROLE)
         returns (uint256)
@@ -94,6 +94,10 @@ contract StoreFront is
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
+
+        // Set royalty Info
+        require(royaltyPercentBasisPoint <= 1000, "StoreFront: Royalty can't be more than 10%");
+        _setTokenRoyalty(currentTokenID, _msgSender(), royaltyPercentBasisPoint);
 
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
@@ -115,7 +119,8 @@ contract StoreFront is
      */
     function delegateAssetCreation(
         address creator,
-        string memory metadataURI
+        string memory metadataURI,
+        uint96 royaltyPercentBasisPoint
     ) public onlyRole(STOREFRONT_OPERATOR_ROLE) returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
@@ -123,6 +128,10 @@ contract StoreFront is
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(creator, currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
+
+        // Set royalty Info
+        require(royaltyPercentBasisPoint <= 1000, "StoreFront: Royalty can't be more than 10%");
+        _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
 
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
@@ -145,6 +154,13 @@ contract StoreFront is
         string memory _tokenURI = _tokenURIs[tokenId];
 
         return _tokenURI;       
+    }
+
+    function destroyAsset(uint256 tokenId) public {
+        require(_isApprovedOrOwner(_msgSender(), tokenId), "StoreFront: Caller is not token owner or approved");
+        _burn(tokenId);
+        emit AssetDestroyed(tokenId, _msgSender());
+        _resetTokenRoyalty(tokenId);
     }
 
     /**
@@ -193,7 +209,7 @@ function _beforeTokenTransfer(
         address to,
         uint256 tokenId,
         uint256 /* batchSize*/
-    ) internal virtual override (ERC721, ERC721Enumerable, ERC721Pausable) {
+    ) internal virtual override (ERC721Enumerable, ERC721Pausable) {
         super._beforeTokenTransfer(from, to, tokenId, 1);
     }
 
@@ -204,7 +220,7 @@ function _beforeTokenTransfer(
         public
         view
         virtual
-        override(AccessControlEnumerable, ERC721, ERC721Enumerable)
+        override(AccessControlEnumerable, ERC721, ERC721Enumerable, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

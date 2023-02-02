@@ -23,20 +23,21 @@ export interface MarketplaceInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
+    "buyItem(uint256)": FunctionFragment;
     "changeFeeAndPayoutAddress(uint96,address)": FunctionFragment;
-    "createMarketItem(address,uint256,uint256)": FunctionFragment;
-    "createMarketSale(address,uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "getRoleMember(bytes32,uint256)": FunctionFragment;
     "getRoleMemberCount(bytes32)": FunctionFragment;
     "grantRole(bytes32,address)": FunctionFragment;
     "hasRole(bytes32,address)": FunctionFragment;
     "idToMarketItem(uint256)": FunctionFragment;
-    "payoutAddress()": FunctionFragment;
+    "listSaleItem(address,uint256,uint256)": FunctionFragment;
+    "marketplacePayoutAddress()": FunctionFragment;
     "platformFeeBasisPoint()": FunctionFragment;
-    "removeFromSale(uint256)": FunctionFragment;
+    "removeSaleItem(uint256)": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
+    "royaltyInfo(uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
   };
 
@@ -49,16 +50,12 @@ export interface MarketplaceInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "buyItem",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "changeFeeAndPayoutAddress",
     values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createMarketItem",
-    values: [string, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createMarketSale",
-    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getRoleAdmin",
@@ -85,7 +82,11 @@ export interface MarketplaceInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "payoutAddress",
+    functionFragment: "listSaleItem",
+    values: [string, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "marketplacePayoutAddress",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -93,7 +94,7 @@ export interface MarketplaceInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "removeFromSale",
+    functionFragment: "removeSaleItem",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -103,6 +104,10 @@ export interface MarketplaceInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "revokeRole",
     values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -117,16 +122,9 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "MARKETPLACE_ADMIN_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "buyItem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "changeFeeAndPayoutAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "createMarketItem",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "createMarketSale",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -148,7 +146,11 @@ export interface MarketplaceInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "payoutAddress",
+    functionFragment: "listSaleItem",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "marketplacePayoutAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -156,7 +158,7 @@ export interface MarketplaceInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "removeFromSale",
+    functionFragment: "removeSaleItem",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -165,64 +167,72 @@ export interface MarketplaceInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "royaltyInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
 
   events: {
-    "MarketItemCreated(uint256,address,uint256,string,address,address,uint256,bool)": EventFragment;
-    "MarketItemRemoved(uint256)": EventFragment;
-    "MarketItemSold(uint256,address,uint256,address,uint256)": EventFragment;
+    "ItemForSale(uint256,address,uint256,string,address,uint256)": EventFragment;
+    "ItemRemoved(uint256,address,uint256,string,address)": EventFragment;
+    "ItemSold(uint256,address,uint256,string,address,address,uint256)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
     "RoleRevoked(bytes32,address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "MarketItemCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MarketItemRemoved"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "MarketItemSold"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ItemForSale"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ItemRemoved"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ItemSold"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
 }
 
-export type MarketItemCreatedEvent = TypedEvent<
-  [BigNumber, string, BigNumber, string, string, string, BigNumber, boolean],
+export type ItemForSaleEvent = TypedEvent<
+  [BigNumber, string, BigNumber, string, string, BigNumber],
   {
     itemId: BigNumber;
     nftContract: string;
     tokenId: BigNumber;
     metaDataURI: string;
     seller: string;
-    owner: string;
     price: BigNumber;
-    forSale: boolean;
   }
 >;
 
-export type MarketItemCreatedEventFilter =
-  TypedEventFilter<MarketItemCreatedEvent>;
+export type ItemForSaleEventFilter = TypedEventFilter<ItemForSaleEvent>;
 
-export type MarketItemRemovedEvent = TypedEvent<
-  [BigNumber],
-  { itemId: BigNumber }
->;
-
-export type MarketItemRemovedEventFilter =
-  TypedEventFilter<MarketItemRemovedEvent>;
-
-export type MarketItemSoldEvent = TypedEvent<
-  [BigNumber, string, BigNumber, string, BigNumber],
+export type ItemRemovedEvent = TypedEvent<
+  [BigNumber, string, BigNumber, string, string],
   {
     itemId: BigNumber;
     nftContract: string;
     tokenId: BigNumber;
+    metaDataURI: string;
+    seller: string;
+  }
+>;
+
+export type ItemRemovedEventFilter = TypedEventFilter<ItemRemovedEvent>;
+
+export type ItemSoldEvent = TypedEvent<
+  [BigNumber, string, BigNumber, string, string, string, BigNumber],
+  {
+    itemId: BigNumber;
+    nftContract: string;
+    tokenId: BigNumber;
+    metadataURI: string;
+    seller: string;
     buyer: string;
     price: BigNumber;
   }
 >;
 
-export type MarketItemSoldEventFilter = TypedEventFilter<MarketItemSoldEvent>;
+export type ItemSoldEventFilter = TypedEventFilter<ItemSoldEvent>;
 
 export type RoleAdminChangedEvent = TypedEvent<
   [string, string, string],
@@ -278,23 +288,15 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    buyItem(
+      itemId: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    createMarketItem(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    createMarketSale(
-      nftContract: string,
-      itemId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
@@ -326,32 +328,29 @@ export interface Marketplace extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        string,
-        BigNumber,
-        string,
-        string,
-        BigNumber,
-        boolean,
-        boolean
-      ] & {
+      [BigNumber, string, BigNumber, string, string, BigNumber, number] & {
         itemId: BigNumber;
         nftContract: string;
         tokenId: BigNumber;
         seller: string;
         owner: string;
         price: BigNumber;
-        forSale: boolean;
-        deleted: boolean;
+        status: number;
       }
     >;
 
-    payoutAddress(overrides?: CallOverrides): Promise<[string]>;
+    listSaleItem(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    marketplacePayoutAddress(overrides?: CallOverrides): Promise<[string]>;
 
     platformFeeBasisPoint(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    removeFromSale(
+    removeSaleItem(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -368,6 +367,12 @@ export interface Marketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -378,23 +383,15 @@ export interface Marketplace extends BaseContract {
 
   MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
+  buyItem(
+    itemId: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   changeFeeAndPayoutAddress(
     newPlatformFee: BigNumberish,
     newPayoutAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  createMarketItem(
-    nftContract: string,
-    tokenId: BigNumberish,
-    price: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  createMarketSale(
-    nftContract: string,
-    itemId: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
@@ -426,32 +423,29 @@ export interface Marketplace extends BaseContract {
     arg0: BigNumberish,
     overrides?: CallOverrides
   ): Promise<
-    [
-      BigNumber,
-      string,
-      BigNumber,
-      string,
-      string,
-      BigNumber,
-      boolean,
-      boolean
-    ] & {
+    [BigNumber, string, BigNumber, string, string, BigNumber, number] & {
       itemId: BigNumber;
       nftContract: string;
       tokenId: BigNumber;
       seller: string;
       owner: string;
       price: BigNumber;
-      forSale: boolean;
-      deleted: boolean;
+      status: number;
     }
   >;
 
-  payoutAddress(overrides?: CallOverrides): Promise<string>;
+  listSaleItem(
+    nftContract: string,
+    tokenId: BigNumberish,
+    price: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  marketplacePayoutAddress(overrides?: CallOverrides): Promise<string>;
 
   platformFeeBasisPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
-  removeFromSale(
+  removeSaleItem(
     itemId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -468,6 +462,12 @@ export interface Marketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  royaltyInfo(
+    _tokenId: BigNumberish,
+    _salePrice: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber]>;
+
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
@@ -478,22 +478,11 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
+    buyItem(itemId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    createMarketItem(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    createMarketSale(
-      nftContract: string,
-      itemId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -526,32 +515,29 @@ export interface Marketplace extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [
-        BigNumber,
-        string,
-        BigNumber,
-        string,
-        string,
-        BigNumber,
-        boolean,
-        boolean
-      ] & {
+      [BigNumber, string, BigNumber, string, string, BigNumber, number] & {
         itemId: BigNumber;
         nftContract: string;
         tokenId: BigNumber;
         seller: string;
         owner: string;
         price: BigNumber;
-        forSale: boolean;
-        deleted: boolean;
+        status: number;
       }
     >;
 
-    payoutAddress(overrides?: CallOverrides): Promise<string>;
+    listSaleItem(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    marketplacePayoutAddress(overrides?: CallOverrides): Promise<string>;
 
     platformFeeBasisPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
-    removeFromSale(
+    removeSaleItem(
       itemId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -568,6 +554,12 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -575,44 +567,56 @@ export interface Marketplace extends BaseContract {
   };
 
   filters: {
-    "MarketItemCreated(uint256,address,uint256,string,address,address,uint256,bool)"(
+    "ItemForSale(uint256,address,uint256,string,address,uint256)"(
       itemId?: BigNumberish | null,
       nftContract?: string | null,
       tokenId?: BigNumberish | null,
       metaDataURI?: null,
       seller?: null,
-      owner?: null,
-      price?: null,
-      forSale?: null
-    ): MarketItemCreatedEventFilter;
-    MarketItemCreated(
+      price?: null
+    ): ItemForSaleEventFilter;
+    ItemForSale(
       itemId?: BigNumberish | null,
       nftContract?: string | null,
       tokenId?: BigNumberish | null,
       metaDataURI?: null,
       seller?: null,
-      owner?: null,
-      price?: null,
-      forSale?: null
-    ): MarketItemCreatedEventFilter;
+      price?: null
+    ): ItemForSaleEventFilter;
 
-    "MarketItemRemoved(uint256)"(itemId?: null): MarketItemRemovedEventFilter;
-    MarketItemRemoved(itemId?: null): MarketItemRemovedEventFilter;
+    "ItemRemoved(uint256,address,uint256,string,address)"(
+      itemId?: null,
+      nftContract?: string | null,
+      tokenId?: BigNumberish | null,
+      metaDataURI?: null,
+      seller?: null
+    ): ItemRemovedEventFilter;
+    ItemRemoved(
+      itemId?: null,
+      nftContract?: string | null,
+      tokenId?: BigNumberish | null,
+      metaDataURI?: null,
+      seller?: null
+    ): ItemRemovedEventFilter;
 
-    "MarketItemSold(uint256,address,uint256,address,uint256)"(
+    "ItemSold(uint256,address,uint256,string,address,address,uint256)"(
       itemId?: BigNumberish | null,
       nftContract?: string | null,
       tokenId?: BigNumberish | null,
+      metadataURI?: null,
+      seller?: null,
       buyer?: null,
       price?: null
-    ): MarketItemSoldEventFilter;
-    MarketItemSold(
+    ): ItemSoldEventFilter;
+    ItemSold(
       itemId?: BigNumberish | null,
       nftContract?: string | null,
       tokenId?: BigNumberish | null,
+      metadataURI?: null,
+      seller?: null,
       buyer?: null,
       price?: null
-    ): MarketItemSoldEventFilter;
+    ): ItemSoldEventFilter;
 
     "RoleAdminChanged(bytes32,bytes32,bytes32)"(
       role?: BytesLike | null,
@@ -653,23 +657,15 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    buyItem(
+      itemId: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    createMarketItem(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    createMarketSale(
-      nftContract: string,
-      itemId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     getRoleAdmin(
@@ -705,11 +701,18 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    payoutAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    listSaleItem(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    marketplacePayoutAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     platformFeeBasisPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
-    removeFromSale(
+    removeSaleItem(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -724,6 +727,12 @@ export interface Marketplace extends BaseContract {
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     supportsInterface(
@@ -741,23 +750,15 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    buyItem(
+      itemId: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    createMarketItem(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    createMarketSale(
-      nftContract: string,
-      itemId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getRoleAdmin(
@@ -793,13 +794,22 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    payoutAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    listSaleItem(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    marketplacePayoutAddress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     platformFeeBasisPoint(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    removeFromSale(
+    removeSaleItem(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -814,6 +824,12 @@ export interface Marketplace extends BaseContract {
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(

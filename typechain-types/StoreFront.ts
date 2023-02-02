@@ -26,9 +26,9 @@ export interface StoreFrontInterface extends utils.Interface {
     "STOREFRONT_OPERATOR_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "burn(uint256)": FunctionFragment;
-    "createAsset(string)": FunctionFragment;
-    "delegateAssetCreation(address,string)": FunctionFragment;
+    "createAsset(string,uint96)": FunctionFragment;
+    "delegateAssetCreation(address,string,uint96)": FunctionFragment;
+    "destroyAsset(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "getRoleMember(bytes32,uint256)": FunctionFragment;
@@ -43,6 +43,7 @@ export interface StoreFrontInterface extends utils.Interface {
     "paused()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
+    "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -76,11 +77,17 @@ export interface StoreFrontInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: "createAsset", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "createAsset",
+    values: [string, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "delegateAssetCreation",
-    values: [string, string]
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "destroyAsset",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -128,6 +135,10 @@ export interface StoreFrontInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "revokeRole",
     values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -182,13 +193,16 @@ export interface StoreFrontInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "createAsset",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "delegateAssetCreation",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "destroyAsset",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -227,6 +241,10 @@ export interface StoreFrontInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "royaltyInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
@@ -262,6 +280,7 @@ export interface StoreFrontInterface extends utils.Interface {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "AssetCreated(uint256,address,string)": EventFragment;
+    "AssetDestroyed(uint256,address)": EventFragment;
     "Paused(address)": EventFragment;
     "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
     "RoleGranted(bytes32,address,address)": EventFragment;
@@ -273,6 +292,7 @@ export interface StoreFrontInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
@@ -301,6 +321,13 @@ export type AssetCreatedEvent = TypedEvent<
 >;
 
 export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
+
+export type AssetDestroyedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; ownerOrApproved: string }
+>;
+
+export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
 
 export type PausedEvent = TypedEvent<[string], { account: string }>;
 
@@ -383,19 +410,21 @@ export interface StoreFront extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    burn(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     createAsset(
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    destroyAsset(
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -461,6 +490,12 @@ export interface StoreFront extends BaseContract {
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -536,19 +571,21 @@ export interface StoreFront extends BaseContract {
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  burn(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   createAsset(
     metadataURI: string,
+    royaltyPercentBasisPoint: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   delegateAssetCreation(
     creator: string,
     metadataURI: string,
+    royaltyPercentBasisPoint: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  destroyAsset(
+    tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -611,6 +648,12 @@ export interface StoreFront extends BaseContract {
     account: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  royaltyInfo(
+    _tokenId: BigNumberish,
+    _salePrice: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber]>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: string,
@@ -683,18 +726,23 @@ export interface StoreFront extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
     createAsset(
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    destroyAsset(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -753,6 +801,12 @@ export interface StoreFront extends BaseContract {
       account: string,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -841,6 +895,15 @@ export interface StoreFront extends BaseContract {
       metaDataURI?: null
     ): AssetCreatedEventFilter;
 
+    "AssetDestroyed(uint256,address)"(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): AssetDestroyedEventFilter;
+    AssetDestroyed(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): AssetDestroyedEventFilter;
+
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
 
@@ -909,19 +972,21 @@ export interface StoreFront extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    burn(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     createAsset(
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    destroyAsset(
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -989,6 +1054,12 @@ export interface StoreFront extends BaseContract {
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256)"(
@@ -1077,19 +1148,21 @@ export interface StoreFront extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    burn(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     createAsset(
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    destroyAsset(
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1157,6 +1230,12 @@ export interface StoreFront extends BaseContract {
       role: BytesLike,
       account: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256)"(

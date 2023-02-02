@@ -63,7 +63,7 @@ describe("storefront contract", () => {
 
     it("Should delegate artifact creation", async () => {
         expect(
-            await storefront.connect(operator).delegateAssetCreation(creator2.address, metaDataHash)
+            await storefront.connect(operator).delegateAssetCreation(creator2.address, metaDataHash, 500)
         )
             .to.emit(storefront, "AssetCreated")
             .withArgs(1, creator2.address, metaDataHash)
@@ -82,53 +82,52 @@ describe("storefront contract", () => {
             .withArgs(creator2.address, marketplace.address, 1)
 
         expect(
-            await marketplace.connect(creator2).createMarketItem(storefront.address, 1, salePrice)
+            await marketplace.connect(creator2).listSaleItem(storefront.address, 1, salePrice)
         )
-            .to.emit(marketplace, "MarketItemCreated")
-            .withArgs(1, storefront.address, 1, metaDataHash, creator2.address, "0x0000000000000000000000000000000000000000", salePrice, true)
+            .to.emit(marketplace, "ItemForSale")
+            .withArgs(1, storefront.address, 1, metaDataHash, creator2.address, "0x0000000000000000000000000000000000000000", salePrice)
 
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.itemId).to.equal(1)
         expect(marketItem.tokenId).to.equal(1)
         expect(marketItem.owner).to.not.equal(creator2.address)
         expect(marketItem.seller).to.equal(creator2.address)
-        expect(marketItem.forSale).to.true
-        expect(marketItem.deleted).to.false
+        expect(marketItem.status).to.be.equal(1)
         expect(marketItem.nftContract).to.equal(storefront.address)
     })
 
     it("Should be able to create market sale", async () => {
-        await marketplace.connect(buyer).createMarketSale(storefront.address, 1, {
+        await marketplace.connect(buyer).buyItem(1, {
             value: salePrice
         })
 
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.owner).to.equal(buyer.address)
-        expect(marketItem.forSale).to.equal(false)
+        expect(marketItem.status).to.equal(3)
     })
 
     it("Should be able to delete market item", async () => {
         // Create artifact
-        await storefront.connect(creator).createAsset("ipfs://QmTiQKxZoVMvDahqVUzvkJhAjF9C1MzytpDEocxUT3oBde")
+        await storefront.connect(creator).createAsset("ipfs://QmTiQKxZoVMvDahqVUzvkJhAjF9C1MzytpDEocxUT3oBde", 500)
         marketplace = marketplace.connect(creator)
 
         // Create Market Item
-        await marketplace.createMarketItem(storefront.address.toString(), 2, 1)
+        await marketplace.listSaleItem(storefront.address.toString(), 2, 1)
 
         // Remove that item market item and expect it to emit MarketItemRemoved and Transfer
-        expect(await marketplace.removeFromSale(2))
-            .to.emit(marketplace, "MarketItemRemoved").withArgs(2)
+        expect(await marketplace.removeSaleItem(2))
+            .to.emit(marketplace, "ItemRemoved").withArgs(2)
             .and
             .to.emit(storefront, "Transfer").withArgs(marketplace.address, creator.address, 2)
 
         // Get that market item and expect it to be soft deleted
         const res = await marketplace.idToMarketItem(2)
-        expect(res.deleted).to.true
+        expect(res.status).to.be.equal(0)
     })
 
     it("Should not be able to create market sale if item is not for sale", async () => {
         const marketplaceBuyer = await marketplace.connect(buyer)
-        await expect(marketplaceBuyer.createMarketSale(storefront.address, 1, {
+        await expect(marketplaceBuyer.buyItem(1, {
             value: salePrice
         })).to.be.revertedWith("Marketplace: Market item is not for sale")
     })
