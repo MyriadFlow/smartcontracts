@@ -45,24 +45,12 @@
       },
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "owner",
-        "type": "address"
-      },
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "price",
         "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "bool",
-        "name": "forSale",
-        "type": "bool"
       }
     ],
-    "name": "MarketItemCreated",
+    "name": "ItemForSale",
     "type": "event"
   },
   {
@@ -73,9 +61,33 @@
         "internalType": "uint256",
         "name": "itemId",
         "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "nftContract",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metaDataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
       }
     ],
-    "name": "MarketItemRemoved",
+    "name": "ItemRemoved",
     "type": "event"
   },
   {
@@ -101,6 +113,18 @@
       },
       {
         "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "seller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "buyer",
         "type": "address"
@@ -112,7 +136,7 @@
         "type": "uint256"
       }
     ],
-    "name": "MarketItemSold",
+    "name": "ItemSold",
     "type": "event"
   },
   {
@@ -219,6 +243,19 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "itemId",
+        "type": "uint256"
+      }
+    ],
+    "name": "buyItem",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "uint96",
         "name": "newPlatformFee",
         "type": "uint96"
@@ -232,53 +269,6 @@
     "name": "changeFeeAndPayoutAddress",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "nftContract",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "price",
-        "type": "uint256"
-      }
-    ],
-    "name": "createMarketItem",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "nftContract",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "itemId",
-        "type": "uint256"
-      }
-    ],
-    "name": "createMarketSale",
-    "outputs": [],
-    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -426,22 +416,46 @@
         "type": "uint256"
       },
       {
-        "internalType": "bool",
-        "name": "forSale",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "deleted",
-        "type": "bool"
+        "internalType": "enum Marketplace.ItemStatus",
+        "name": "status",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftContract",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      }
+    ],
+    "name": "listSaleItem",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
-    "name": "payoutAddress",
+    "name": "marketplacePayoutAddress",
     "outputs": [
       {
         "internalType": "address",
@@ -473,7 +487,7 @@
         "type": "uint256"
       }
     ],
-    "name": "removeFromSale",
+    "name": "removeSaleItem",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -512,6 +526,35 @@
     "name": "revokeRole",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_salePrice",
+        "type": "uint256"
+      }
+    ],
+    "name": "royaltyInfo",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

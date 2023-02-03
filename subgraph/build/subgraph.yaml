@@ -6,17 +6,17 @@ dataSources:
     name: Marketplace
     network: mumbai
     source:
-      address: "0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988"
+      address: "0x72AFc9D60EBd2265a2420d580D2918392fae47f6"
       abi: Marketplace
-      startBlock: 30863357
+      startBlock: 31690149
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - MarketItemCreated
-        - MarketItemRemoved
-        - MarketItemSold
+        - ItemForSale
+        - ItemRemoved
+        - ItemSold
         - RoleAdminChanged
         - RoleGranted
         - RoleRevoked
@@ -24,13 +24,13 @@ dataSources:
         - name: Marketplace
           file: Marketplace/abis/Marketplace.json
       eventHandlers:
-        - event: MarketItemCreated(indexed uint256,indexed address,indexed
-            uint256,string,address,address,uint256,bool)
-          handler: handleMarketItemCreated
-        - event: MarketItemRemoved(uint256)
-          handler: handleMarketItemRemoved
-        - event: MarketItemSold(indexed uint256,indexed address,indexed uint256,address,uint256)
-          handler: handleMarketItemSold
+        - event: ItemForSale(indexed uint256,indexed address,indexed uint256,string,address,uint256)
+          handler: handleItemForSale
+        - event: ItemRemoved(uint256,indexed address,indexed uint256,string,address)
+          handler: handleItemRemoved
+        - event: ItemSold(indexed uint256,indexed address,indexed
+            uint256,string,address,address,uint256)
+          handler: handleItemSold
         - event: RoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)
           handler: handleRoleAdminChanged
         - event: RoleGranted(indexed bytes32,indexed address,indexed address)
@@ -42,9 +42,9 @@ dataSources:
     name: StoreFront
     network: mumbai
     source:
-      address: "0x6ACe19E59680514A02ae8D558183d5C3Ce55B866"
+      address: "0xe0CdEbF537574BcbB362885593Ee896D58Aa88Ec"
       abi: StoreFront
-      startBlock: 30863361
+      startBlock: 31690153
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -53,6 +53,7 @@ dataSources:
         - Approval
         - ApprovalForAll
         - AssetCreated
+        - AssetDestroyed
         - Paused
         - StoreFrontRoleAdminChanged
         - StoreFrontRoleGranted
@@ -69,6 +70,8 @@ dataSources:
           handler: handleApprovalForAll
         - event: AssetCreated(uint256,indexed address,string)
           handler: handleAssetCreated
+        - event: AssetDestroyed(indexed uint256,address)
+          handler: handleAssetDestroyed
         - event: Paused(address)
           handler: handlePaused
         - event: StoreFrontRoleAdminChanged(indexed bytes32,indexed bytes32,indexed bytes32)

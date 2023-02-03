@@ -10,16 +10,16 @@ import {
   BigInt
 } from "@graphprotocol/graph-ts";
 
-export class MarketItemCreated extends ethereum.Event {
-  get params(): MarketItemCreated__Params {
-    return new MarketItemCreated__Params(this);
+export class ItemForSale extends ethereum.Event {
+  get params(): ItemForSale__Params {
+    return new ItemForSale__Params(this);
   }
 }
 
-export class MarketItemCreated__Params {
-  _event: MarketItemCreated;
+export class ItemForSale__Params {
+  _event: ItemForSale;
 
-  constructor(event: MarketItemCreated) {
+  constructor(event: ItemForSale) {
     this._event = event;
   }
 
@@ -43,47 +43,21 @@ export class MarketItemCreated__Params {
     return this._event.parameters[4].value.toAddress();
   }
 
-  get owner(): Address {
-    return this._event.parameters[5].value.toAddress();
-  }
-
   get price(): BigInt {
-    return this._event.parameters[6].value.toBigInt();
-  }
-
-  get forSale(): boolean {
-    return this._event.parameters[7].value.toBoolean();
+    return this._event.parameters[5].value.toBigInt();
   }
 }
 
-export class MarketItemRemoved extends ethereum.Event {
-  get params(): MarketItemRemoved__Params {
-    return new MarketItemRemoved__Params(this);
+export class ItemRemoved extends ethereum.Event {
+  get params(): ItemRemoved__Params {
+    return new ItemRemoved__Params(this);
   }
 }
 
-export class MarketItemRemoved__Params {
-  _event: MarketItemRemoved;
+export class ItemRemoved__Params {
+  _event: ItemRemoved;
 
-  constructor(event: MarketItemRemoved) {
-    this._event = event;
-  }
-
-  get itemId(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
-  }
-}
-
-export class MarketItemSold extends ethereum.Event {
-  get params(): MarketItemSold__Params {
-    return new MarketItemSold__Params(this);
-  }
-}
-
-export class MarketItemSold__Params {
-  _event: MarketItemSold;
-
-  constructor(event: MarketItemSold) {
+  constructor(event: ItemRemoved) {
     this._event = event;
   }
 
@@ -99,12 +73,54 @@ export class MarketItemSold__Params {
     return this._event.parameters[2].value.toBigInt();
   }
 
+  get metaDataURI(): string {
+    return this._event.parameters[3].value.toString();
+  }
+
+  get seller(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+}
+
+export class ItemSold extends ethereum.Event {
+  get params(): ItemSold__Params {
+    return new ItemSold__Params(this);
+  }
+}
+
+export class ItemSold__Params {
+  _event: ItemSold;
+
+  constructor(event: ItemSold) {
+    this._event = event;
+  }
+
+  get itemId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get nftContract(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get tokenId(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get metadataURI(): string {
+    return this._event.parameters[3].value.toString();
+  }
+
+  get seller(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
   get buyer(): Address {
-    return this._event.parameters[3].value.toAddress();
+    return this._event.parameters[5].value.toAddress();
   }
 
   get price(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
+    return this._event.parameters[6].value.toBigInt();
   }
 }
 
@@ -193,8 +209,7 @@ export class Marketplace__idToMarketItemResult {
   value3: Address;
   value4: Address;
   value5: BigInt;
-  value6: boolean;
-  value7: boolean;
+  value6: i32;
 
   constructor(
     value0: BigInt,
@@ -203,8 +218,7 @@ export class Marketplace__idToMarketItemResult {
     value3: Address,
     value4: Address,
     value5: BigInt,
-    value6: boolean,
-    value7: boolean
+    value6: i32
   ) {
     this.value0 = value0;
     this.value1 = value1;
@@ -213,7 +227,6 @@ export class Marketplace__idToMarketItemResult {
     this.value4 = value4;
     this.value5 = value5;
     this.value6 = value6;
-    this.value7 = value7;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
@@ -224,8 +237,10 @@ export class Marketplace__idToMarketItemResult {
     map.set("value3", ethereum.Value.fromAddress(this.value3));
     map.set("value4", ethereum.Value.fromAddress(this.value4));
     map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
-    map.set("value6", ethereum.Value.fromBoolean(this.value6));
-    map.set("value7", ethereum.Value.fromBoolean(this.value7));
+    map.set(
+      "value6",
+      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(this.value6))
+    );
     return map;
   }
 
@@ -253,12 +268,33 @@ export class Marketplace__idToMarketItemResult {
     return this.value5;
   }
 
-  getForSale(): boolean {
+  getStatus(): i32 {
     return this.value6;
   }
+}
 
-  getDeleted(): boolean {
-    return this.value7;
+export class Marketplace__royaltyInfoResult {
+  value0: Address;
+  value1: BigInt;
+
+  constructor(value0: Address, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getValue0(): Address {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
   }
 }
 
@@ -311,45 +347,6 @@ export class Marketplace extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBytes());
-  }
-
-  createMarketItem(
-    nftContract: Address,
-    tokenId: BigInt,
-    price: BigInt
-  ): BigInt {
-    let result = super.call(
-      "createMarketItem",
-      "createMarketItem(address,uint256,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(nftContract),
-        ethereum.Value.fromUnsignedBigInt(tokenId),
-        ethereum.Value.fromUnsignedBigInt(price)
-      ]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_createMarketItem(
-    nftContract: Address,
-    tokenId: BigInt,
-    price: BigInt
-  ): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "createMarketItem",
-      "createMarketItem(address,uint256,uint256):(uint256)",
-      [
-        ethereum.Value.fromAddress(nftContract),
-        ethereum.Value.fromUnsignedBigInt(tokenId),
-        ethereum.Value.fromUnsignedBigInt(price)
-      ]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   getRoleAdmin(role: Bytes): Bytes {
@@ -449,7 +446,7 @@ export class Marketplace extends ethereum.SmartContract {
   idToMarketItem(param0: BigInt): Marketplace__idToMarketItemResult {
     let result = super.call(
       "idToMarketItem",
-      "idToMarketItem(uint256):(uint256,address,uint256,address,address,uint256,bool,bool)",
+      "idToMarketItem(uint256):(uint256,address,uint256,address,address,uint256,uint8)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
@@ -460,8 +457,7 @@ export class Marketplace extends ethereum.SmartContract {
       result[3].toAddress(),
       result[4].toAddress(),
       result[5].toBigInt(),
-      result[6].toBoolean(),
-      result[7].toBoolean()
+      result[6].toI32()
     );
   }
 
@@ -470,7 +466,7 @@ export class Marketplace extends ethereum.SmartContract {
   ): ethereum.CallResult<Marketplace__idToMarketItemResult> {
     let result = super.tryCall(
       "idToMarketItem",
-      "idToMarketItem(uint256):(uint256,address,uint256,address,address,uint256,bool,bool)",
+      "idToMarketItem(uint256):(uint256,address,uint256,address,address,uint256,uint8)",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
     if (result.reverted) {
@@ -485,22 +481,60 @@ export class Marketplace extends ethereum.SmartContract {
         value[3].toAddress(),
         value[4].toAddress(),
         value[5].toBigInt(),
-        value[6].toBoolean(),
-        value[7].toBoolean()
+        value[6].toI32()
       )
     );
   }
 
-  payoutAddress(): Address {
-    let result = super.call("payoutAddress", "payoutAddress():(address)", []);
+  listSaleItem(nftContract: Address, tokenId: BigInt, price: BigInt): BigInt {
+    let result = super.call(
+      "listSaleItem",
+      "listSaleItem(address,uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(nftContract),
+        ethereum.Value.fromUnsignedBigInt(tokenId),
+        ethereum.Value.fromUnsignedBigInt(price)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_listSaleItem(
+    nftContract: Address,
+    tokenId: BigInt,
+    price: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "listSaleItem",
+      "listSaleItem(address,uint256,uint256):(uint256)",
+      [
+        ethereum.Value.fromAddress(nftContract),
+        ethereum.Value.fromUnsignedBigInt(tokenId),
+        ethereum.Value.fromUnsignedBigInt(price)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  marketplacePayoutAddress(): Address {
+    let result = super.call(
+      "marketplacePayoutAddress",
+      "marketplacePayoutAddress():(address)",
+      []
+    );
 
     return result[0].toAddress();
   }
 
-  try_payoutAddress(): ethereum.CallResult<Address> {
+  try_marketplacePayoutAddress(): ethereum.CallResult<Address> {
     let result = super.tryCall(
-      "payoutAddress",
-      "payoutAddress():(address)",
+      "marketplacePayoutAddress",
+      "marketplacePayoutAddress():(address)",
       []
     );
     if (result.reverted) {
@@ -531,6 +565,49 @@ export class Marketplace extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  royaltyInfo(
+    _tokenId: BigInt,
+    _salePrice: BigInt
+  ): Marketplace__royaltyInfoResult {
+    let result = super.call(
+      "royaltyInfo",
+      "royaltyInfo(uint256,uint256):(address,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_tokenId),
+        ethereum.Value.fromUnsignedBigInt(_salePrice)
+      ]
+    );
+
+    return new Marketplace__royaltyInfoResult(
+      result[0].toAddress(),
+      result[1].toBigInt()
+    );
+  }
+
+  try_royaltyInfo(
+    _tokenId: BigInt,
+    _salePrice: BigInt
+  ): ethereum.CallResult<Marketplace__royaltyInfoResult> {
+    let result = super.tryCall(
+      "royaltyInfo",
+      "royaltyInfo(uint256,uint256):(address,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_tokenId),
+        ethereum.Value.fromUnsignedBigInt(_salePrice)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new Marketplace__royaltyInfoResult(
+        value[0].toAddress(),
+        value[1].toBigInt()
+      )
+    );
   }
 
   supportsInterface(interfaceId: Bytes): boolean {
@@ -587,6 +664,36 @@ export class ConstructorCall__Outputs {
   }
 }
 
+export class BuyItemCall extends ethereum.Call {
+  get inputs(): BuyItemCall__Inputs {
+    return new BuyItemCall__Inputs(this);
+  }
+
+  get outputs(): BuyItemCall__Outputs {
+    return new BuyItemCall__Outputs(this);
+  }
+}
+
+export class BuyItemCall__Inputs {
+  _call: BuyItemCall;
+
+  constructor(call: BuyItemCall) {
+    this._call = call;
+  }
+
+  get itemId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class BuyItemCall__Outputs {
+  _call: BuyItemCall;
+
+  constructor(call: BuyItemCall) {
+    this._call = call;
+  }
+}
+
 export class ChangeFeeAndPayoutAddressCall extends ethereum.Call {
   get inputs(): ChangeFeeAndPayoutAddressCall__Inputs {
     return new ChangeFeeAndPayoutAddressCall__Inputs(this);
@@ -617,82 +724,6 @@ export class ChangeFeeAndPayoutAddressCall__Outputs {
   _call: ChangeFeeAndPayoutAddressCall;
 
   constructor(call: ChangeFeeAndPayoutAddressCall) {
-    this._call = call;
-  }
-}
-
-export class CreateMarketItemCall extends ethereum.Call {
-  get inputs(): CreateMarketItemCall__Inputs {
-    return new CreateMarketItemCall__Inputs(this);
-  }
-
-  get outputs(): CreateMarketItemCall__Outputs {
-    return new CreateMarketItemCall__Outputs(this);
-  }
-}
-
-export class CreateMarketItemCall__Inputs {
-  _call: CreateMarketItemCall;
-
-  constructor(call: CreateMarketItemCall) {
-    this._call = call;
-  }
-
-  get nftContract(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get tokenId(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
-  }
-
-  get price(): BigInt {
-    return this._call.inputValues[2].value.toBigInt();
-  }
-}
-
-export class CreateMarketItemCall__Outputs {
-  _call: CreateMarketItemCall;
-
-  constructor(call: CreateMarketItemCall) {
-    this._call = call;
-  }
-
-  get value0(): BigInt {
-    return this._call.outputValues[0].value.toBigInt();
-  }
-}
-
-export class CreateMarketSaleCall extends ethereum.Call {
-  get inputs(): CreateMarketSaleCall__Inputs {
-    return new CreateMarketSaleCall__Inputs(this);
-  }
-
-  get outputs(): CreateMarketSaleCall__Outputs {
-    return new CreateMarketSaleCall__Outputs(this);
-  }
-}
-
-export class CreateMarketSaleCall__Inputs {
-  _call: CreateMarketSaleCall;
-
-  constructor(call: CreateMarketSaleCall) {
-    this._call = call;
-  }
-
-  get nftContract(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-
-  get itemId(): BigInt {
-    return this._call.inputValues[1].value.toBigInt();
-  }
-}
-
-export class CreateMarketSaleCall__Outputs {
-  _call: CreateMarketSaleCall;
-
-  constructor(call: CreateMarketSaleCall) {
     this._call = call;
   }
 }
@@ -731,20 +762,62 @@ export class GrantRoleCall__Outputs {
   }
 }
 
-export class RemoveFromSaleCall extends ethereum.Call {
-  get inputs(): RemoveFromSaleCall__Inputs {
-    return new RemoveFromSaleCall__Inputs(this);
+export class ListSaleItemCall extends ethereum.Call {
+  get inputs(): ListSaleItemCall__Inputs {
+    return new ListSaleItemCall__Inputs(this);
   }
 
-  get outputs(): RemoveFromSaleCall__Outputs {
-    return new RemoveFromSaleCall__Outputs(this);
+  get outputs(): ListSaleItemCall__Outputs {
+    return new ListSaleItemCall__Outputs(this);
   }
 }
 
-export class RemoveFromSaleCall__Inputs {
-  _call: RemoveFromSaleCall;
+export class ListSaleItemCall__Inputs {
+  _call: ListSaleItemCall;
 
-  constructor(call: RemoveFromSaleCall) {
+  constructor(call: ListSaleItemCall) {
+    this._call = call;
+  }
+
+  get nftContract(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get tokenId(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+
+  get price(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+}
+
+export class ListSaleItemCall__Outputs {
+  _call: ListSaleItemCall;
+
+  constructor(call: ListSaleItemCall) {
+    this._call = call;
+  }
+
+  get value0(): BigInt {
+    return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class RemoveSaleItemCall extends ethereum.Call {
+  get inputs(): RemoveSaleItemCall__Inputs {
+    return new RemoveSaleItemCall__Inputs(this);
+  }
+
+  get outputs(): RemoveSaleItemCall__Outputs {
+    return new RemoveSaleItemCall__Outputs(this);
+  }
+}
+
+export class RemoveSaleItemCall__Inputs {
+  _call: RemoveSaleItemCall;
+
+  constructor(call: RemoveSaleItemCall) {
     this._call = call;
   }
 
@@ -753,10 +826,10 @@ export class RemoveFromSaleCall__Inputs {
   }
 }
 
-export class RemoveFromSaleCall__Outputs {
-  _call: RemoveFromSaleCall;
+export class RemoveSaleItemCall__Outputs {
+  _call: RemoveSaleItemCall;
 
-  constructor(call: RemoveFromSaleCall) {
+  constructor(call: RemoveSaleItemCall) {
     this._call = call;
   }
 }

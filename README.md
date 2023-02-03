@@ -37,7 +37,7 @@ MNEMONIC=
 
 5. Lastly we need to provide the wallet from which the gas will be deducted in order to deploy the smart contract. We provide the `MNEMONIC` i.e., The seed words from the ETH wallet/metamask to pay for the transaction. Ensure that there are enough funds in the wallet to pay for the transaction.
 
-## Compiling the contract
+## Compiling Contracts
 
 Next, if you take a look at `contracts/`, you should be able to find `StoreFront.sol` & `Marketplace.sol` and the `Rarible` Royalties Library.
 
@@ -47,7 +47,7 @@ Compile the smart contract by using
 yarn hardhat compile
 ```
 
-## Testing the contract
+## Testing Contracts
 
 This project has tests that uses `@openzeppelin/test-helpers`. If we take a look at `test/`, you should be able to find various `test.js`.
 
@@ -57,7 +57,7 @@ To run the tests, we can use command:
 yarn test
 ```
 
-## Deploying the contract
+## Deploying Contracts
 
 Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we use `deploy.js` and run it with
 
@@ -65,13 +65,13 @@ Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we 
 yarn deploy maticmum
 ```
 
-## Contract deployments
+## Contract Deployments - V2
 
-> `Marketplace Deployed to: 0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988`
+> `Marketplace Deployed to: 0x72AFc9D60EBd2265a2420d580D2918392fae47f6`
 
-> `StoreFront Deployed to: 0x6ACe19E59680514A02ae8D558183d5C3Ce55B866`
+> `StoreFront Deployed to: 0xe0CdEbF537574BcbB362885593Ee896D58Aa88Ec`
 
-## Etherscan verification
+## Etherscan Verification
 
 To try out Etherscan verification, we need to deploy a contract to an Ethereum network that's supported by Etherscan, such as `Polygon Testnet - maticmum`.
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
@@ -83,9 +83,9 @@ npx hardhat verify --network maticmum --constructor-args StoreFrontArguments.js 
 
 where `MarketplaceArguments.js` & `StoreFrontArguments.js` is a javascript module that exports the argument list.
 
-[Marketplace Contract](https://mumbai.polygonscan.com/address/0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988#code)
+[Marketplace Contract](https://mumbai.polygonscan.com/address/0x72AFc9D60EBd2265a2420d580D2918392fae47f6#code)
 
-[StoreFront Contract](https://mumbai.polygonscan.com/address/0x6ACe19E59680514A02ae8D558183d5C3Ce55B866#code)
+[StoreFront Contract](https://mumbai.polygonscan.com/address/0xe0CdEbF537574BcbB362885593Ee896D58Aa88Ec#code)
 
 Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and interact with the smart contract at section `Read Contract` and `Write Contract`
 
@@ -95,17 +95,17 @@ Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and
 graph init --index-events
 graph codegen && graph build
 graph auth --product hosted-service $GRAPH_TOKEN
-graph deploy --product hosted-service myriadflow/storefront-v1
+graph deploy --product hosted-service myriadflow/marketplacev1
 ```
 
-Build completed: QmWFXH6aKGV8AS9wWqJdp7NoYBsYksAAL9X7hXTmxncfyQ
+Build completed: QmWRK1oCkdiq2gSjhJAB9bDU4gkRMKQEZmF7Vf1vPzrG2v
 
-Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1
+Deployed to https://thegraph.com/explorer/subgraph/myriadflow/marketplacev1
 
 Subgraph endpoints:
-Queries (HTTP):     https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v1
+Queries (HTTP):     https://api.thegraph.com/subgraphs/name/myriadflow/marketplacev1
 
-# Quick deployment
+# Quick Deployment
 
 Run
 

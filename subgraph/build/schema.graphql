@@ -1,31 +1,35 @@
-type MarketItemCreated @entity(immutable: true) {
+type ItemForSale @entity(immutable: true) {
   id: Bytes!
   itemId: BigInt! # uint256
   nftContract: Bytes! # address
   tokenId: BigInt! # uint256
   metaDataURI: String! # string
   seller: Bytes! # address
-  owner: Bytes! # address
   price: BigInt! # uint256
-  forSale: Boolean! # bool
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
 }
 
-type MarketItemRemoved @entity(immutable: true) {
-  id: Bytes!
-  itemId: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type MarketItemSold @entity(immutable: true) {
+type ItemRemoved @entity(immutable: true) {
   id: Bytes!
   itemId: BigInt! # uint256
   nftContract: Bytes! # address
   tokenId: BigInt! # uint256
+  metaDataURI: String! # string
+  seller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ItemSold @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  metadataURI: String! # string
+  seller: Bytes! # address
   buyer: Bytes! # address
   price: BigInt! # uint256
   blockNumber: BigInt!
@@ -87,6 +91,15 @@ type AssetCreated @entity(immutable: true) {
   tokenID: BigInt! # uint256
   creator: Bytes! # address
   metaDataURI: String! # string
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AssetDestroyed @entity(immutable: true) {
+  id: Bytes!
+  tokenId: BigInt! # uint256
+  ownerOrApproved: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

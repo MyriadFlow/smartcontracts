@@ -2,6 +2,7 @@ import {
   Approval as ApprovalEvent,
   ApprovalForAll as ApprovalForAllEvent,
   AssetCreated as AssetCreatedEvent,
+  AssetDestroyed as AssetDestroyedEvent,
   Paused as PausedEvent,
   StoreFrontRoleAdminChanged as StoreFrontRoleAdminChangedEvent,
   StoreFrontRoleGranted as StoreFrontRoleGrantedEvent,
@@ -13,6 +14,7 @@ import {
   Approval,
   ApprovalForAll,
   AssetCreated,
+  AssetDestroyed,
   Paused,
   StoreFrontRoleAdminChanged,
   StoreFrontRoleGranted,
@@ -58,6 +60,20 @@ export function handleAssetCreated(event: AssetCreatedEvent): void {
   entity.tokenID = event.params.tokenID
   entity.creator = event.params.creator
   entity.metaDataURI = event.params.metaDataURI
+
+  entity.blockNumber = event.block.number
+  entity.blockTimestamp = event.block.timestamp
+  entity.transactionHash = event.transaction.hash
+
+  entity.save()
+}
+
+export function handleAssetDestroyed(event: AssetDestroyedEvent): void {
+  let entity = new AssetDestroyed(
+    event.transaction.hash.concatI32(event.logIndex.toI32())
+  )
+  entity.tokenId = event.params.tokenId
+  entity.ownerOrApproved = event.params.ownerOrApproved
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

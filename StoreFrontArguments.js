@@ -1,5 +1,5 @@
 module.exports = [
-  "StoreFront V1",
-  "SFv1",
-  "0x8C0594bf5e27b62DafCA04e9c6aB883EfD64B988",
+  "StoreFront V2",
+  "SFv2",
+  "0x72AFc9D60EBd2265a2420d580D2918392fae47f6",
 ];

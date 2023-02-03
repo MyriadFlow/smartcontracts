@@ -4,6 +4,7 @@ import {
   Approval,
   ApprovalForAll,
   AssetCreated,
+  AssetDestroyed,
   Paused,
   StoreFrontRoleAdminChanged,
   StoreFrontRoleGranted,
@@ -85,6 +86,30 @@ export function createAssetCreatedEvent(
   )
 
   return assetCreatedEvent
+}
+
+export function createAssetDestroyedEvent(
+  tokenId: BigInt,
+  ownerOrApproved: Address
+): AssetDestroyed {
+  let assetDestroyedEvent = changetype<AssetDestroyed>(newMockEvent())
+
+  assetDestroyedEvent.parameters = new Array()
+
+  assetDestroyedEvent.parameters.push(
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  )
+  assetDestroyedEvent.parameters.push(
+    new ethereum.EventParam(
+      "ownerOrApproved",
+      ethereum.Value.fromAddress(ownerOrApproved)
+    )
+  )
+
+  return assetDestroyedEvent
 }
 
 export function createPausedEvent(account: Address): Paused {

@@ -88,6 +88,28 @@ export class AssetCreated__Params {
   }
 }
 
+export class AssetDestroyed extends ethereum.Event {
+  get params(): AssetDestroyed__Params {
+    return new AssetDestroyed__Params(this);
+  }
+}
+
+export class AssetDestroyed__Params {
+  _event: AssetDestroyed;
+
+  constructor(event: AssetDestroyed) {
+    this._event = event;
+  }
+
+  get tokenId(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+
+  get ownerOrApproved(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+}
+
 export class Paused extends ethereum.Event {
   get params(): Paused__Params {
     return new Paused__Params(this);
@@ -228,6 +250,31 @@ export class Unpaused__Params {
   }
 }
 
+export class StoreFront__royaltyInfoResult {
+  value0: Address;
+  value1: BigInt;
+
+  constructor(value0: Address, value1: BigInt) {
+    this.value0 = value0;
+    this.value1 = value1;
+  }
+
+  toMap(): TypedMap<string, ethereum.Value> {
+    let map = new TypedMap<string, ethereum.Value>();
+    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    return map;
+  }
+
+  getValue0(): Address {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
+}
+
 export class StoreFront extends ethereum.SmartContract {
   static bind(address: Address): StoreFront {
     return new StoreFront("StoreFront", address);
@@ -344,18 +391,31 @@ export class StoreFront extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  createAsset(metadataURI: string): BigInt {
-    let result = super.call("createAsset", "createAsset(string):(uint256)", [
-      ethereum.Value.fromString(metadataURI)
-    ]);
+  createAsset(metadataURI: string, royaltyPercentBasisPoint: BigInt): BigInt {
+    let result = super.call(
+      "createAsset",
+      "createAsset(string,uint96):(uint256)",
+      [
+        ethereum.Value.fromString(metadataURI),
+        ethereum.Value.fromUnsignedBigInt(royaltyPercentBasisPoint)
+      ]
+    );
 
     return result[0].toBigInt();
   }
 
-  try_createAsset(metadataURI: string): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("createAsset", "createAsset(string):(uint256)", [
-      ethereum.Value.fromString(metadataURI)
-    ]);
+  try_createAsset(
+    metadataURI: string,
+    royaltyPercentBasisPoint: BigInt
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "createAsset",
+      "createAsset(string,uint96):(uint256)",
+      [
+        ethereum.Value.fromString(metadataURI),
+        ethereum.Value.fromUnsignedBigInt(royaltyPercentBasisPoint)
+      ]
+    );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -363,13 +423,18 @@ export class StoreFront extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  delegateAssetCreation(creator: Address, metadataURI: string): BigInt {
+  delegateAssetCreation(
+    creator: Address,
+    metadataURI: string,
+    royaltyPercentBasisPoint: BigInt
+  ): BigInt {
     let result = super.call(
       "delegateAssetCreation",
-      "delegateAssetCreation(address,string):(uint256)",
+      "delegateAssetCreation(address,string,uint96):(uint256)",
       [
         ethereum.Value.fromAddress(creator),
-        ethereum.Value.fromString(metadataURI)
+        ethereum.Value.fromString(metadataURI),
+        ethereum.Value.fromUnsignedBigInt(royaltyPercentBasisPoint)
       ]
     );
 
@@ -378,14 +443,16 @@ export class StoreFront extends ethereum.SmartContract {
 
   try_delegateAssetCreation(
     creator: Address,
-    metadataURI: string
+    metadataURI: string,
+    royaltyPercentBasisPoint: BigInt
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "delegateAssetCreation",
-      "delegateAssetCreation(address,string):(uint256)",
+      "delegateAssetCreation(address,string,uint96):(uint256)",
       [
         ethereum.Value.fromAddress(creator),
-        ethereum.Value.fromString(metadataURI)
+        ethereum.Value.fromString(metadataURI),
+        ethereum.Value.fromUnsignedBigInt(royaltyPercentBasisPoint)
       ]
     );
     if (result.reverted) {
@@ -600,6 +667,49 @@ export class StoreFront extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
+  royaltyInfo(
+    _tokenId: BigInt,
+    _salePrice: BigInt
+  ): StoreFront__royaltyInfoResult {
+    let result = super.call(
+      "royaltyInfo",
+      "royaltyInfo(uint256,uint256):(address,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_tokenId),
+        ethereum.Value.fromUnsignedBigInt(_salePrice)
+      ]
+    );
+
+    return new StoreFront__royaltyInfoResult(
+      result[0].toAddress(),
+      result[1].toBigInt()
+    );
+  }
+
+  try_royaltyInfo(
+    _tokenId: BigInt,
+    _salePrice: BigInt
+  ): ethereum.CallResult<StoreFront__royaltyInfoResult> {
+    let result = super.tryCall(
+      "royaltyInfo",
+      "royaltyInfo(uint256,uint256):(address,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(_tokenId),
+        ethereum.Value.fromUnsignedBigInt(_salePrice)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new StoreFront__royaltyInfoResult(
+        value[0].toAddress(),
+        value[1].toBigInt()
+      )
+    );
+  }
+
   supportsInterface(interfaceId: Bytes): boolean {
     let result = super.call(
       "supportsInterface",
@@ -798,36 +908,6 @@ export class ApproveCall__Outputs {
   }
 }
 
-export class BurnCall extends ethereum.Call {
-  get inputs(): BurnCall__Inputs {
-    return new BurnCall__Inputs(this);
-  }
-
-  get outputs(): BurnCall__Outputs {
-    return new BurnCall__Outputs(this);
-  }
-}
-
-export class BurnCall__Inputs {
-  _call: BurnCall;
-
-  constructor(call: BurnCall) {
-    this._call = call;
-  }
-
-  get tokenId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class BurnCall__Outputs {
-  _call: BurnCall;
-
-  constructor(call: BurnCall) {
-    this._call = call;
-  }
-}
-
 export class CreateAssetCall extends ethereum.Call {
   get inputs(): CreateAssetCall__Inputs {
     return new CreateAssetCall__Inputs(this);
@@ -847,6 +927,10 @@ export class CreateAssetCall__Inputs {
 
   get metadataURI(): string {
     return this._call.inputValues[0].value.toString();
+  }
+
+  get royaltyPercentBasisPoint(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
   }
 }
 
@@ -886,6 +970,10 @@ export class DelegateAssetCreationCall__Inputs {
   get metadataURI(): string {
     return this._call.inputValues[1].value.toString();
   }
+
+  get royaltyPercentBasisPoint(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
 }
 
 export class DelegateAssetCreationCall__Outputs {
@@ -897,6 +985,36 @@ export class DelegateAssetCreationCall__Outputs {
 
   get value0(): BigInt {
     return this._call.outputValues[0].value.toBigInt();
+  }
+}
+
+export class DestroyAssetCall extends ethereum.Call {
+  get inputs(): DestroyAssetCall__Inputs {
+    return new DestroyAssetCall__Inputs(this);
+  }
+
+  get outputs(): DestroyAssetCall__Outputs {
+    return new DestroyAssetCall__Outputs(this);
+  }
+}
+
+export class DestroyAssetCall__Inputs {
+  _call: DestroyAssetCall;
+
+  constructor(call: DestroyAssetCall) {
+    this._call = call;
+  }
+
+  get tokenId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class DestroyAssetCall__Outputs {
+  _call: DestroyAssetCall;
+
+  constructor(call: DestroyAssetCall) {
+    this._call = call;
   }
 }
 

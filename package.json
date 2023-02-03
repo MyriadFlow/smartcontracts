@@ -8,9 +8,9 @@
   "scripts": {
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.ts --network $NETWORK",
-    "verify": "npm run verify:storefront && npm run verify:marketplace",
-    "verify:storefront": "npx hardhat verify --network $NETWORK $STOREFRONT_ADDRESS 'StoreFront V1' SFv1 $MARKETPLACE_ADDRESS",
-    "verify:marketplace": "npx hardhat verify --network $NETWORK $MARKETPLACE_ADDRESS 30"
+    "verify": "npm run verify:marketplace && npm run verify:storefront",
+    "verify:marketplace": "npx hardhat verify --network $NETWORK $MARKETPLACE_ADDRESS 30",
+    "verify:storefront": "npx hardhat verify --network $NETWORK $STOREFRONT_ADDRESS 'StoreFront V1' SFv1 $MARKETPLACE_ADDRESS"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",
