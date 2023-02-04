@@ -1,13 +1,14 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
-import { expect } from "chai"
-import { ethers } from "hardhat"
+import { expect , assert } from "chai"
+import { ethers , network} from "hardhat"
 import { StoreFront, Marketplace } from "../typechain-types"
 
 describe("storefront contract", () => {
 
-    let [owner, creator, creator2, buyer, operator]: SignerWithAddress[] = new Array(5)
+    let [owner, creator, creator2, buyer, operator ]: SignerWithAddress[] = new Array(5)
     before(async () => {
         [owner, operator, creator, creator2, buyer] = await ethers.getSigners()
+        
     })
     let storefront: StoreFront
     let marketplace: Marketplace
@@ -103,7 +104,7 @@ describe("storefront contract", () => {
 
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.owner).to.equal(buyer.address)
-        expect(marketItem.status).to.equal(3)
+        expect(marketItem.status).to.equal(2)//check
     })
 
     it("Should be able to delete market item", async () => {
@@ -131,4 +132,87 @@ describe("storefront contract", () => {
             value: salePrice
         })).to.be.revertedWith("Marketplace: Market item is not for sale")
     })
+    it("To check the royalty is working or not",async () => {
+        await storefront.connect(buyer).approve(marketplace.address, 1)
+        const startingCreatorBalance =  await marketplace.provider.getBalance(
+                creator2.address
+            ) 
+        let val = ethers.utils.parseEther("1");
+        
+        await marketplace.connect(buyer).listSaleItem(storefront.address,1 , val);
+        await  marketplace.connect(operator).buyItem(3 , {value : val});
+
+        const endingCreatorBalance = await marketplace.provider.getBalance(
+                creator2.address
+            ) 
+        let amount = (val.mul(70)).div(100)    
+        
+        //700000000000000000
+        const royalty = await storefront.royaltyInfo(1,amount)
+        assert.equal(
+                endingCreatorBalance.sub(startingCreatorBalance).toString(),
+                royalty[1].toString()
+            )   
+    })
+   
+    it("Auction : to check if the auction is working or not",async () => {
+        let accounts = await ethers.getSigners() 
+        let [buyer1,buyer2 , buyer3] = [accounts[5] , accounts[6] , accounts[7]]
+        await storefront.connect(operator).approve(marketplace.address, 1)
+        let val = ethers.utils.parseEther("1");
+        await marketplace.connect(operator).listSaleItem(storefront.address,1 , val);
+
+        
+        //to check if the auction item  is created or not
+        expect(marketplace.connect(operator).startAuction(storefront.address , 1 , val , 60 , 4)).to.emit(marketplace ,"Start")
+        val = ethers.utils.parseEther("1.1");
+
+        //to check if bidding can be done or not
+        expect(marketplace.connect(buyer1).bid(4, {value : val })).to.emit(marketplace,"Bid").withArgs(1,val,buyer1.address)
+
+        //to check user won't be bid less than the previous highest bid
+       expect(marketplace.connect(buyer2).bid(4, {value : val })).to.be.revertedWith("value less than the highest Bid")
+       val = ethers.utils.parseEther("2");
+       await marketplace.connect(buyer2).bid(4, {value : val })
+       await network.provider.send("hardhat_mine", ["0x150"]);
+
+        //to check if the user can't bid after end time  
+        val = ethers.utils.parseEther("2");
+        const Bidder2 = marketplace.connect(buyer2)
+        await expect(Bidder2.bid(1, {value : val })).to.be.reverted;
+    })
+    it("Auction : to check the highest bidder , Withdraw ",async () => {
+        let accounts = await ethers.getSigners() 
+        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
+        const highestBidder = await marketplace.highestBidder(1)
+  
+        expect(highestBidder.toString()).to.be.equal(buyer2.address);
+        
+        //highest bidder can't pull out the money 
+        
+        await expect(marketplace.connect(buyer2).withdrawBid(1)).to.be.reverted;
+
+        let Bidder1 = await marketplace.connect(buyer1).withdrawBid(1)
+
+        //if the user didn't bid any amount to be reverted
+        await expect(marketplace.withdrawBid(1)).to.be.reverted;
+        
+        
+
+    })
+    it("Auction : buyitem and EndAuction",async () => {
+          let accounts = await ethers.getSigners() 
+        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
+        const val = ethers.utils.parseEther("1")
+        await marketplace.connect(creator).listSaleItem(storefront.address,2,val)
+        await marketplace.connect(creator).startAuction(storefront.address,2,0,40,5)
+
+        await expect(marketplace.buyItem(5,{value : val})).to.be.revertedWith("Marketplace: Market item is  for Auction")
+        
+        await expect(marketplace.connect(operator).endAuction(4)).to.emit(marketplace,"AuctionEnded").withArgs(1,operator.address,buyer2.address)
+        //user can't bid , the auction has bee ended
+        await expect(marketplace.bid(5 , {value : ethers.utils.parseEther("1")})).to.be.reverted;
+
+    })
+
 })
