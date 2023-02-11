@@ -23,6 +23,7 @@ export interface MarketplaceInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
+    "Time()": FunctionFragment;
     "acceptBidAndEndAuction(uint256)": FunctionFragment;
     "bids(uint256,address)": FunctionFragment;
     "buyItem(uint256)": FunctionFragment;
@@ -34,6 +35,7 @@ export interface MarketplaceInterface extends utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "highestBidder(uint256)": FunctionFragment;
     "idToMarketItem(uint256)": FunctionFragment;
+    "invokeStartAuction(uint256,uint256)": FunctionFragment;
     "listItem(address,uint256,uint256,bool,uint256)": FunctionFragment;
     "marketplacePayoutAddress()": FunctionFragment;
     "placeBid(uint256)": FunctionFragment;
@@ -42,7 +44,6 @@ export interface MarketplaceInterface extends utils.Interface {
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
-    "startAuction(address,uint256,uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "updateAuctionTime(uint256,uint256)": FunctionFragment;
     "updatePrice(uint256,uint256)": FunctionFragment;
@@ -56,6 +57,7 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "MARKETPLACE_ADMIN_ROLE",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "Time", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "acceptBidAndEndAuction",
     values: [BigNumberish]
@@ -101,6 +103,10 @@ export interface MarketplaceInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "invokeStartAuction",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "listItem",
     values: [string, BigNumberish, BigNumberish, boolean, BigNumberish]
   ): string;
@@ -133,10 +139,6 @@ export interface MarketplaceInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "startAuction",
-    values: [string, BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
@@ -157,6 +159,7 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "MARKETPLACE_ADMIN_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "Time", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "acceptBidAndEndAuction",
     data: BytesLike
@@ -189,6 +192,10 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "idToMarketItem",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "invokeStartAuction",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "listItem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "marketplacePayoutAddress",
@@ -207,10 +214,6 @@ export interface MarketplaceInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "startAuction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -389,6 +392,8 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    Time(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -465,6 +470,12 @@ export interface Marketplace extends BaseContract {
       }
     >;
 
+    invokeStartAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     listItem(
       nftContract: string,
       tokenId: BigNumberish,
@@ -506,14 +517,6 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
-    startAuction(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      time: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -535,6 +538,8 @@ export interface Marketplace extends BaseContract {
   DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  Time(overrides?: CallOverrides): Promise<BigNumber>;
 
   acceptBidAndEndAuction(
     itemId: BigNumberish,
@@ -609,6 +614,12 @@ export interface Marketplace extends BaseContract {
     }
   >;
 
+  invokeStartAuction(
+    itemId: BigNumberish,
+    time: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   listItem(
     nftContract: string,
     tokenId: BigNumberish,
@@ -650,14 +661,6 @@ export interface Marketplace extends BaseContract {
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
-  startAuction(
-    nftContract: string,
-    tokenId: BigNumberish,
-    price: BigNumberish,
-    time: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
@@ -679,6 +682,8 @@ export interface Marketplace extends BaseContract {
     DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    Time(overrides?: CallOverrides): Promise<BigNumber>;
 
     acceptBidAndEndAuction(
       itemId: BigNumberish,
@@ -753,6 +758,12 @@ export interface Marketplace extends BaseContract {
       }
     >;
 
+    invokeStartAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     listItem(
       nftContract: string,
       tokenId: BigNumberish,
@@ -787,14 +798,6 @@ export interface Marketplace extends BaseContract {
       _salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
-
-    startAuction(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -952,6 +955,8 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    Time(overrides?: CallOverrides): Promise<BigNumber>;
+
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1009,6 +1014,12 @@ export interface Marketplace extends BaseContract {
     idToMarketItem(
       arg0: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    invokeStartAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     listItem(
@@ -1052,14 +1063,6 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    startAuction(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      time: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -1086,6 +1089,8 @@ export interface Marketplace extends BaseContract {
     MARKETPLACE_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    Time(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     acceptBidAndEndAuction(
       itemId: BigNumberish,
@@ -1144,6 +1149,12 @@ export interface Marketplace extends BaseContract {
     idToMarketItem(
       arg0: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    invokeStartAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     listItem(
@@ -1189,14 +1200,6 @@ export interface Marketplace extends BaseContract {
       _tokenId: BigNumberish,
       _salePrice: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    startAuction(
-      nftContract: string,
-      tokenId: BigNumberish,
-      price: BigNumberish,
-      time: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(

@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
+import "hardhat/console.sol";
 
 error NotSeller();
 
@@ -159,12 +160,14 @@ contract Marketplace is
         address recieverAddress
     ) private nonReentrant {
         MarketItem memory _item = idToMarketItem[itemId];
+        _marketItem[_item.nftContract][_item.tokenId] = false;
+        _item.status = ItemStatus.SOLD;
+
         IERC721(_item.nftContract).transferFrom(
             address(this),
             recieverAddress,
             _item.tokenId
         );
-
         // Calculate Payout for Platform
         uint256 amountReceived = value;
         uint256 payoutForMarketplace = (amountReceived *
@@ -177,13 +180,13 @@ contract Marketplace is
 
         // Calculate Payout for Seller
         uint256 payoutForSeller = amountRemaining - royaltyAmount;
-
         //transfering amounts to marketplace, creator and seller
         payable(marketplacePayoutAddress).transfer(payoutForMarketplace);
         //creator
         payable(creator).transfer(royaltyAmount);
         //item Seller
         payable(_item.seller).transfer(payoutForSeller);
+        idToMarketItem[itemId].seller = address(0);
     }
 
     /**
@@ -205,7 +208,6 @@ contract Marketplace is
         _itemIds.increment();
         itemId = _itemIds.current();
 
-        //transfering the nft to the marketplace
         IERC721(nftContract).transferFrom(_msgSender(), address(this), tokenId);
 
         require(price > 0, "Marketplace: Price must be at least 1 wei");
@@ -253,6 +255,7 @@ contract Marketplace is
                 price,
                 ItemStatus.AUCTION
             );
+            idToMarketItem[itemId].status = ItemStatus.AUCTION;
             emit AuctionStarted(itemId, price, endAt, _msgSender());
         }
         return itemId;
@@ -277,7 +280,6 @@ contract Marketplace is
         string memory metadataURI = IERC721Metadata(
             idToMarketItem[itemId].nftContract
         ).tokenURI(idToMarketItem[itemId].tokenId);
-
         emit ItemRemoved(
             itemId,
             idToMarketItem[itemId].nftContract,
@@ -290,16 +292,16 @@ contract Marketplace is
     // why to start the sell always  and transfer
     function _invokeStartSale(uint itemId) private onlySeller(itemId) {
         idToMarketItem[itemId].auctioneEndTime = 0;
+        idToMarketItem[itemId].status = ItemStatus.SALE;
 
         address nftContract = idToMarketItem[itemId].nftContract;
         uint256 tokenId = idToMarketItem[itemId].tokenId;
         uint256 price = idToMarketItem[itemId].price;
 
-        idToMarketItem[itemId].status = ItemStatus.SALE;
-
         string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
             tokenId
         );
+
         emit SaleStarted(
             itemId,
             nftContract,
@@ -310,9 +312,6 @@ contract Marketplace is
         );
     }
 
-    //startSale to Auction -> StartAuction ;
-    //Auction to startSale -> conclude or acceptBid
-    // to generate Id in listItem
     /**
      *  @dev buy nft from a seller , transfer it &&
      *  check if it's not in auction already
@@ -330,15 +329,7 @@ contract Marketplace is
             "Marketplace: Pay Market Price to buy the NFT"
         );
 
-        idToMarketItem[itemId].seller = payable(_msgSender());
         idToMarketItem[itemId].status = ItemStatus.SOLD;
-
-        IERC721(_item.nftContract).transferFrom(
-            address(this),
-            _msgSender(),
-            _item.tokenId
-        );
-
         _paymentSplit(itemId, msg.value, _msgSender());
         // _itemsSold.increment();
         emit ItemSold(
@@ -356,6 +347,10 @@ contract Marketplace is
         uint256 itemId,
         uint256 time
     ) external onlySeller(itemId) {
+        require(
+            time >= 60,
+            "Marketplace: Timer cannot be less than One Minute"
+        );
         idToMarketItem[itemId].auctioneEndTime = 0;
 
         uint256 price = idToMarketItem[itemId].price;
@@ -385,7 +380,9 @@ contract Marketplace is
         );
         address lastBidder = highestBidder[itemId];
         uint256 lastHighestBid = idToMarketItem[itemId].highestBid;
-        payable(lastBidder).transfer(lastHighestBid);
+        if (highestBidder[itemId] != address(0)) {
+            payable(lastBidder).transfer(lastHighestBid);
+        }
         highestBidder[itemId] = _msgSender();
         bids[itemId][_msgSender()] = msg.value;
         idToMarketItem[itemId].highestBid = msg.value;
@@ -404,11 +401,8 @@ contract Marketplace is
         if (highestBidder[itemId] != address(0)) {
             _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
 
-            idToMarketItem[itemId].status = ItemStatus.SOLD;
-
             emit AuctionEnded(itemId, auctioneerAddress, highestBidder[itemId]);
 
-            //ask
             highestBidder[itemId] = address(0);
             bids[itemId][_msgSender()] = 0;
         } else {
@@ -424,21 +418,20 @@ contract Marketplace is
     function concludeAuction(
         uint256 itemId
     ) public onlyWhenItemIsForAuction(itemId) {
+      
+
         require(
             idToMarketItem[itemId].auctioneEndTime <= block.timestamp,
-            "Auction is still running"
+            "Marketplace: Auction is still running"
         );
 
         address auctioneerAddress = idToMarketItem[itemId].seller;
         uint256 bidAmount = idToMarketItem[itemId].highestBid;
 
         if (highestBidder[itemId] != address(0)) {
+            
             _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
-
-            idToMarketItem[itemId].status = ItemStatus.SOLD;
-
             emit AuctionEnded(itemId, auctioneerAddress, highestBidder[itemId]);
-            //ask
             highestBidder[itemId] = address(0);
             bids[itemId][_msgSender()] = 0;
         } else {
@@ -489,5 +482,9 @@ contract Marketplace is
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    function Time() external view returns (uint) {
+        return block.timestamp;
     }
 }
