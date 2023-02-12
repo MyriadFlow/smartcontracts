@@ -9,7 +9,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
-error NotSeller();
+error ItemNotExist();
 
 contract Marketplace is
     Context,
@@ -20,55 +20,42 @@ contract Marketplace is
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
-    bytes32 public constant MARKETPLACE_ADMIN_ROLE = keccak256("MARKETPLACE_ADMIN_ROLE");
+    bytes32 public constant MARKETPLACE_ADMIN_ROLE =
+        keccak256("MARKETPLACE_ADMIN_ROLE");
 
     using Counters for Counters.Counter;
 
-    Counters.Counter private _saleItemId;
-    Counters.Counter private _auctionItemId;
-    Counters.Counter private _itemsSold;
+    Counters.Counter private _itemIds;
 
     address public marketplacePayoutAddress;
     uint96 public platformFeeBasisPoint;
 
     enum ItemStatus {
-        REMOVED,
-        AVAILABLE,
-        SOLD
+        NONEXISTANT,
+        SALE,
+        AUCTION,
+        SOLD,
+        REMOVED
     }
 
-    struct SaleItem {
+    struct MarketItem {
         uint256 itemId;
         address nftContract;
         uint256 tokenId;
         address seller;
         uint256 price;
+        uint256 auctioneEndTime;
+        uint256 highestBid;
         ItemStatus status;
     }
 
-    struct AuctionItem {
-        uint256 itemId;
-        address nftContract;
-        uint256 tokenId;
-        address auctioneer;
-        uint256 endTime;
-        uint256 highestBid;
-        bool started; // to check if auction started or not
-        bool ended; // for emergency cancellation
-    }
+    mapping(uint256 => MarketItem) public idToMarketItem;
 
-    // Sale
-    mapping(uint256 => SaleItem) public idToSaleItem;
+    mapping(address => mapping(uint256 => uint256)) private _marketItem;
 
-    // Auction
-    mapping(uint256 => AuctionItem) public idToAuctionItem;
-    mapping(uint256 => mapping(address => uint256)) public bids;
     mapping(uint256 => address) public highestBidder;
 
-    //@notice to map ItemId to Auction Id
-    mapping(uint256 => uint256) public ItemIdtoAuctionId;
-
-    event ItemForSale(
+    event SaleStarted(
         uint256 indexed itemId,
         address indexed nftContract,
         uint256 indexed tokenId,
@@ -76,6 +63,21 @@ contract Marketplace is
         address seller,
         uint256 price
     );
+
+    event AuctionStarted(
+        uint256 auctionId,
+        uint256 basePrice,
+        uint256 time,
+        address indexed auctioneer
+    );
+    event BidPlaced(uint256 itemId, uint256 amount, address indexed bidder);
+    event AuctionEnded(
+        uint256 auctionId,
+        address indexed auctioneer,
+        address indexed highestBidder
+    );
+    event PriceUpdated(uint256 itemId, uint256 updatedPrice);
+    event TimeUpdated(uint256 itemId, uint256 updatedTime);
 
     event ItemSold(
         uint256 indexed itemId,
@@ -87,25 +89,13 @@ contract Marketplace is
         uint256 price
     );
 
-    event SaleItemRemoved(
+    event ItemRemoved(
         uint256 itemId,
         address indexed nftContract,
         uint256 indexed tokenId,
         string metaDataURI,
         address seller
     );
-
-    event AuctionItemRemoved(
-        uint256 itemId,
-        address indexed nftContract,
-        uint256 indexed tokenId,
-        string metaDataURI,
-        address seller
-    );
-
-    event AuctionStarted(uint256 AuctionId, uint256 BasePrice, address indexed Auctioneer);
-    event Bid(uint256 AuctionId, uint256 amount, address indexed Bidder);
-    event AuctionEnded(uint256 AuctionId, address indexed Auctioneer,address indexed HighestBidder);
 
     // Only item owner should be able to perform action
     modifier onlyItemOwner(address nftContract, uint256 tokenId) {
@@ -116,20 +106,20 @@ contract Marketplace is
         _;
     }
 
-    // Only when item exist
-    modifier onlyWhenItemExists(uint256 itemId) {
+    // Only when item is is for sale
+    modifier onlyWhenItemIsForSale(uint256 itemId) {
         require(
-            (idToSaleItem[itemId].nftContract != address(0)),
-            "Marketplace: Market item doesn't exist"
+            idToMarketItem[itemId].status == ItemStatus.SALE,
+            "Marketplace: Market item is not for sale"
         );
         _;
     }
 
-    // Only when item is is for sale
-    modifier onlyWhenItemIsForSale(uint256 itemId) {
+    // only when item is for auction
+    modifier onlyWhenItemIsForAuction(uint256 itemId) {
         require(
-            idToSaleItem[itemId].status == ItemStatus.AVAILABLE,
-            "Marketplace: Market item is not for sale"
+            idToMarketItem[itemId].status == ItemStatus.AUCTION,
+            "Marketplace: The auction has not started yet"
         );
         _;
     }
@@ -137,8 +127,17 @@ contract Marketplace is
     // Only seller should be able to perform action
     modifier onlySeller(uint256 itemId) {
         require(
-            idToSaleItem[itemId].seller == _msgSender(),
+            idToMarketItem[itemId].seller == _msgSender(),
             "Marketplace: Sender is not seller of this item"
+        );
+        _;
+    }
+
+    // only when there is no bid placed for an item then action will be performed
+    modifier onlyWhenNoBidder(uint256 itemId) {
+        require(
+            highestBidder[itemId] == address(0),
+            "Marketplace : Auction is still running"
         );
         _;
     }
@@ -150,33 +149,163 @@ contract Marketplace is
         marketplacePayoutAddress = _msgSender();
     }
 
-    /*  Places an item for sale on the marketplace
-        Accepts price in native asset of the blockchain network
-    */
-    function listSaleItem(
+    /**
+     * @dev function to split the payment between creator , marketplace & nft Seller
+     *  also tranfer it to the nft buyer who paid for it
+     */
+    function _paymentSplit(
+        uint256 itemId,
+        uint256 value,
+        address recieverAddress
+    ) private nonReentrant {
+        MarketItem memory _item = idToMarketItem[itemId];
+
+        IERC721(_item.nftContract).transferFrom(
+            address(this),
+            recieverAddress,
+            _item.tokenId
+        );
+        // Calculate Payout for Platform
+        uint256 amountReceived = value;
+        uint256 payoutForMarketplace = (amountReceived *
+            platformFeeBasisPoint) / 1000;
+        uint256 amountRemaining = value - payoutForMarketplace;
+
+        //Calculate Royalty Amount for Creator
+        (address creator, uint256 royaltyAmount) = IERC2981(_item.nftContract)
+            .royaltyInfo(_item.tokenId, amountRemaining);
+
+        // Calculate Payout for Seller
+        uint256 payoutForSeller = amountRemaining - royaltyAmount;
+        //transfering amounts to marketplace, creator and seller
+        payable(marketplacePayoutAddress).transfer(payoutForMarketplace);
+        //creator
+        payable(creator).transfer(royaltyAmount);
+        //item Seller
+        payable(_item.seller).transfer(payoutForSeller);
+
+        idToMarketItem[itemId].seller = address(0);
+        idToMarketItem[itemId].status = ItemStatus.SOLD;
+    }
+
+    /**
+     * @dev only first time a user can use this function for listing
+     */
+    function listItem(
         address nftContract,
         uint256 tokenId,
-        uint256 price
-    ) public onlyItemOwner(nftContract, tokenId) returns (uint256) {
+        uint256 price,
+        bool forAuction,
+        uint256 time
+    ) external onlyItemOwner(nftContract, tokenId) returns (uint256) {
+        uint256 itemId;
+        uint256 marketId = _marketItem[nftContract][tokenId];
+        uint256 marketIdStatus = uint(idToMarketItem[marketId].status);
+        if (marketId == 0) {
+            _itemIds.increment();
+            itemId = _itemIds.current();
+        } else if (marketId != 0 && marketIdStatus > 2) {
+            itemId = marketId;
+        } else {
+            revert ItemNotExist();
+        }
+
+        IERC721(nftContract).transferFrom(_msgSender(), address(this), tokenId);
+
         require(price > 0, "Marketplace: Price must be at least 1 wei");
 
-        _saleItemId.increment();
-        uint256 itemId = _saleItemId.current();
+        if (forAuction != true) {
+            idToMarketItem[itemId] = MarketItem(
+                itemId,
+                nftContract,
+                tokenId,
+                payable(_msgSender()),
+                price,
+                0,
+                0,
+                ItemStatus.SALE
+            );
 
-        idToSaleItem[itemId] = SaleItem(
-            itemId,
-            nftContract,
-            tokenId,
-            payable(_msgSender()),
-            price,
-            ItemStatus.AVAILABLE
+            string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
+                tokenId
+            );
+            emit SaleStarted(
+                itemId,
+                nftContract,
+                tokenId,
+                metadataURI,
+                _msgSender(),
+                price
+            );
+        } else {
+            require(
+                time >= 60,
+                "Marketplace: Time cannot be less than One hour"
+            );
+            //time argument should be set in unix
+            uint256 endAt = block.timestamp + time;
+            idToMarketItem[itemId] = MarketItem(
+                itemId,
+                nftContract,
+                tokenId,
+                _msgSender(),
+                price,
+                endAt,
+                price,
+                ItemStatus.AUCTION
+            );
+            idToMarketItem[itemId].status = ItemStatus.AUCTION;
+            emit AuctionStarted(itemId, price, endAt, _msgSender());
+        }
+
+        _marketItem[nftContract][tokenId] = itemId;
+        return itemId;
+    }
+
+    /**
+     * @dev Removes/Deletes  the item from marketplace
+     *  Transfers ownership of the item back to seller
+     * check if the auction is already ended or not
+     *
+     */
+    function removeItem(
+        uint256 itemId
+    ) public onlySeller(itemId) onlyWhenNoBidder(itemId) {
+        IERC721(idToMarketItem[itemId].nftContract).transferFrom(
+            address(this),
+            idToMarketItem[itemId].seller,
+            idToMarketItem[itemId].tokenId
         );
-        IERC721(nftContract).transferFrom(_msgSender(), address(this), tokenId);
+        idToMarketItem[itemId].status = ItemStatus.REMOVED;
+
+        string memory metadataURI = IERC721Metadata(
+            idToMarketItem[itemId].nftContract
+        ).tokenURI(idToMarketItem[itemId].tokenId);
+        emit ItemRemoved(
+            itemId,
+            idToMarketItem[itemId].nftContract,
+            idToMarketItem[itemId].tokenId,
+            metadataURI,
+            _msgSender()
+        );
+    }
+
+    /***
+     * @dev it starts sale automatically after the Auction is ended
+     */
+    function _invokeStartSale(uint itemId) private onlySeller(itemId) {
+        idToMarketItem[itemId].auctioneEndTime = 0;
+        idToMarketItem[itemId].status = ItemStatus.SALE;
+
+        address nftContract = idToMarketItem[itemId].nftContract;
+        uint256 tokenId = idToMarketItem[itemId].tokenId;
+        uint256 price = idToMarketItem[itemId].price;
 
         string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
             tokenId
         );
-        emit ItemForSale(
+
+        emit SaleStarted(
             itemId,
             nftContract,
             tokenId,
@@ -184,54 +313,16 @@ contract Marketplace is
             _msgSender(),
             price
         );
-        return itemId;
     }
 
-    /*  Removes the item from marketplace
-        Transfers ownership of the item back to seller
-    */
-    function removeSaleItem(uint256 itemId) public onlySeller(itemId) {
-        IERC721(idToSaleItem[itemId].nftContract).transferFrom(
-            address(this),
-            idToSaleItem[itemId].seller,
-            idToSaleItem[itemId].tokenId
-        );
-        idToSaleItem[itemId].status = ItemStatus.REMOVED;
-
-        string memory metadataURI = IERC721Metadata(
-            idToSaleItem[itemId].nftContract
-        ).tokenURI(idToSaleItem[itemId].tokenId);
-
-        if (ItemIdtoAuctionId[itemId] != 0) {
-            endAuction(ItemIdtoAuctionId[itemId]);
-        }
-
-        emit SaleItemRemoved(
-            itemId,
-            idToSaleItem[itemId].nftContract,
-            idToSaleItem[itemId].tokenId,
-            metadataURI,
-            _msgSender()
-        );
-    }
-
-    /*  Creates the sale of a marketplace item
-        Transfers ownership of the item, as well as funds between parties
-    */
+    /**
+     *  @dev buy nft from a seller , transfer it &&
+     *  check if it's not in auction already
+     */
     function buyItem(
         uint256 itemId
-    )
-        public
-        payable
-        nonReentrant
-        onlyWhenItemExists(itemId)
-        onlyWhenItemIsForSale(itemId)
-    {
-        require(
-            ItemIdtoAuctionId[itemId] == 0,
-            "Marketplace: Market item is  for Auction"
-        );
-        SaleItem memory _item = idToSaleItem[itemId];
+    ) public payable onlyWhenItemIsForSale(itemId) {
+        MarketItem memory _item = idToMarketItem[itemId];
 
         string memory metadataURI = IERC721Metadata(_item.nftContract).tokenURI(
             _item.tokenId
@@ -241,33 +332,8 @@ contract Marketplace is
             "Marketplace: Pay Market Price to buy the NFT"
         );
 
-        idToSaleItem[itemId].status = ItemStatus.SOLD;
-
-        IERC721(_item.nftContract).transferFrom(
-            address(this),
-            _msgSender(),
-            _item.tokenId
-        );
-
-        // Calculate Payout for Platform
-        uint256 amountReceived = msg.value;
-        uint256 payoutForMarketplace = (amountReceived *
-            platformFeeBasisPoint) / 1000;
-        uint256 amountRemaining = msg.value - payoutForMarketplace;
-
-        //Calculate Royalty Amount for Creator
-        (address creator, uint256 royaltyAmount) = IERC2981(_item.nftContract)
-            .royaltyInfo(_item.tokenId, amountRemaining);
-
-        // Calculate Payout for Seller
-        uint256 payoutForSeller = amountRemaining - royaltyAmount;
-
-        //transfering amounts to marketplace, creator and seller
-        payable(marketplacePayoutAddress).transfer(payoutForMarketplace);
-        payable(creator).transfer(royaltyAmount);
-        payable(_item.seller).transfer(payoutForSeller);
-
-        _itemsSold.increment();
+        idToMarketItem[itemId].status = ItemStatus.SOLD;
+        _paymentSplit(itemId, msg.value, _msgSender());
         emit ItemSold(
             itemId,
             _item.nftContract,
@@ -279,159 +345,132 @@ contract Marketplace is
         );
     }
 
-    /*
-     **  @dev creating an Auction Item for an existing seller
-     * End Time value should be in minutes (60 for 1 hour)
+    /***
+     * @dev start auction for an item
      */
-    function startAuction(
-        uint256 _itemId,
-        address _nftContract,
-        uint256 _tokenId,
-        uint256 _price,
-        uint256 _endTime
-    ) public onlyWhenItemIsForSale(_itemId) returns (uint256) {
-        //If user doesn't want to set different Price than the previous listed price
-        if (_price == 0) {
-            _price = idToSaleItem[_itemId].price;
+    function invokeStartAuction(
+        uint256 itemId,
+        uint256 time
+    ) external onlySeller(itemId) {
+        require(
+            time >= 60,
+            "Marketplace: Timer cannot be less than One Minute"
+        );
+        idToMarketItem[itemId].auctioneEndTime = 0;
+
+        uint256 price = idToMarketItem[itemId].price;
+
+        uint256 endTime = block.timestamp + time;
+
+        idToMarketItem[itemId].auctioneEndTime = endTime;
+        idToMarketItem[itemId].status = ItemStatus.AUCTION;
+
+        emit AuctionStarted(itemId, price, time, _msgSender());
+    }
+
+    /**
+     * @dev Users can place a bid on a specific item &&
+     * to check if the item auction time is still there or not
+     */
+    function placeBid(
+        uint256 itemId
+    ) external payable onlyWhenItemIsForAuction(itemId) {
+        require(
+            block.timestamp < idToMarketItem[itemId].auctioneEndTime,
+            "Marketplace: Time limit has been reached"
+        );
+        require(
+            msg.value > idToMarketItem[itemId].highestBid,
+            "Marketplace: value less than the highest Bid"
+        );
+        address lastBidder = highestBidder[itemId];
+        uint256 lastHighestBid = idToMarketItem[itemId].highestBid;
+        if (highestBidder[itemId] != address(0)) {
+            payable(lastBidder).transfer(lastHighestBid);
         }
-
-        if (idToSaleItem[_itemId].seller != _msgSender()) revert NotSeller();
-
-        require(_endTime > 0, "Time can't be less than one minute");
-
-        _auctionItemId.increment();
-        uint256 auctionId = _auctionItemId.current();
-
-        //time argument should be set in minutes
-        uint256 endAt = block.number + (5 * _endTime) + 1;
-        idToAuctionItem[auctionId] = AuctionItem(
-            _itemId,
-            _nftContract,
-            _tokenId,
-            _msgSender(),
-            endAt,
-            _price,
-            false,
-            true
-        );
-        ItemIdtoAuctionId[_itemId] = auctionId;
-        emit AuctionStarted(auctionId, _price, _msgSender());
-
-        return auctionId;
+        highestBidder[itemId] = _msgSender();
+        idToMarketItem[itemId].highestBid = msg.value;
+        emit BidPlaced(itemId, msg.value, _msgSender());
     }
 
     /**
-     * @dev to create a function for bidding in a specific auctionId
+     * @dev Accept the current highest Bid and transfer the NFT concluding the auction  only by the item Seller
      */
-    function bid(uint256 itemId) external payable {
-        uint256 auctionId = ItemIdtoAuctionId[itemId];
-        require(
-            idToAuctionItem[auctionId].started == true,
-            "The auction has not started yet"
-        );
-        require(!idToAuctionItem[auctionId].ended, "Ended!");
-        require(
-            block.number < idToAuctionItem[auctionId].endTime,
-            "time limit has been reached"
-        );
-        require(
-            msg.value > idToAuctionItem[auctionId].highestBid,
-            "value less than the highest Bid"
-        );
-        highestBidder[auctionId] = _msgSender();
-        bids[auctionId][_msgSender()] = msg.value;
-        idToAuctionItem[auctionId].highestBid = msg.value;
-        emit Bid(auctionId, msg.value, msg.sender);
-    }
+    function acceptBidAndEndAuction(
+        uint256 itemId
+    ) public onlyWhenItemIsForAuction(itemId) {
+        address auctioneerAddress = idToMarketItem[itemId].seller;
+        uint256 bidAmount = idToMarketItem[itemId].highestBid;
 
-    /**
-     * @dev TO Withdraw the money if the user isn't the highest bidder
-     */
-    function withdrawBid(uint256 auctionId) external {
-        require(bids[auctionId][_msgSender()] > 0, "You cannot withdraw");
-        require(
-            highestBidder[auctionId] != _msgSender(),
-            "User can't Withdraw , user is the highestBidder"
-        );
-        uint256 bal = bids[auctionId][_msgSender()];
-        bids[auctionId][msg.sender] = 0;
-        payable(msg.sender).transfer(bal);
-    }
+        if (highestBidder[itemId] != address(0)) {
+            _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
 
-    function endAuction(uint256 itemId) public onlySeller(itemId) {
-        uint256 auctionId = ItemIdtoAuctionId[itemId];
-        require(idToAuctionItem[auctionId].started, "not started");
-        require(!idToAuctionItem[auctionId].ended, "Ended");
-        //require(block.number >= idToAuctionItem[auctionId].endTime, "Still time left");
-        address auctioneerAddress = idToAuctionItem[auctionId].auctioneer;
+            emit AuctionEnded(itemId, auctioneerAddress, highestBidder[itemId]);
 
-        address nftContractAddress = idToAuctionItem[auctionId].nftContract;
-
-        uint256 _tokenId = idToAuctionItem[auctionId].tokenId;
-
-        idToAuctionItem[auctionId].ended = true;
-
-        uint256 bidAmount = idToAuctionItem[auctionId].highestBid;
-
-        if (highestBidder[auctionId] != address(0)) {
-            IERC721(nftContractAddress).transferFrom(
-                address(this),
-                auctioneerAddress,
-                _tokenId
-            );
-
-            // Calculate Payout for Platform
-            uint256 amountReceived = bidAmount;
-            uint256 payoutForMarketplace = (amountReceived *
-                platformFeeBasisPoint) / 1000;
-            uint256 amountRemaining = amountReceived - payoutForMarketplace;
-
-            //Calculate Royalty Amount for Creator
-            (address creator, uint256 royaltyAmount) = IERC2981(
-                nftContractAddress
-            ).royaltyInfo(_tokenId, amountRemaining);
-
-            // Calculate Payout for Seller
-            uint256 payoutForAuctioneer = amountRemaining - royaltyAmount;
-
-            //transfering amounts to marketplace, creator and seller
-            payable(marketplacePayoutAddress).transfer(payoutForMarketplace);
-            //paying to the creator
-            payable(creator).transfer(royaltyAmount);
-            //paying to the auctioneer
-            payable(auctioneerAddress).transfer(payoutForAuctioneer);
+            highestBidder[itemId] = address(0);
+            idToMarketItem[itemId].highestBid = 0;
         } else {
-            IERC721(nftContractAddress).transferFrom(
-                address(this),
-                auctioneerAddress,
-                _tokenId
-            );
+            _invokeStartSale(itemId);
         }
+    }
 
-        emit AuctionEnded(
-            auctionId,
-            auctioneerAddress,
-            highestBidder[auctionId]
+    /**
+     *  @dev After the auction's time has run out, anybody can conclude the
+     * bidding by confirming the highest bid and bidder, and
+     * therefore transferring the NFT; otherwise launching Sale automatically
+     */
+    function concludeAuction(
+        uint256 itemId
+    ) public onlyWhenItemIsForAuction(itemId) {
+        require(
+            idToMarketItem[itemId].auctioneEndTime <= block.timestamp,
+            "Marketplace: Auction is still running"
         );
+
+        address auctioneerAddress = idToMarketItem[itemId].seller;
+        uint256 bidAmount = idToMarketItem[itemId].highestBid;
+
+        if (highestBidder[itemId] != address(0)) {
+            _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
+            emit AuctionEnded(itemId, auctioneerAddress, highestBidder[itemId]);
+            highestBidder[itemId] = address(0);
+            idToMarketItem[itemId].highestBid = 0;
+        } else {
+            _invokeStartSale(itemId);
+        }
     }
 
-    /*  Change the Platform fees along with the payout address
-        Allows only Admins to perform this operation
-    */
-    function changeFeeAndPayoutAddress(
-        uint96 newPlatformFee,
-        address newPayoutAddress
-    ) public onlyRole(MARKETPLACE_ADMIN_ROLE) {
-        platformFeeBasisPoint = newPlatformFee;
-        marketplacePayoutAddress = newPayoutAddress;
+    /**
+     * @dev function to update the price of the auction
+     * by the auctioneer ,if there is no bids available
+     */
+    function updatePrice(
+        uint256 itemId,
+        uint256 price
+    ) external onlySeller(itemId) onlyWhenNoBidder(itemId) returns (uint256) {
+        idToMarketItem[itemId].price = price;
+        emit PriceUpdated(itemId, price);
+        return price;
     }
 
-    function Totalitem() public view returns (uint256) {
-        return _saleItemId.current();
-    }
-
-    function TotalitemSold() public view returns (uint256) {
-        return _itemsSold.current();
+    /***
+     * @dev function to update the end time of the auction by the auctioneer ,
+     * if there is no bids available
+     *  @param the time must be in seconds
+     */
+    function updateAuctionTime(
+        uint256 itemId,
+        uint256 time
+    )
+        public
+        onlySeller(itemId)
+        onlyWhenItemIsForAuction(itemId)
+        onlyWhenNoBidder(itemId)
+        returns (uint256)
+    {
+        idToMarketItem[itemId].auctioneEndTime = block.timestamp + time;
+        emit TimeUpdated(itemId, idToMarketItem[itemId].auctioneEndTime);
+        return idToMarketItem[itemId].auctioneEndTime;
     }
 
     function supportsInterface(

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 /**
@@ -28,6 +29,7 @@ contract StoreFront is
     Context,
     AccessControlEnumerable,
     ERC721Enumerable,
+    ERC721Pausable,
     ERC2981
 {
     using Counters for Counters.Counter;
@@ -175,13 +177,39 @@ contract StoreFront is
         require(_exists(tokenId), "StoreFront: Non-Existent Asset");
         _tokenURIs[tokenId] = _tokenURI;
     }
-    
-    function _beforeTokenTransfer(
+
+    /**
+     * @dev Pauses all token transfers.
+     *
+     * See {ERC721Pausable} and {Pausable-_pause}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the `STOREFRONT_OPERATOR_ROLE`.
+     */
+    function pause() public onlyRole(STOREFRONT_OPERATOR_ROLE) {
+        _pause();
+    }
+
+    /**
+     * @dev Unpauses all token transfers.
+     *
+     * See {ERC721Pausable} and {Pausable-_unpause}.
+     *
+     * Requirements:
+     *
+     * - the caller must have the `STOREFRONT_OPERATOR_ROLE`.
+     */
+    function unpause() public onlyRole(STOREFRONT_OPERATOR_ROLE) {
+        _unpause();
+    }
+
+function _beforeTokenTransfer(
         address from,
         address to,
         uint256 tokenId,
         uint256 /* batchSize*/
-    ) internal virtual override (ERC721Enumerable) {
+    ) internal virtual override (ERC721Enumerable, ERC721Pausable) {
         super._beforeTokenTransfer(from, to, tokenId, 1);
     }
 
