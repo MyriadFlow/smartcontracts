@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Pausable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 /**
@@ -29,14 +28,16 @@ contract StoreFront is
     Context,
     AccessControlEnumerable,
     ERC721Enumerable,
-    ERC721Pausable,
     ERC2981
 {
     using Counters for Counters.Counter;
 
-    bytes32 public constant STOREFRONT_ADMIN_ROLE = keccak256("STOREFRONT_ADMIN_ROLE");
-    bytes32 public constant STOREFRONT_OPERATOR_ROLE = keccak256("STOREFRONT_OPERATOR_ROLE");
-    bytes32 public constant STOREFRONT_CREATOR_ROLE = keccak256("STOREFRONT_CREATOR_ROLE");
+    bytes32 public constant STOREFRONT_ADMIN_ROLE =
+        keccak256("STOREFRONT_ADMIN_ROLE");
+    bytes32 public constant STOREFRONT_OPERATOR_ROLE =
+        keccak256("STOREFRONT_OPERATOR_ROLE");
+    bytes32 public constant STOREFRONT_CREATOR_ROLE =
+        keccak256("STOREFRONT_CREATOR_ROLE");
 
     Counters.Counter private _tokenIdTracker;
 
@@ -45,7 +46,11 @@ contract StoreFront is
 
     address public marketplace;
 
-    event AssetCreated(uint256 tokenID, address indexed creator, string metaDataURI);
+    event AssetCreated(
+        uint256 tokenID,
+        address indexed creator,
+        string metaDataURI
+    );
     event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
     using Strings for uint256;
@@ -62,7 +67,6 @@ contract StoreFront is
         string memory symbol,
         address marketplaceAddress
     ) ERC721(name, symbol) {
-
         _setupRole(STOREFRONT_ADMIN_ROLE, _msgSender());
 
         marketplace = marketplaceAddress;
@@ -83,11 +87,10 @@ contract StoreFront is
      *
      * - the caller must have the `STOREFRONT_CREATOR_ROLE`.
      */
-    function createAsset(string memory metadataURI, uint96 royaltyPercentBasisPoint)
-        public
-        onlyRole(STOREFRONT_CREATOR_ROLE)
-        returns (uint256)
-    {
+    function createAsset(
+        string memory metadataURI,
+        uint96 royaltyPercentBasisPoint
+    ) public onlyRole(STOREFRONT_CREATOR_ROLE) returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         _tokenIdTracker.increment();
@@ -96,8 +99,15 @@ contract StoreFront is
         _setTokenURI(currentTokenID, metadataURI);
 
         // Set royalty Info
-        require(royaltyPercentBasisPoint <= 1000, "StoreFront: Royalty can't be more than 10%");
-        _setTokenRoyalty(currentTokenID, _msgSender(), royaltyPercentBasisPoint);
+        require(
+            royaltyPercentBasisPoint <= 1000,
+            "StoreFront: Royalty can't be more than 10%"
+        );
+        _setTokenRoyalty(
+            currentTokenID,
+            _msgSender(),
+            royaltyPercentBasisPoint
+        );
 
         // Approve marketplace to transfer NFTs
         setApprovalForAll(marketplace, true);
@@ -130,7 +140,10 @@ contract StoreFront is
         _setTokenURI(currentTokenID, metadataURI);
 
         // Set royalty Info
-        require(royaltyPercentBasisPoint <= 1000, "StoreFront: Royalty can't be more than 10%");
+        require(
+            royaltyPercentBasisPoint <= 1000,
+            "StoreFront: Royalty can't be more than 10%"
+        );
         _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
 
         // Approve marketplace to transfer NFTs
@@ -143,21 +156,20 @@ contract StoreFront is
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId)
-        public
-        view
-        virtual
-        override
-        returns (string memory)
-    {
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         require(_exists(tokenId), "StoreFront: Non-Existent Asset");
         string memory _tokenURI = _tokenURIs[tokenId];
 
-        return _tokenURI;       
+        return _tokenURI;
     }
 
     function destroyAsset(uint256 tokenId) public {
-        require(_isApprovedOrOwner(_msgSender(), tokenId), "StoreFront: Caller is not token owner or approved");
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "StoreFront: Caller is not token owner or approved"
+        );
         _burn(tokenId);
         emit AssetDestroyed(tokenId, _msgSender());
         _resetTokenRoyalty(tokenId);
@@ -170,57 +182,33 @@ contract StoreFront is
      *
      * - `tokenId` must exist.
      */
-    function _setTokenURI(uint256 tokenId, string memory _tokenURI)
-        internal
-        virtual
-    {
+    function _setTokenURI(
+        uint256 tokenId,
+        string memory _tokenURI
+    ) internal virtual {
         require(_exists(tokenId), "StoreFront: Non-Existent Asset");
         _tokenURIs[tokenId] = _tokenURI;
     }
 
-    /**
-     * @dev Pauses all token transfers.
-     *
-     * See {ERC721Pausable} and {Pausable-_pause}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the `STOREFRONT_OPERATOR_ROLE`.
-     */
-    function pause() public onlyRole(STOREFRONT_OPERATOR_ROLE) {
-        _pause();
-    }
-
-    /**
-     * @dev Unpauses all token transfers.
-     *
-     * See {ERC721Pausable} and {Pausable-_unpause}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the `STOREFRONT_OPERATOR_ROLE`.
-     */
-    function unpause() public onlyRole(STOREFRONT_OPERATOR_ROLE) {
-        _unpause();
-    }
-
-function _beforeTokenTransfer(
+    function _beforeTokenTransfer(
         address from,
         address to,
         uint256 tokenId,
         uint256 /* batchSize*/
-    ) internal virtual override (ERC721Enumerable, ERC721Pausable) {
+    ) internal virtual override(ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId, 1);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         virtual
-        override(AccessControlEnumerable, ERC721, ERC721Enumerable, ERC2981)
+        override(AccessControlEnumerable, ERC721Enumerable, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

@@ -4,7 +4,7 @@ import { ethers , network} from "hardhat"
 import { StoreFront, Marketplace } from "../typechain-types"
 
 describe("storefront contract", () => {
-
+                                    
     let [owner, creator, creator2, buyer, operator ]: SignerWithAddress[] = new Array(5)
     before(async () => {
         [owner, operator, creator, creator2, buyer] = await ethers.getSigners()
@@ -83,15 +83,14 @@ describe("storefront contract", () => {
             .withArgs(creator2.address, marketplace.address, 1)
 
         expect(
-            await marketplace.connect(creator2).listSaleItem(storefront.address, 1, salePrice)
+            await marketplace.connect(creator2).listItem(storefront.address, 1, salePrice,false,0)
         )
-            .to.emit(marketplace, "ItemForSale")
-            .withArgs(1, storefront.address, 1, metaDataHash, creator2.address, "0x0000000000000000000000000000000000000000", salePrice)
+            .to.emit(marketplace, "SaleStarted")
+            .withArgs(1, storefront.address, 1, metaDataHash, creator2.address,salePrice)
 
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.itemId).to.equal(1)
         expect(marketItem.tokenId).to.equal(1)
-        expect(marketItem.owner).to.not.equal(creator2.address)
         expect(marketItem.seller).to.equal(creator2.address)
         expect(marketItem.status).to.be.equal(1)
         expect(marketItem.nftContract).to.equal(storefront.address)
@@ -101,10 +100,9 @@ describe("storefront contract", () => {
         await marketplace.connect(buyer).buyItem(1, {
             value: salePrice
         })
-
         const marketItem = await marketplace.idToMarketItem(1)
-        expect(marketItem.owner).to.equal(buyer.address)
-        expect(marketItem.status).to.equal(2)//check
+        expect(await storefront.ownerOf(1)).to.equal(buyer.address)
+        expect(marketItem.status).to.equal(3)//check
     })
 
     it("Should be able to delete market item", async () => {
@@ -113,17 +111,17 @@ describe("storefront contract", () => {
         marketplace = marketplace.connect(creator)
 
         // Create Market Item
-        await marketplace.listSaleItem(storefront.address.toString(), 2, 1)
+        await marketplace.listItem(storefront.address.toString(), 2, salePrice,false,0)
 
         // Remove that item market item and expect it to emit MarketItemRemoved and Transfer
-        expect(await marketplace.removeSaleItem(2))
+        expect(await marketplace.removeItem(2))
             .to.emit(marketplace, "ItemRemoved").withArgs(2)
             .and
             .to.emit(storefront, "Transfer").withArgs(marketplace.address, creator.address, 2)
 
         // Get that market item and expect it to be soft deleted
         const res = await marketplace.idToMarketItem(2)
-        expect(res.status).to.be.equal(0)
+        expect(res.status).to.be.equal(4)
     })
 
     it("Should not be able to create market sale if item is not for sale", async () => {
@@ -137,10 +135,11 @@ describe("storefront contract", () => {
         const startingCreatorBalance =  await marketplace.provider.getBalance(
                 creator2.address
             ) 
-        let val = ethers.utils.parseEther("1");
-        
-        await marketplace.connect(buyer).listSaleItem(storefront.address,1 , val);
-        await  marketplace.connect(operator).buyItem(3 , {value : val});
+        let val = salePrice
+        //account[1]
+        await  marketplace.connect(buyer).listItem(storefront.address,1,val,false,0);
+
+        await marketplace.connect(operator).buyItem(1 , {value : val})
 
         const endingCreatorBalance = await marketplace.provider.getBalance(
                 creator2.address
@@ -155,64 +154,94 @@ describe("storefront contract", () => {
             )   
     })
    
-    it("Auction : to check if the auction is working or not",async () => {
+    it("Auction: auction working or not,placebid,AcceptBidandEndAuction",async () => {
         let accounts = await ethers.getSigners() 
-        let [buyer1,buyer2 , buyer3] = [accounts[5] , accounts[6] , accounts[7]]
+        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
         await storefront.connect(operator).approve(marketplace.address, 1)
-        let val = ethers.utils.parseEther("1");
-        await marketplace.connect(operator).listSaleItem(storefront.address,1 , val);
-
-        
+        let val = ethers.utils.parseEther("1.1");
+        let Time = 3600 
         //to check if the auction item  is created or not
-        expect(marketplace.connect(operator).startAuction(storefront.address , 1 , val , 60 , 4)).to.emit(marketplace ,"Start")
-        val = ethers.utils.parseEther("1.1");
-
-        //to check if bidding can be done or not
-        expect(marketplace.connect(buyer1).bid(4, {value : val })).to.emit(marketplace,"Bid").withArgs(1,val,buyer1.address)
+        await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,Time);
+         //to check if bidding can be done or not
+        expect(await marketplace.connect(buyer1).placeBid(1,{value : val})).to.emit(marketplace ,"Bidplaced").withArgs(1,salePrice,buyer1.address)
 
         //to check user won't be bid less than the previous highest bid
-       expect(marketplace.connect(buyer2).bid(4, {value : val })).to.be.revertedWith("value less than the highest Bid")
-       val = ethers.utils.parseEther("2");
-       await marketplace.connect(buyer2).bid(4, {value : val })
-       await network.provider.send("hardhat_mine", ["0x150"]);
+       expect(marketplace.connect(buyer2).placeBid(1, {value : val })).to.be.revertedWith("value less than the highest Bid")
 
+        //moving the time forward
+       await network.provider.send("hardhat_mine", ["0x1200"]);
+       
         //to check if the user can't bid after end time  
-        val = ethers.utils.parseEther("2");
+        val = ethers.utils.parseEther("2.1");
         const Bidder2 = marketplace.connect(buyer2)
-        await expect(Bidder2.bid(1, {value : val })).to.be.reverted;
+        await expect(Bidder2.placeBid(1, {value : val })).to.be.reverted;
+        
+        await  marketplace.connect(operator).acceptBidAndEndAuction(1);
+        
+        expect(await storefront.ownerOf(1)).to.be.equal(buyer1.address);
+        
     })
-    it("Auction : to check the highest bidder , Withdraw ",async () => {
+    it("concludeAuction , invokeStartAuction , _invokestartSale ",async () => {
         let accounts = await ethers.getSigners() 
-        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
-        const highestBidder = await marketplace.highestBidder(1)
-  
-        expect(highestBidder.toString()).to.be.equal(buyer2.address);
+        let [buyer1] = [accounts[5]]
         
-        //highest bidder can't pull out the money 
+        await storefront.connect(buyer1).approve(marketplace.address,1)
         
-        await expect(marketplace.connect(buyer2).withdrawBid(1)).to.be.reverted;
+        await marketplace.connect(buyer1).listItem(storefront.address,1,salePrice,true,600)
 
-        let Bidder1 = await marketplace.connect(buyer1).withdrawBid(1)
+        expect(await marketplace.connect(buyer1).acceptBidAndEndAuction(1)).to.emit(marketplace,"SaleStarted");
 
-        //if the user didn't bid any amount to be reverted
-        await expect(marketplace.withdrawBid(1)).to.be.reverted;
-        
-        
+        const marketItem = await marketplace.idToMarketItem(1)
+        expect(marketItem.status).to.be.equal(1)
 
+         await marketplace.connect(buyer1).startAuction(1,600);
+
+        let val = ethers.utils.parseEther("2")
+        await marketplace.connect(operator).placeBid(1, {value : val});
+
+        //user can't conclude before item End Time Ended
+        expect(marketplace.connect(creator).concludeAuction(1)).to.be.reverted
+        //moving the time forward
+        await network.provider.send("hardhat_mine", ["0x260"]);
+
+        expect( marketplace.concludeAuction(1)).to.emit(marketplace,"AuctionEnded").withArgs(1,buyer1.address,operator.address)
+
+        expect(await storefront.ownerOf(1)).to.be.equal(operator.address);
     })
-    it("Auction : buyitem and EndAuction",async () => {
-          let accounts = await ethers.getSigners() 
-        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
-        const val = ethers.utils.parseEther("1")
-        await marketplace.connect(creator).listSaleItem(storefront.address,2,val)
-        await marketplace.connect(creator).startAuction(storefront.address,2,0,40,5)
+     it("UpdatePrice and UpdateTime ",async () => {
 
-        await expect(marketplace.buyItem(5,{value : val})).to.be.revertedWith("Marketplace: Market item is  for Auction")
+        await storefront.connect(operator).approve(marketplace.address,1)
+
+        await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,300);
+
+         const marketItem = await marketplace.idToMarketItem(1)
+         
+         const IntialTime = marketItem.auctioneEndTime;
+
+         const IntialPrice = marketItem.price;
+
+        let val = ethers.utils.parseEther("2");
         
-        await expect(marketplace.connect(operator).endAuction(4)).to.emit(marketplace,"AuctionEnded").withArgs(1,operator.address,buyer2.address)
-        //user can't bid , the auction has bee ended
-        await expect(marketplace.bid(5 , {value : ethers.utils.parseEther("1")})).to.be.reverted;
+        await marketplace.connect(operator).updatePrice(1,val)
+        await marketplace.connect(operator).updateAuctionTime(1,600)
 
+         const marketItem1 = await marketplace.idToMarketItem(1)
+         
+         const ATime = marketItem1.auctioneEndTime;
+
+         const APrice = marketItem1.price;
+
+         expect(IntialTime).to.not.equal(ATime)
+         expect(IntialPrice).to.not.equal(APrice)
+
+        val = ethers.utils.parseEther("2.1");
+        await marketplace.connect(buyer).placeBid(1, {value : val })
+
+        //no one can change time or price  when bid is there
+        expect(marketplace.connect(operator).updatePrice(1,val)).to.be.reverted
+        expect(marketplace.connect(operator).updateAuctionTime(1,1000)).to.be.reverted
+    
     })
 
 })
+
