@@ -139,7 +139,7 @@ describe("storefront contract", () => {
         //account[1]
         await  marketplace.connect(buyer).listItem(storefront.address,1,val,false,0);
 
-        await marketplace.connect(operator).buyItem(3 , {value : val})
+        await marketplace.connect(operator).buyItem(1 , {value : val})
 
         const endingCreatorBalance = await marketplace.provider.getBalance(
                 creator2.address
@@ -156,17 +156,17 @@ describe("storefront contract", () => {
    
     it("Auction: auction working or not,placebid,AcceptBidandEndAuction",async () => {
         let accounts = await ethers.getSigners() 
-        let [buyer1,buyer2 , buyer3] = [accounts[5] , accounts[6] , accounts[7]]
+        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
         await storefront.connect(operator).approve(marketplace.address, 1)
         let val = ethers.utils.parseEther("1.1");
         let Time = 3600 
         //to check if the auction item  is created or not
         await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,Time);
          //to check if bidding can be done or not
-        expect(await marketplace.connect(buyer1).placeBid(4,{value : val})).to.emit(marketplace ,"Bidplaced").withArgs(3,salePrice,buyer1.address)
+        expect(await marketplace.connect(buyer1).placeBid(1,{value : val})).to.emit(marketplace ,"Bidplaced").withArgs(1,salePrice,buyer1.address)
 
         //to check user won't be bid less than the previous highest bid
-       expect(marketplace.connect(buyer2).placeBid(4, {value : val })).to.be.revertedWith("value less than the highest Bid")
+       expect(marketplace.connect(buyer2).placeBid(1, {value : val })).to.be.revertedWith("value less than the highest Bid")
 
         //moving the time forward
        await network.provider.send("hardhat_mine", ["0x1200"]);
@@ -174,9 +174,9 @@ describe("storefront contract", () => {
         //to check if the user can't bid after end time  
         val = ethers.utils.parseEther("2.1");
         const Bidder2 = marketplace.connect(buyer2)
-        await expect(Bidder2.placeBid(4, {value : val })).to.be.reverted;
+        await expect(Bidder2.placeBid(1, {value : val })).to.be.reverted;
         
-        await  marketplace.connect(operator).acceptBidAndEndAuction(4);
+        await  marketplace.connect(operator).acceptBidAndEndAuction(1);
         
         expect(await storefront.ownerOf(1)).to.be.equal(buyer1.address);
         
@@ -184,24 +184,27 @@ describe("storefront contract", () => {
     it("concludeAuction , invokeStartAuction , _invokestartSale ",async () => {
         let accounts = await ethers.getSigners() 
         let [buyer1] = [accounts[5]]
+        
         await storefront.connect(buyer1).approve(marketplace.address,1)
         
         await marketplace.connect(buyer1).listItem(storefront.address,1,salePrice,true,600)
 
-        expect(await marketplace.connect(buyer1).acceptBidAndEndAuction(5)).to.emit(marketplace,"SaleStarted");
+        expect(await marketplace.connect(buyer1).acceptBidAndEndAuction(1)).to.emit(marketplace,"SaleStarted");
 
-        const marketItem = await marketplace.idToMarketItem(5)
+        const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.status).to.be.equal(1)
 
-         await marketplace.connect(buyer1).invokeStartAuction(5,600);
+         await marketplace.connect(buyer1).invokeStartAuction(1,600);
 
         let val = ethers.utils.parseEther("2")
-        await marketplace.connect(operator).placeBid(5, {value : val});
+        await marketplace.connect(operator).placeBid(1, {value : val});
 
-        expect(marketplace.connect(creator).concludeAuction(5)).to.be.reverted
+        //user can't conclude before item End Time Ended
+        expect(marketplace.connect(creator).concludeAuction(1)).to.be.reverted
         //moving the time forward
         await network.provider.send("hardhat_mine", ["0x260"]);
-        expect( marketplace.concludeAuction(5)).to.emit(marketplace,"AuctionEnded").withArgs(1,buyer1.address,operator.address)
+
+        expect( marketplace.concludeAuction(1)).to.emit(marketplace,"AuctionEnded").withArgs(1,buyer1.address,operator.address)
 
         expect(await storefront.ownerOf(1)).to.be.equal(operator.address);
     })
@@ -211,7 +214,7 @@ describe("storefront contract", () => {
 
         await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,300);
 
-         const marketItem = await marketplace.idToMarketItem(6)
+         const marketItem = await marketplace.idToMarketItem(1)
          
          const IntialTime = marketItem.auctioneEndTime;
 
@@ -219,10 +222,10 @@ describe("storefront contract", () => {
 
         let val = ethers.utils.parseEther("2");
         
-        await marketplace.connect(operator).updatePrice(6,val)
-        await marketplace.connect(operator).updateAuctionTime(6,600)
+        await marketplace.connect(operator).updatePrice(1,val)
+        await marketplace.connect(operator).updateAuctionTime(1,600)
 
-         const marketItem1 = await marketplace.idToMarketItem(6)
+         const marketItem1 = await marketplace.idToMarketItem(1)
          
          const ATime = marketItem1.auctioneEndTime;
 
@@ -232,11 +235,11 @@ describe("storefront contract", () => {
          expect(IntialPrice).to.not.equal(APrice)
 
         val = ethers.utils.parseEther("2.1");
-        await marketplace.connect(buyer).placeBid(6, {value : val })
+        await marketplace.connect(buyer).placeBid(1, {value : val })
 
         //no one can change time or price  when bid is there
-        expect(marketplace.connect(operator).updatePrice(6,val)).to.be.reverted
-        expect(marketplace.connect(operator).updateAuctionTime(6,1000)).to.be.reverted
+        expect(marketplace.connect(operator).updatePrice(1,val)).to.be.reverted
+        expect(marketplace.connect(operator).updateAuctionTime(1,1000)).to.be.reverted
     
     })
 

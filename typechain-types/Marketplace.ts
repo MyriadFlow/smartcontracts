@@ -23,9 +23,7 @@ export interface MarketplaceInterface extends utils.Interface {
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
-    "Time()": FunctionFragment;
     "acceptBidAndEndAuction(uint256)": FunctionFragment;
-    "bids(uint256,address)": FunctionFragment;
     "buyItem(uint256)": FunctionFragment;
     "concludeAuction(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -57,14 +55,9 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "MARKETPLACE_ADMIN_ROLE",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "Time", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "acceptBidAndEndAuction",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "bids",
-    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "buyItem",
@@ -159,12 +152,10 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "MARKETPLACE_ADMIN_ROLE",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "Time", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "acceptBidAndEndAuction",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "bids", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "buyItem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "concludeAuction",
@@ -392,18 +383,10 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
-    Time(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    bids(
-      arg0: BigNumberish,
-      arg1: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     buyItem(
       itemId: BigNumberish,
@@ -539,18 +522,10 @@ export interface Marketplace extends BaseContract {
 
   MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-  Time(overrides?: CallOverrides): Promise<BigNumber>;
-
   acceptBidAndEndAuction(
     itemId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  bids(
-    arg0: BigNumberish,
-    arg1: string,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   buyItem(
     itemId: BigNumberish,
@@ -683,18 +658,10 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
-    Time(overrides?: CallOverrides): Promise<BigNumber>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    bids(
-      arg0: BigNumberish,
-      arg1: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     buyItem(itemId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
@@ -955,17 +922,9 @@ export interface Marketplace extends BaseContract {
 
     MARKETPLACE_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    Time(overrides?: CallOverrides): Promise<BigNumber>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    bids(
-      arg0: BigNumberish,
-      arg1: string,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     buyItem(
@@ -1090,17 +1049,9 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    Time(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    bids(
-      arg0: BigNumberish,
-      arg1: string,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     buyItem(
