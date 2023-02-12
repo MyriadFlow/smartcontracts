@@ -33,7 +33,6 @@ export interface MarketplaceInterface extends utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "highestBidder(uint256)": FunctionFragment;
     "idToMarketItem(uint256)": FunctionFragment;
-    "invokeStartAuction(uint256,uint256)": FunctionFragment;
     "listItem(address,uint256,uint256,bool,uint256)": FunctionFragment;
     "marketplacePayoutAddress()": FunctionFragment;
     "placeBid(uint256)": FunctionFragment;
@@ -42,6 +41,7 @@ export interface MarketplaceInterface extends utils.Interface {
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
+    "startAuction(uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "updateAuctionTime(uint256,uint256)": FunctionFragment;
     "updatePrice(uint256,uint256)": FunctionFragment;
@@ -96,10 +96,6 @@ export interface MarketplaceInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "invokeStartAuction",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "listItem",
     values: [string, BigNumberish, BigNumberish, boolean, BigNumberish]
   ): string;
@@ -129,6 +125,10 @@ export interface MarketplaceInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "startAuction",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -183,10 +183,6 @@ export interface MarketplaceInterface extends utils.Interface {
     functionFragment: "idToMarketItem",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "invokeStartAuction",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "listItem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "marketplacePayoutAddress",
@@ -208,6 +204,10 @@ export interface MarketplaceInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "startAuction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
@@ -222,7 +222,7 @@ export interface MarketplaceInterface extends utils.Interface {
 
   events: {
     "AuctionEnded(uint256,address,address)": EventFragment;
-    "AuctionStarted(uint256,uint256,uint256,address)": EventFragment;
+    "AuctionStarted(uint256,address,uint256,string,address,uint256,uint256)": EventFragment;
     "BidPlaced(uint256,uint256,address)": EventFragment;
     "ItemRemoved(uint256,address,uint256,string,address)": EventFragment;
     "ItemSold(uint256,address,uint256,string,address,address,uint256)": EventFragment;
@@ -255,12 +255,15 @@ export type AuctionEndedEvent = TypedEvent<
 export type AuctionEndedEventFilter = TypedEventFilter<AuctionEndedEvent>;
 
 export type AuctionStartedEvent = TypedEvent<
-  [BigNumber, BigNumber, BigNumber, string],
+  [BigNumber, string, BigNumber, string, string, BigNumber, BigNumber],
   {
-    auctionId: BigNumber;
-    basePrice: BigNumber;
-    time: BigNumber;
+    itemId: BigNumber;
+    nftContract: string;
+    tokenId: BigNumber;
+    metaDataURI: string;
     auctioneer: string;
+    basePrice: BigNumber;
+    endTime: BigNumber;
   }
 >;
 
@@ -453,12 +456,6 @@ export interface Marketplace extends BaseContract {
       }
     >;
 
-    invokeStartAuction(
-      itemId: BigNumberish,
-      time: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     listItem(
       nftContract: string,
       tokenId: BigNumberish,
@@ -499,6 +496,12 @@ export interface Marketplace extends BaseContract {
       _salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
+
+    startAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -589,12 +592,6 @@ export interface Marketplace extends BaseContract {
     }
   >;
 
-  invokeStartAuction(
-    itemId: BigNumberish,
-    time: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   listItem(
     nftContract: string,
     tokenId: BigNumberish,
@@ -635,6 +632,12 @@ export interface Marketplace extends BaseContract {
     _salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
+
+  startAuction(
+    itemId: BigNumberish,
+    time: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   supportsInterface(
     interfaceId: BytesLike,
@@ -725,12 +728,6 @@ export interface Marketplace extends BaseContract {
       }
     >;
 
-    invokeStartAuction(
-      itemId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     listItem(
       nftContract: string,
       tokenId: BigNumberish,
@@ -766,6 +763,12 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
+    startAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -796,17 +799,23 @@ export interface Marketplace extends BaseContract {
       highestBidder?: string | null
     ): AuctionEndedEventFilter;
 
-    "AuctionStarted(uint256,uint256,uint256,address)"(
-      auctionId?: null,
+    "AuctionStarted(uint256,address,uint256,string,address,uint256,uint256)"(
+      itemId?: null,
+      nftContract?: string | null,
+      tokenId?: BigNumberish | null,
+      metaDataURI?: null,
+      auctioneer?: string | null,
       basePrice?: null,
-      time?: null,
-      auctioneer?: string | null
+      endTime?: null
     ): AuctionStartedEventFilter;
     AuctionStarted(
-      auctionId?: null,
+      itemId?: null,
+      nftContract?: string | null,
+      tokenId?: BigNumberish | null,
+      metaDataURI?: null,
+      auctioneer?: string | null,
       basePrice?: null,
-      time?: null,
-      auctioneer?: string | null
+      endTime?: null
     ): AuctionStartedEventFilter;
 
     "BidPlaced(uint256,uint256,address)"(
@@ -975,12 +984,6 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    invokeStartAuction(
-      itemId: BigNumberish,
-      time: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     listItem(
       nftContract: string,
       tokenId: BigNumberish,
@@ -1020,6 +1023,12 @@ export interface Marketplace extends BaseContract {
       _tokenId: BigNumberish,
       _salePrice: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    startAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     supportsInterface(
@@ -1102,12 +1111,6 @@ export interface Marketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    invokeStartAuction(
-      itemId: BigNumberish,
-      time: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     listItem(
       nftContract: string,
       tokenId: BigNumberish,
@@ -1151,6 +1154,12 @@ export interface Marketplace extends BaseContract {
       _tokenId: BigNumberish,
       _salePrice: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    startAuction(
+      itemId: BigNumberish,
+      time: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(

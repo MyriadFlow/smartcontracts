@@ -65,18 +65,25 @@ contract Marketplace is
     );
 
     event AuctionStarted(
-        uint256 auctionId,
+        uint256 itemId,
+        address indexed nftContract,
+        uint256 indexed tokenId,
+        string metaDataURI,
+        address indexed auctioneer,
         uint256 basePrice,
-        uint256 time,
-        address indexed auctioneer
+        uint256 endTime
     );
+
     event BidPlaced(uint256 itemId, uint256 amount, address indexed bidder);
+
     event AuctionEnded(
         uint256 auctionId,
         address indexed auctioneer,
         address indexed highestBidder
     );
+
     event PriceUpdated(uint256 itemId, uint256 updatedPrice);
+
     event TimeUpdated(uint256 itemId, uint256 updatedTime);
 
     event ItemSold(
@@ -189,7 +196,7 @@ contract Marketplace is
     }
 
     /**
-     * @dev only first time a user can use this function for listing
+     * @dev token owner can use this function for listing
      */
     function listItem(
         address nftContract,
@@ -198,21 +205,35 @@ contract Marketplace is
         bool forAuction,
         uint256 time
     ) external onlyItemOwner(nftContract, tokenId) returns (uint256) {
+        require(price > 0, "Marketplace: Price must be at least 1 wei");
+        if (forAuction == true) {
+            require(
+                time >= 60,
+                "Marketplace: Time cannot be less than One hour"
+            );
+        }
+
         uint256 itemId;
-        uint256 marketId = _marketItem[nftContract][tokenId];
-        uint256 marketIdStatus = uint(idToMarketItem[marketId].status);
-        if (marketId == 0) {
+        uint256 marketItemId = _marketItem[nftContract][tokenId];
+
+        if (marketItemId == 0) {
             _itemIds.increment();
             itemId = _itemIds.current();
-        } else if (marketId != 0 && marketIdStatus > 2) {
-            itemId = marketId;
+            _marketItem[nftContract][tokenId] = itemId;
+        } else if (
+            marketItemId != 0 &&
+            (idToMarketItem[marketItemId].status == ItemStatus.SOLD ||
+                idToMarketItem[marketItemId].status == ItemStatus.REMOVED)
+        ) {
+            itemId = marketItemId;
         } else {
             revert ItemNotExist();
         }
 
         IERC721(nftContract).transferFrom(_msgSender(), address(this), tokenId);
-
-        require(price > 0, "Marketplace: Price must be at least 1 wei");
+        string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
+            tokenId
+        );
 
         if (forAuction != true) {
             idToMarketItem[itemId] = MarketItem(
@@ -226,9 +247,6 @@ contract Marketplace is
                 ItemStatus.SALE
             );
 
-            string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
-                tokenId
-            );
             emit SaleStarted(
                 itemId,
                 nftContract,
@@ -238,10 +256,6 @@ contract Marketplace is
                 price
             );
         } else {
-            require(
-                time >= 60,
-                "Marketplace: Time cannot be less than One hour"
-            );
             //time argument should be set in unix
             uint256 endAt = block.timestamp + time;
             idToMarketItem[itemId] = MarketItem(
@@ -255,10 +269,16 @@ contract Marketplace is
                 ItemStatus.AUCTION
             );
             idToMarketItem[itemId].status = ItemStatus.AUCTION;
-            emit AuctionStarted(itemId, price, endAt, _msgSender());
+            emit AuctionStarted(
+                itemId,
+                nftContract,
+                tokenId,
+                metadataURI,
+                _msgSender(),
+                price,
+                endAt
+            );
         }
-
-        _marketItem[nftContract][tokenId] = itemId;
         return itemId;
     }
 
@@ -293,7 +313,7 @@ contract Marketplace is
     /***
      * @dev it starts sale automatically after the Auction is ended
      */
-    function _invokeStartSale(uint itemId) private onlySeller(itemId) {
+    function _invokeStartSale(uint itemId) private {
         idToMarketItem[itemId].auctioneEndTime = 0;
         idToMarketItem[itemId].status = ItemStatus.SALE;
 
@@ -348,7 +368,7 @@ contract Marketplace is
     /***
      * @dev start auction for an item
      */
-    function invokeStartAuction(
+    function startAuction(
         uint256 itemId,
         uint256 time
     ) external onlySeller(itemId) {
@@ -365,7 +385,21 @@ contract Marketplace is
         idToMarketItem[itemId].auctioneEndTime = endTime;
         idToMarketItem[itemId].status = ItemStatus.AUCTION;
 
-        emit AuctionStarted(itemId, price, time, _msgSender());
+        address nftContract = idToMarketItem[itemId].nftContract;
+        uint256 tokenId = idToMarketItem[itemId].tokenId;
+        string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
+            tokenId
+        );
+
+        emit AuctionStarted(
+            itemId,
+            nftContract,
+            tokenId,
+            metadataURI,
+            _msgSender(),
+            price,
+            time
+        );
     }
 
     /**

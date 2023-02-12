@@ -194,7 +194,7 @@ describe("storefront contract", () => {
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.status).to.be.equal(1)
 
-         await marketplace.connect(buyer1).invokeStartAuction(1,600);
+         await marketplace.connect(buyer1).startAuction(1,600);
 
         let val = ethers.utils.parseEther("2")
         await marketplace.connect(operator).placeBid(1, {value : val});
