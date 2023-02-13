@@ -65,11 +65,11 @@ Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we 
 yarn deploy maticmum
 ```
 
-## Contract Deployments - V2
+## Contract Deployments - V3
 
-> `Marketplace Deployed to: 0x72AFc9D60EBd2265a2420d580D2918392fae47f6`
+> `Marketplace Deployed to: 0xb5599E75A71C8f0FFDc9D2a60809d2F910455c72`
 
-> `StoreFront Deployed to: 0xe0CdEbF537574BcbB362885593Ee896D58Aa88Ec`
+> `StoreFront Deployed to: 0x2E77d56b4376dD1D2e57f4a915048B06522fc107`
 
 ## Etherscan Verification
 
@@ -83,9 +83,9 @@ npx hardhat verify --network maticmum --constructor-args StoreFrontArguments.js 
 
 where `MarketplaceArguments.js` & `StoreFrontArguments.js` is a javascript module that exports the argument list.
 
-[Marketplace Contract](https://mumbai.polygonscan.com/address/0x72AFc9D60EBd2265a2420d580D2918392fae47f6#code)
+[Marketplace Contract](https://mumbai.polygonscan.com/address/0xb5599E75A71C8f0FFDc9D2a60809d2F910455c72#code)
 
-[StoreFront Contract](https://mumbai.polygonscan.com/address/0xe0CdEbF537574BcbB362885593Ee896D58Aa88Ec#code)
+[StoreFront Contract](https://mumbai.polygonscan.com/address/0x2E77d56b4376dD1D2e57f4a915048B06522fc107#code)
 
 Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and interact with the smart contract at section `Read Contract` and `Write Contract`
 
@@ -98,12 +98,20 @@ graph auth --product hosted-service $GRAPH_TOKEN
 graph deploy --product hosted-service myriadflow/marketplacev1
 ```
 
-Build completed: QmWRK1oCkdiq2gSjhJAB9bDU4gkRMKQEZmF7Vf1vPzrG2v
+- MarketplaceV1:
 
+Build completed: QmQpztirZ6a2FrLq6GFWj26ai4zjj68T2ZUQpFFoxvmwEc
 Deployed to https://thegraph.com/explorer/subgraph/myriadflow/marketplacev1
 
-Subgraph endpoints:
-Queries (HTTP):     https://api.thegraph.com/subgraphs/name/myriadflow/marketplacev1
+- StoreFront-V1:
+
+Build completed: QmU1uD3HSYYKE8qUzMgDC7axpxoQPuoQQuUZoE1Y4dJa5r
+Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1
+
+- Subgraph endpoints:
+
+Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/marketplacev1
+Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v
 
 # Quick Deployment
 

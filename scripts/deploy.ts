@@ -27,7 +27,7 @@ async function main() {
     const txReceipt = await hre.ethers.provider.waitForTransaction(txHash);
     console.log("Confirming Marketplace Address:", txReceipt.contractAddress);
     const StoreFront = await hre.ethers.getContractFactory("StoreFront");
-    const storefront = await StoreFront.deploy("StoreFront V2", "SFv2", txReceipt.contractAddress);
+    const storefront = await StoreFront.deploy("StoreFront V3", "SFv3", txReceipt.contractAddress);
     await storefront.deployed();
     console.log("StoreFront Deployed to:", storefront.address);
 
@@ -46,7 +46,7 @@ async function main() {
         await storefront.grantRole(await storefront.STOREFRONT_CREATOR_ROLE(), await storefront.signer.getAddress())
         await storefront.grantRole(await storefront.STOREFRONT_CREATOR_ROLE(), await buyer.getAddress())
         await storefront.createAsset("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF", 500)
-        await marketplace.listSaleItem(storefront.address, 1, 1)
+        await marketplace.listItem(storefront.address, 1, 1, false, 0)
         await marketplace.connect(buyer).buyItem(1, { value: 1 })
         await storefront.revokeRole(await storefront.STOREFRONT_CREATOR_ROLE(), await buyer.getAddress())
         updateGraphAddress(storefront.address, marketplace.address, marketplace.deployTransaction.blockNumber, true)
@@ -56,16 +56,32 @@ async function main() {
 }
 
 function updateGraphAddress(storefrontAddr: string, marketPlaceAddr: string, startBlock: number | undefined, local: boolean) {
-    const urlSubgraphLocal = local ? `subgraph/subgraph.local.yaml` : `subgraph/subgraph.yaml`
-    const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
-    umlSubgraphLocal.dataSources[0].source.address = storefrontAddr
-    umlSubgraphLocal.dataSources[1].source.address = marketPlaceAddr
+    // const urlSubgraphLocal = local ? `subgraph/subgraph.local.yaml` : `subgraph/subgraph.yaml`
+    // const umlSubgraphLocal = yaml.load(fs.readFileSync(urlSubgraphLocal, 'utf8')) as any
+
+    const urlMarketplaceSubgraphLocal = local ? `subgraph/subgraph.local.yaml` : `subgraph/marketplacev1/subgraph.yaml`
+    const urlStorefrontSubgraphLocal = local ? `subgraph/storefront-v1/subgraph.local.yaml` : `subgraph/storefront-v1/subgraph.yaml`
+    const umlMarketplaceSubgraphLocal = yaml.load(fs.readFileSync(urlMarketplaceSubgraphLocal, 'utf8')) as any
+    const umlStorefrontSubgraphLocal = yaml.load(fs.readFileSync(urlStorefrontSubgraphLocal, 'utf8')) as any
+
+    // umlSubgraphLocal.dataSources[0].source.address = storefrontAddr
+    // umlSubgraphLocal.dataSources[1].source.address = marketPlaceAddr
+
+    umlMarketplaceSubgraphLocal.dataSources[0].source.address = marketPlaceAddr
+    umlStorefrontSubgraphLocal.dataSources[0].source.address = storefrontAddr
+
+    // if (startBlock) {
+    //     umlSubgraphLocal.dataSources[0].source.startBlock = startBlock
+    //     umlSubgraphLocal.dataSources[1].source.startBlock = startBlock
+    // }
+    // fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
 
     if (startBlock) {
-        umlSubgraphLocal.dataSources[0].source.startBlock = startBlock
-        umlSubgraphLocal.dataSources[1].source.startBlock = startBlock
+        umlMarketplaceSubgraphLocal.dataSources[0].source.startBlock = startBlock
+        umlStorefrontSubgraphLocal.dataSources[0].source.startBlock = startBlock
     }
-    fs.writeFileSync(urlSubgraphLocal, yaml.dump(umlSubgraphLocal));
+    fs.writeFileSync(urlMarketplaceSubgraphLocal, yaml.dump(umlMarketplaceSubgraphLocal));
+    fs.writeFileSync(urlStorefrontSubgraphLocal, yaml.dump(umlStorefrontSubgraphLocal));
 }
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.

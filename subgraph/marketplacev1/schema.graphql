@@ -1,0 +1,120 @@
+type AuctionEnded @entity(immutable: true) {
+  id: Bytes!
+  auctionId: BigInt! # uint256
+  auctioneer: Bytes! # address
+  highestBidder: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AuctionStarted @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  metaDataURI: String! # string
+  auctioneer: Bytes! # address
+  basePrice: BigInt! # uint256
+  endTime: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type BidPlaced @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  amount: BigInt! # uint256
+  bidder: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ItemRemoved @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  metaDataURI: String! # string
+  seller: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type ItemSold @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  metadataURI: String! # string
+  seller: Bytes! # address
+  buyer: Bytes! # address
+  price: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type PriceUpdated @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  updatedPrice: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleAdminChanged @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  previousAdminRole: Bytes! # bytes32
+  newAdminRole: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleGranted @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleRevoked @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type SaleStarted @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  metaDataURI: String! # string
+  seller: Bytes! # address
+  price: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TimeUpdated @entity(immutable: true) {
+  id: Bytes!
+  itemId: BigInt! # uint256
+  updatedTime: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
