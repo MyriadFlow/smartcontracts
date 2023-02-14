@@ -16,8 +16,12 @@ import {
 
 export function createAuctionEndedEvent(
   auctionId: BigInt,
+  nftContract: Address,
+  tokenId: BigInt,
+  metadataURI: string,
   auctioneer: Address,
-  highestBidder: Address
+  highestBidder: Address,
+  bid: BigInt
 ): AuctionEnded {
   let auctionEndedEvent = changetype<AuctionEnded>(newMockEvent())
 
@@ -31,6 +35,24 @@ export function createAuctionEndedEvent(
   )
   auctionEndedEvent.parameters.push(
     new ethereum.EventParam(
+      "nftContract",
+      ethereum.Value.fromAddress(nftContract)
+    )
+  )
+  auctionEndedEvent.parameters.push(
+    new ethereum.EventParam(
+      "tokenId",
+      ethereum.Value.fromUnsignedBigInt(tokenId)
+    )
+  )
+  auctionEndedEvent.parameters.push(
+    new ethereum.EventParam(
+      "metadataURI",
+      ethereum.Value.fromString(metadataURI)
+    )
+  )
+  auctionEndedEvent.parameters.push(
+    new ethereum.EventParam(
       "auctioneer",
       ethereum.Value.fromAddress(auctioneer)
     )
@@ -40,6 +62,9 @@ export function createAuctionEndedEvent(
       "highestBidder",
       ethereum.Value.fromAddress(highestBidder)
     )
+  )
+  auctionEndedEvent.parameters.push(
+    new ethereum.EventParam("bid", ethereum.Value.fromUnsignedBigInt(bid))
   )
 
   return auctionEndedEvent

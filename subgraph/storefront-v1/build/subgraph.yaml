@@ -6,9 +6,9 @@ dataSources:
     name: StoreFront
     network: mumbai
     source:
-      address: "0x2E77d56b4376dD1D2e57f4a915048B06522fc107"
+      address: "0xe5c5FDBde18F94a50C47BC7b7f8dBe484A476B78"
       abi: StoreFront
-      startBlock: 32000042
+      startBlock: 32033232
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

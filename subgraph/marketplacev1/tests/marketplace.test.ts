@@ -18,16 +18,26 @@ import { createAuctionEndedEvent } from "./marketplace-utils"
 describe("Describe entity assertions", () => {
   beforeAll(() => {
     let auctionId = BigInt.fromI32(234)
+    let nftContract = Address.fromString(
+      "0x0000000000000000000000000000000000000001"
+    )
+    let tokenId = BigInt.fromI32(234)
+    let metadataURI = "Example string value"
     let auctioneer = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
     let highestBidder = Address.fromString(
       "0x0000000000000000000000000000000000000001"
     )
+    let bid = BigInt.fromI32(234)
     let newAuctionEndedEvent = createAuctionEndedEvent(
       auctionId,
+      nftContract,
+      tokenId,
+      metadataURI,
       auctioneer,
-      highestBidder
+      highestBidder,
+      bid
     )
     handleAuctionEnded(newAuctionEndedEvent)
   })
@@ -52,6 +62,24 @@ describe("Describe entity assertions", () => {
     assert.fieldEquals(
       "AuctionEnded",
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "nftContract",
+      "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "AuctionEnded",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "tokenId",
+      "234"
+    )
+    assert.fieldEquals(
+      "AuctionEnded",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "metadataURI",
+      "Example string value"
+    )
+    assert.fieldEquals(
+      "AuctionEnded",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "auctioneer",
       "0x0000000000000000000000000000000000000001"
     )
@@ -60,6 +88,12 @@ describe("Describe entity assertions", () => {
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
       "highestBidder",
       "0x0000000000000000000000000000000000000001"
+    )
+    assert.fieldEquals(
+      "AuctionEnded",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
+      "bid",
+      "234"
     )
 
     // More assert options:

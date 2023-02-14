@@ -77,9 +77,13 @@ contract Marketplace is
     event BidPlaced(uint256 itemId, uint256 amount, address indexed bidder);
 
     event AuctionEnded(
-        uint256 auctionId,
-        address indexed auctioneer,
-        address indexed highestBidder
+        uint256 indexed auctionId,
+        address indexed nftContract,
+        uint256 indexed tokenId,
+        string metadataURI,
+        address auctioneer,
+        address highestBidder,
+        uint256 bid
     );
 
     event PriceUpdated(uint256 itemId, uint256 updatedPrice);
@@ -435,11 +439,16 @@ contract Marketplace is
     ) public onlyWhenItemIsForAuction(itemId) {
         address auctioneerAddress = idToMarketItem[itemId].seller;
         uint256 bidAmount = idToMarketItem[itemId].highestBid;
+        address nftContract = idToMarketItem[itemId].nftContract;
+        uint256 tokenId = idToMarketItem[itemId].tokenId;
+        string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
+            tokenId
+        );
 
         if (highestBidder[itemId] != address(0)) {
             _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
 
-            emit AuctionEnded(itemId, auctioneerAddress, highestBidder[itemId]);
+            emit AuctionEnded(itemId, nftContract, tokenId, metadataURI, auctioneerAddress, highestBidder[itemId], bidAmount);
 
             highestBidder[itemId] = address(0);
             idToMarketItem[itemId].highestBid = 0;
@@ -463,10 +472,15 @@ contract Marketplace is
 
         address auctioneerAddress = idToMarketItem[itemId].seller;
         uint256 bidAmount = idToMarketItem[itemId].highestBid;
+        address nftContract = idToMarketItem[itemId].nftContract;
+        uint256 tokenId = idToMarketItem[itemId].tokenId;
+        string memory metadataURI = IERC721Metadata(nftContract).tokenURI(
+            tokenId
+        );
 
         if (highestBidder[itemId] != address(0)) {
             _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
-            emit AuctionEnded(itemId, auctioneerAddress, highestBidder[itemId]);
+            emit AuctionEnded(itemId, nftContract, tokenId, metadataURI, auctioneerAddress, highestBidder[itemId], bidAmount);
             highestBidder[itemId] = address(0);
             idToMarketItem[itemId].highestBid = 0;
         } else {

@@ -53,6 +53,33 @@ export class AuctionEnded extends Entity {
     this.set("auctionId", Value.fromBigInt(value));
   }
 
+  get nftContract(): Bytes {
+    let value = this.get("nftContract");
+    return value!.toBytes();
+  }
+
+  set nftContract(value: Bytes) {
+    this.set("nftContract", Value.fromBytes(value));
+  }
+
+  get tokenId(): BigInt {
+    let value = this.get("tokenId");
+    return value!.toBigInt();
+  }
+
+  set tokenId(value: BigInt) {
+    this.set("tokenId", Value.fromBigInt(value));
+  }
+
+  get metadataURI(): string {
+    let value = this.get("metadataURI");
+    return value!.toString();
+  }
+
+  set metadataURI(value: string) {
+    this.set("metadataURI", Value.fromString(value));
+  }
+
   get auctioneer(): Bytes {
     let value = this.get("auctioneer");
     return value!.toBytes();
@@ -69,6 +96,15 @@ export class AuctionEnded extends Entity {
 
   set highestBidder(value: Bytes) {
     this.set("highestBidder", Value.fromBytes(value));
+  }
+
+  get bid(): BigInt {
+    let value = this.get("bid");
+    return value!.toBigInt();
+  }
+
+  set bid(value: BigInt) {
+    this.set("bid", Value.fromBigInt(value));
   }
 
   get blockNumber(): BigInt {

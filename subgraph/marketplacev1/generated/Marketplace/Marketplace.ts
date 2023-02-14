@@ -27,12 +27,28 @@ export class AuctionEnded__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get auctioneer(): Address {
+  get nftContract(): Address {
     return this._event.parameters[1].value.toAddress();
   }
 
+  get tokenId(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get metadataURI(): string {
+    return this._event.parameters[3].value.toString();
+  }
+
+  get auctioneer(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
   get highestBidder(): Address {
-    return this._event.parameters[2].value.toAddress();
+    return this._event.parameters[5].value.toAddress();
+  }
+
+  get bid(): BigInt {
+    return this._event.parameters[6].value.toBigInt();
   }
 }
 

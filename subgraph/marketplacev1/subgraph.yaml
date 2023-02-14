@@ -6,9 +6,9 @@ dataSources:
     name: Marketplace
     network: mumbai
     source:
-      address: "0xb5599E75A71C8f0FFDc9D2a60809d2F910455c72"
+      address: "0xc2d4d1E0103cfe42c35398Edce983f4c8999F429"
       abi: Marketplace
-      startBlock: 32000038
+      startBlock: 32033229
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -29,7 +29,7 @@ dataSources:
         - name: Marketplace
           file: ./abis/Marketplace.json
       eventHandlers:
-        - event: AuctionEnded(uint256,indexed address,indexed address)
+        - event: AuctionEnded(indexed uint256,indexed address,indexed uint256,string,address,address,uint256)
           handler: handleAuctionEnded
         - event: AuctionStarted(uint256,indexed address,indexed uint256,string,indexed address,uint256,uint256)
           handler: handleAuctionStarted

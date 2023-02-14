@@ -27,7 +27,7 @@ async function main() {
     const txReceipt = await hre.ethers.provider.waitForTransaction(txHash);
     console.log("Confirming Marketplace Address:", txReceipt.contractAddress);
     const StoreFront = await hre.ethers.getContractFactory("StoreFront");
-    const storefront = await StoreFront.deploy("StoreFront V3", "SFv3", txReceipt.contractAddress);
+    const storefront = await StoreFront.deploy("StoreFront V4", "SFv4", txReceipt.contractAddress);
     await storefront.deployed();
     console.log("StoreFront Deployed to:", storefront.address);
 

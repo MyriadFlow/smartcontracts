@@ -33,10 +33,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC2981__factory>;
     getContractFactory(
-      name: "Pausable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Pausable__factory>;
-    getContractFactory(
       name: "ERC2981",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC2981__factory>;
@@ -48,10 +44,6 @@ declare module "hardhat/types/runtime" {
       name: "ERC721Enumerable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC721Enumerable__factory>;
-    getContractFactory(
-      name: "ERC721Pausable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC721Pausable__factory>;
     getContractFactory(
       name: "IERC721Enumerable",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -111,11 +103,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC2981>;
     getContractAt(
-      name: "Pausable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Pausable>;
-    getContractAt(
       name: "ERC2981",
       address: string,
       signer?: ethers.Signer
@@ -130,11 +117,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC721Enumerable>;
-    getContractAt(
-      name: "ERC721Pausable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC721Pausable>;
     getContractAt(
       name: "IERC721Enumerable",
       address: string,

@@ -11,7 +11,7 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
+        "indexed": true,
         "internalType": "uint256",
         "name": "auctionId",
         "type": "uint256"
@@ -19,14 +19,38 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "auctioneer",
+        "name": "nftContract",
         "type": "address"
       },
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "metadataURI",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "auctioneer",
+        "type": "address"
+      },
+      {
+        "indexed": false,
         "internalType": "address",
         "name": "highestBidder",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "bid",
+        "type": "uint256"
       }
     ],
     "name": "AuctionEnded",

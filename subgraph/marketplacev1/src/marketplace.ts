@@ -30,8 +30,12 @@ export function handleAuctionEnded(event: AuctionEndedEvent): void {
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.auctionId = event.params.auctionId
+  entity.nftContract = event.params.nftContract
+  entity.tokenId = event.params.tokenId
+  entity.metadataURI = event.params.metadataURI
   entity.auctioneer = event.params.auctioneer
   entity.highestBidder = event.params.highestBidder
+  entity.bid = event.params.bid
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp

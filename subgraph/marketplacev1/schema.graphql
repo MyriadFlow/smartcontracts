@@ -1,8 +1,12 @@
 type AuctionEnded @entity(immutable: true) {
   id: Bytes!
   auctionId: BigInt! # uint256
+  nftContract: Bytes! # address
+  tokenId: BigInt! # uint256
+  metadataURI: String! # string
   auctioneer: Bytes! # address
   highestBidder: Bytes! # address
+  bid: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

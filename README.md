@@ -55,6 +55,7 @@ To run the tests, we can use command:
 
 ```shell
 yarn test
+yarn coverage
 ```
 
 ## Deploying Contracts
@@ -67,9 +68,9 @@ yarn deploy maticmum
 
 ## Contract Deployments - V3
 
-> `Marketplace Deployed to: 0xb5599E75A71C8f0FFDc9D2a60809d2F910455c72`
+> `Marketplace Deployed to: 0xc2d4d1E0103cfe42c35398Edce983f4c8999F429`
 
-> `StoreFront Deployed to: 0x2E77d56b4376dD1D2e57f4a915048B06522fc107`
+> `StoreFront Deployed to: 0xe5c5FDBde18F94a50C47BC7b7f8dBe484A476B78`
 
 ## Etherscan Verification
 
@@ -77,15 +78,15 @@ To try out Etherscan verification, we need to deploy a contract to an Ethereum n
 Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
 ```shell
-npx hardhat verify --network maticmum --constructor-args MarketplaceArguments.js DEPLOYED_CONTRACT_ADDRESS
-npx hardhat verify --network maticmum --constructor-args StoreFrontArguments.js DEPLOYED_CONTRACT_ADDRESS
+yarn hardhat verify --network maticmum --constructor-args MarketplaceArguments.js DEPLOYED_CONTRACT_ADDRESS
+yarn hardhat verify --network maticmum --constructor-args StoreFrontArguments.js DEPLOYED_CONTRACT_ADDRESS
 ```
 
 where `MarketplaceArguments.js` & `StoreFrontArguments.js` is a javascript module that exports the argument list.
 
-[Marketplace Contract](https://mumbai.polygonscan.com/address/0xb5599E75A71C8f0FFDc9D2a60809d2F910455c72#code)
+[Marketplace Contract](https://mumbai.polygonscan.com/address/0xc2d4d1E0103cfe42c35398Edce983f4c8999F429#code)
 
-[StoreFront Contract](https://mumbai.polygonscan.com/address/0x2E77d56b4376dD1D2e57f4a915048B06522fc107#code)
+[StoreFront Contract](https://mumbai.polygonscan.com/address/0xe5c5FDBde18F94a50C47BC7b7f8dBe484A476B78#code)
 
 Finally, visit the contract address on the Blockchain Explorer (PolygonScan) and interact with the smart contract at section `Read Contract` and `Write Contract`
 
@@ -100,18 +101,18 @@ graph deploy --product hosted-service myriadflow/marketplacev1
 
 - MarketplaceV1:
 
-Build completed: QmQpztirZ6a2FrLq6GFWj26ai4zjj68T2ZUQpFFoxvmwEc
-Deployed to https://thegraph.com/explorer/subgraph/myriadflow/marketplacev1
+> `Build completed: QmdPYT6USJwaNQKExAsYggHfLeSoK6wWwYz1YmX5ui6YeM`
+> `Deployed to https://thegraph.com/explorer/subgraph/myriadflow/marketplacev1`
 
 - StoreFront-V1:
 
-Build completed: QmU1uD3HSYYKE8qUzMgDC7axpxoQPuoQQuUZoE1Y4dJa5r
-Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1
+> `Build completed: QmSbPdM1RxBVouxG9THHdDtWchLZBsNzHZGurEMi4nJyfu`
+> `Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1`
 
 - Subgraph endpoints:
 
 Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/marketplacev1
-Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v
+Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v1
 
 # Quick Deployment
 

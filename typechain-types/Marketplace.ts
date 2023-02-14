@@ -221,7 +221,7 @@ export interface MarketplaceInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "AuctionEnded(uint256,address,address)": EventFragment;
+    "AuctionEnded(uint256,address,uint256,string,address,address,uint256)": EventFragment;
     "AuctionStarted(uint256,address,uint256,string,address,uint256,uint256)": EventFragment;
     "BidPlaced(uint256,uint256,address)": EventFragment;
     "ItemRemoved(uint256,address,uint256,string,address)": EventFragment;
@@ -248,8 +248,16 @@ export interface MarketplaceInterface extends utils.Interface {
 }
 
 export type AuctionEndedEvent = TypedEvent<
-  [BigNumber, string, string],
-  { auctionId: BigNumber; auctioneer: string; highestBidder: string }
+  [BigNumber, string, BigNumber, string, string, string, BigNumber],
+  {
+    auctionId: BigNumber;
+    nftContract: string;
+    tokenId: BigNumber;
+    metadataURI: string;
+    auctioneer: string;
+    highestBidder: string;
+    bid: BigNumber;
+  }
 >;
 
 export type AuctionEndedEventFilter = TypedEventFilter<AuctionEndedEvent>;
@@ -788,15 +796,23 @@ export interface Marketplace extends BaseContract {
   };
 
   filters: {
-    "AuctionEnded(uint256,address,address)"(
-      auctionId?: null,
-      auctioneer?: string | null,
-      highestBidder?: string | null
+    "AuctionEnded(uint256,address,uint256,string,address,address,uint256)"(
+      auctionId?: BigNumberish | null,
+      nftContract?: string | null,
+      tokenId?: BigNumberish | null,
+      metadataURI?: null,
+      auctioneer?: null,
+      highestBidder?: null,
+      bid?: null
     ): AuctionEndedEventFilter;
     AuctionEnded(
-      auctionId?: null,
-      auctioneer?: string | null,
-      highestBidder?: string | null
+      auctionId?: BigNumberish | null,
+      nftContract?: string | null,
+      tokenId?: BigNumberish | null,
+      metadataURI?: null,
+      auctioneer?: null,
+      highestBidder?: null,
+      bid?: null
     ): AuctionEndedEventFilter;
 
     "AuctionStarted(uint256,address,uint256,string,address,uint256,uint256)"(
