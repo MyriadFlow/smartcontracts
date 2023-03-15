@@ -8,7 +8,6 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-
 error ItemNotExist();
 
 contract Marketplace is
@@ -30,12 +29,21 @@ contract Marketplace is
     address public marketplacePayoutAddress;
     uint96 public platformFeeBasisPoint;
 
+    uint256 public proposalCounter = 0;
+
     enum ItemStatus {
         NONEXISTANT,
         SALE,
         AUCTION,
         SOLD,
         REMOVED
+    }
+
+    enum ProposalStatus {
+        NONEXISTANT,
+        ACTIVE,
+        WITHDRAWN,
+        SOLD // Accepted
     }
 
     struct MarketItem {
@@ -49,11 +57,21 @@ contract Marketplace is
         ItemStatus status;
     }
 
+    struct ProposalId {
+        address nftContractAddress;
+        uint tokenId;
+        address buyer;
+        uint proposedBid;
+        ProposalStatus status;
+    }
+
     mapping(uint256 => MarketItem) public idToMarketItem;
 
     mapping(address => mapping(uint256 => uint256)) private _marketItem;
 
     mapping(uint256 => address) public highestBidder;
+
+    mapping(uint => ProposalId) public idToproposal;
 
     event SaleStarted(
         uint256 indexed itemId,
@@ -108,7 +126,29 @@ contract Marketplace is
         address seller
     );
 
-    // Only item owner should be able to perform action
+    event ProposalInitiated(
+        address indexed nftContractAddress,
+        uint256 indexed tokenId,
+        uint256 offerId,
+        string metadataURI,
+        address buyer,
+        uint256 indexed proposedAmmount
+    );
+    event ProposalWithdrawn(uint256 indexed offerId);
+
+    event ProposalAccepted(
+        address indexed contractAddress,
+        uint256 indexed tokenId,
+        uint256 indexed offerId,
+        address seller,
+        address buyer,
+        uint256 finalAmount
+    );
+    event ProposalUpdated(
+        uint256 indexed offerId,
+        uint256 indexed previousAmount,
+        uint256 indexed updatedAmount
+    );
     modifier onlyItemOwner(address nftContract, uint256 tokenId) {
         require(
             IERC721(nftContract).ownerOf(tokenId) == _msgSender(),
@@ -116,8 +156,6 @@ contract Marketplace is
         );
         _;
     }
-
-    // Only when item is is for sale
     modifier onlyWhenItemIsForSale(uint256 itemId) {
         require(
             idToMarketItem[itemId].status == ItemStatus.SALE,
@@ -125,8 +163,6 @@ contract Marketplace is
         );
         _;
     }
-
-    // only when item is for auction
     modifier onlyWhenItemIsForAuction(uint256 itemId) {
         require(
             idToMarketItem[itemId].status == ItemStatus.AUCTION,
@@ -134,8 +170,6 @@ contract Marketplace is
         );
         _;
     }
-
-    // Only seller should be able to perform action
     modifier onlySeller(uint256 itemId) {
         require(
             idToMarketItem[itemId].seller == _msgSender(),
@@ -143,12 +177,25 @@ contract Marketplace is
         );
         _;
     }
-
-    // only when there is no bid placed for an item then action will be performed
     modifier onlyWhenNoBidder(uint256 itemId) {
         require(
             highestBidder[itemId] == address(0),
             "Marketplace : Auction is still running"
+        );
+        _;
+    }
+
+      modifier onlyWhenProposalActive(uint offerId) {
+        require(
+            idToproposal[offerId].status == ProposalStatus.ACTIVE,
+            "Marketplace: Proposal is already Closed"
+        );
+        _;
+    }
+    modifier onlyIfOfferCreator(uint offerId) {
+        require(
+            idToproposal[offerId].buyer == _msgSender(),
+            "Marketplace: User did not intiated the offer!"
         );
         _;
     }
@@ -448,7 +495,15 @@ contract Marketplace is
         if (highestBidder[itemId] != address(0)) {
             _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
 
-            emit AuctionEnded(itemId, nftContract, tokenId, metadataURI, auctioneerAddress, highestBidder[itemId], bidAmount);
+            emit AuctionEnded(
+                itemId,
+                nftContract,
+                tokenId,
+                metadataURI,
+                auctioneerAddress,
+                highestBidder[itemId],
+                bidAmount
+            );
 
             highestBidder[itemId] = address(0);
             idToMarketItem[itemId].highestBid = 0;
@@ -480,7 +535,15 @@ contract Marketplace is
 
         if (highestBidder[itemId] != address(0)) {
             _paymentSplit(itemId, bidAmount, highestBidder[itemId]);
-            emit AuctionEnded(itemId, nftContract, tokenId, metadataURI, auctioneerAddress, highestBidder[itemId], bidAmount);
+            emit AuctionEnded(
+                itemId,
+                nftContract,
+                tokenId,
+                metadataURI,
+                auctioneerAddress,
+                highestBidder[itemId],
+                bidAmount
+            );
             highestBidder[itemId] = address(0);
             idToMarketItem[itemId].highestBid = 0;
         } else {
@@ -519,6 +582,115 @@ contract Marketplace is
         idToMarketItem[itemId].auctioneEndTime = block.timestamp + time;
         emit TimeUpdated(itemId, idToMarketItem[itemId].auctioneEndTime);
         return idToMarketItem[itemId].auctioneEndTime;
+    }
+
+    /******************** PROPOSAL ************************** */
+
+    /// @notice create an Offer to any  nft contract in the blockchain
+    function createOffer(
+        address _nftContractAddress,
+        uint _tokenId
+    ) external payable returns (uint) {
+        proposalCounter++;
+        idToproposal[proposalCounter] = ProposalId(
+            _nftContractAddress,
+            _tokenId,
+            _msgSender(),
+            msg.value,
+            ProposalStatus.ACTIVE
+        );
+
+        string memory metadataURI = IERC721Metadata(_nftContractAddress)
+            .tokenURI(_tokenId);
+
+        emit ProposalInitiated(
+            _nftContractAddress,
+            _tokenId,
+            proposalCounter,
+            metadataURI,
+            _msgSender(),
+            msg.value
+        );
+        return proposalCounter;
+    }
+
+    /// @notice Withdraw the offer if the User does not intend anymore
+    function withdrawOffer(
+        uint256 offerId
+    )
+        external
+        nonReentrant
+        onlyWhenProposalActive(offerId)
+        onlyIfOfferCreator(offerId) //onlyIfOfferCreator
+        returns (uint)
+    {
+        payable(msg.sender).transfer(idToproposal[offerId].proposedBid);
+
+        idToproposal[offerId].status = ProposalStatus.WITHDRAWN;
+
+        emit ProposalWithdrawn(offerId);
+
+        return offerId;
+    }
+
+    /// @notice Token Owner accepts the Offer and transfers the token to the buyer
+    function acceptOffer(
+        uint _offerId
+    ) external nonReentrant onlyWhenProposalActive(_offerId) {
+        address contractAddress = idToproposal[_offerId].nftContractAddress;
+        uint tokenId = idToproposal[_offerId].tokenId;
+        address buyer = idToproposal[_offerId].buyer;
+
+        require(
+            IERC721(contractAddress).ownerOf(tokenId) == _msgSender(),
+            "Marketplace: Caller is not the owner !"
+        );
+
+        IERC721(contractAddress).transferFrom(_msgSender(), buyer, tokenId);
+
+        uint value = idToproposal[_offerId].proposedBid;
+        // Calculate Payout for Platform
+        uint256 amountReceived = value;
+        uint256 payoutForMarketplace = (amountReceived *
+            platformFeeBasisPoint) / 1000;
+
+        uint256 amountToOwner = value - payoutForMarketplace;
+
+        //transfering amounts to marketplace, creator and seller
+        payable(marketplacePayoutAddress).transfer(payoutForMarketplace);
+        //item Seller
+        payable(_msgSender()).transfer(amountToOwner);
+
+        emit ProposalAccepted(
+            contractAddress,
+            tokenId,
+            _offerId,
+            _msgSender(),
+            idToproposal[_offerId].buyer,
+            value
+        );
+    }
+
+    /// @notice To increase the Offer Price of a Offer Id
+
+    function increaseOffer(
+        uint256 offerId
+    )
+        external
+        payable
+        onlyWhenProposalActive(offerId)
+        onlyIfOfferCreator(offerId)
+    {
+        require(msg.value > 0, "Marketplace: Can't be Zero! ");
+        uint previousAmount = idToproposal[offerId].proposedBid;
+
+        idToproposal[offerId].proposedBid = previousAmount + msg.value;
+
+        emit ProposalUpdated(
+            offerId,
+            previousAmount,
+            idToproposal[offerId].proposedBid
+        );
     }
 
     function supportsInterface(

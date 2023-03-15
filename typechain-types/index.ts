@@ -16,6 +16,7 @@ export type { IERC721Receiver } from "./IERC721Receiver";
 export type { ERC165 } from "./ERC165";
 export type { IERC165 } from "./IERC165";
 export type { Marketplace } from "./Marketplace";
+export type { Proposal } from "./Proposal";
 export type { StoreFront } from "./StoreFront";
 
 export { AccessControl__factory } from "./factories/AccessControl__factory";
@@ -33,4 +34,5 @@ export { IERC721Receiver__factory } from "./factories/IERC721Receiver__factory";
 export { ERC165__factory } from "./factories/ERC165__factory";
 export { IERC165__factory } from "./factories/IERC165__factory";
 export { Marketplace__factory } from "./factories/Marketplace__factory";
+export { Proposal__factory } from "./factories/Proposal__factory";
 export { StoreFront__factory } from "./factories/StoreFront__factory";

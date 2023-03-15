@@ -209,7 +209,6 @@ describe("storefront contract", () => {
         expect(await storefront.ownerOf(1)).to.be.equal(operator.address);
     })
      it("UpdatePrice and UpdateTime ",async () => {
-
         await storefront.connect(operator).approve(marketplace.address,1)
 
         await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,300);
@@ -241,6 +240,73 @@ describe("storefront contract", () => {
         expect(marketplace.connect(operator).updatePrice(1,val)).to.be.reverted
         expect(marketplace.connect(operator).updateAuctionTime(1,1000)).to.be.reverted
     
+    })
+    it("User can offer to any NFT owner in the blockchain,withdraw and Update",async () => {
+        marketplace = marketplace.connect(owner)
+        await storefront.connect(creator).createAsset("www.xyz.com",300);
+        const contractAddress = storefront.address
+
+        expect(await marketplace.connect(buyer).createOffer(contractAddress,3 , {value : ethers.utils.parseEther("1.0")})).to.emit(marketplace,"ProposalIntiated")
+
+        let proposalId = await marketplace.idToproposal(1)
+        expect(proposalId.nftContractAddress).to.be.equal(storefront.address)
+        expect(proposalId.tokenId).to.be.equal(3)
+        expect(proposalId.status).to.be.equal(1)
+        
+        //increase the Offer Price
+        let val = ethers.utils.parseEther("0.5");
+
+        await marketplace.connect(buyer).increaseOffer(1,{value : val })
+
+        proposalId = await marketplace.idToproposal(1)
+
+        val = ethers.utils.parseEther("1.5");
+        
+        expect(proposalId.proposedBid).to.be.equal(val)
+
+        //Withdraw the offer
+        expect(await marketplace.connect(buyer).withdrawOffer(1)).to.emit(marketplace,"ProposalWithdrawn") 
+
+        proposalId = await marketplace.idToproposal(1)
+
+        expect(proposalId.status).to.be.equal(2)
+
+    })
+    it("Accept Offer by Owner",async()=>{
+
+        const contractAddress = storefront.address
+         //Accept Offer
+        let val2 = ethers.utils.parseEther("1.0")
+        await marketplace.createOffer(contractAddress,3 , {value : val2})
+
+        expect(marketplace.acceptOffer(1)).to.be.revertedWith("Marketplace: Proposal is already Closed")
+
+        expect(await storefront.ownerOf(3)).to.be.equal(creator.address)
+
+        const startingCreatorBalance =  await marketplace.provider.getBalance(
+                creator.address
+            )
+
+        const transactionResponse = await marketplace.connect(creator).acceptOffer(2)
+        const transactionReceipt = await transactionResponse.wait()
+        const { gasUsed, effectiveGasPrice } = transactionReceipt
+        const gasCost = gasUsed.mul(effectiveGasPrice)        
+
+        const endingCreatorBalance = await marketplace.provider.getBalance(
+                creator.address
+            ) 
+
+        expect(await storefront.ownerOf(3)).to.be.equal(owner.address)
+       
+        let amount = (val2.mul(70)).div(100) 
+        
+        let totalValue = (endingCreatorBalance.sub(startingCreatorBalance)).add(gasCost)
+
+         assert.equal(
+                totalValue.toString(),
+                amount.toString()
+            )
+
     })
 
 })

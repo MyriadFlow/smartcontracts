@@ -18,8 +18,8 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface MarketplaceInterface extends utils.Interface {
-  contractName: "Marketplace";
+export interface ProposalInterface extends utils.Interface {
+  contractName: "Proposal";
   functions: {
     "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
@@ -469,13 +469,13 @@ export type TimeUpdatedEvent = TypedEvent<
 
 export type TimeUpdatedEventFilter = TypedEventFilter<TimeUpdatedEvent>;
 
-export interface Marketplace extends BaseContract {
-  contractName: "Marketplace";
+export interface Proposal extends BaseContract {
+  contractName: "Proposal";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: MarketplaceInterface;
+  interface: ProposalInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
