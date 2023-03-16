@@ -24,7 +24,7 @@ import "@openzeppelin/contracts/token/common/ERC2981.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract StoreFront is
+contract StorefrontCollection is
     Context,
     AccessControlEnumerable,
     ERC721Enumerable,
@@ -101,7 +101,7 @@ contract StoreFront is
         // Set royalty Info
         require(
             royaltyPercentBasisPoint <= 1000,
-            "StoreFront: Royalty can't be more than 10%"
+            "StorefrontCollection: Royalty can't be more than 10%"
         );
         _setTokenRoyalty(
             currentTokenID,
@@ -142,7 +142,7 @@ contract StoreFront is
         // Set royalty Info
         require(
             royaltyPercentBasisPoint <= 1000,
-            "StoreFront: Royalty can't be more than 10%"
+            "StorefrontCollection: Royalty can't be more than 10%"
         );
         _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
 
@@ -159,7 +159,7 @@ contract StoreFront is
     function tokenURI(
         uint256 tokenId
     ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "StoreFront: Non-Existent Asset");
+        require(_exists(tokenId), "StorefrontCollection: Non-Existent Asset");
         string memory _tokenURI = _tokenURIs[tokenId];
 
         return _tokenURI;
@@ -168,7 +168,7 @@ contract StoreFront is
     function destroyAsset(uint256 tokenId) public {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "StoreFront: Caller is not token owner or approved"
+            "StorefrontCollection: Caller is not token owner or approved"
         );
         _burn(tokenId);
         emit AssetDestroyed(tokenId, _msgSender());
@@ -186,7 +186,7 @@ contract StoreFront is
         uint256 tokenId,
         string memory _tokenURI
     ) internal virtual {
-        require(_exists(tokenId), "StoreFront: Non-Existent Asset");
+        require(_exists(tokenId), "StorefrontCollection: Non-Existent Asset");
         _tokenURIs[tokenId] = _tokenURI;
     }
 

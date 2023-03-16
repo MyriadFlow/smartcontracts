@@ -69,13 +69,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "Marketplace",
+      name: "OfferStation",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Marketplace__factory>;
+    ): Promise<Contracts.OfferStation__factory>;
     getContractFactory(
-      name: "StoreFront",
+      name: "StorefrontCollection",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.StoreFront__factory>;
+    ): Promise<Contracts.StorefrontCollection__factory>;
+    getContractFactory(
+      name: "StorefrontMarketplace",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.StorefrontMarketplace__factory>;
 
     getContractAt(
       name: "AccessControl",
@@ -148,15 +152,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "Marketplace",
+      name: "OfferStation",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.Marketplace>;
+    ): Promise<Contracts.OfferStation>;
     getContractAt(
-      name: "StoreFront",
+      name: "StorefrontCollection",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.StoreFront>;
+    ): Promise<Contracts.StorefrontCollection>;
+    getContractAt(
+      name: "StorefrontMarketplace",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.StorefrontMarketplace>;
 
     // default types
     getContractFactory(

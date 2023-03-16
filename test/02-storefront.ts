@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect , assert } from "chai"
 import { ethers , network} from "hardhat"
-import { StoreFront, Marketplace } from "../typechain-types"
+import { StorefrontCollection, StorefrontMarketplace } from "../typechain-types"
 
 describe("storefront contract", () => {
                                     
@@ -10,8 +10,8 @@ describe("storefront contract", () => {
         [owner, operator, creator, creator2, buyer] = await ethers.getSigners()
         
     })
-    let storefront: StoreFront
-    let marketplace: Marketplace
+    let storefront: StorefrontCollection
+    let marketplace: StorefrontMarketplace
     const metadata = {
         name: "StoreFront V1",
         symbol: "SFv1",
@@ -19,10 +19,10 @@ describe("storefront contract", () => {
         marketplaceAddress: ""
     }
     before(async () => {
-        let marketplaceFactory = await ethers.getContractFactory("Marketplace")
-        marketplace = await marketplaceFactory.deploy(300)
+        let marketplaceFactory = await ethers.getContractFactory("StorefrontMarketplace")
+        marketplace = await marketplaceFactory.deploy(300,"MyMarketplace")
 
-        let storefrontFactory = await ethers.getContractFactory("StoreFront")
+        let storefrontFactory = await ethers.getContractFactory("StorefrontCollection")
         storefront = await storefrontFactory.deploy(metadata.name, metadata.symbol, marketplace.address)
     })
     it("Should return the right name and symbol of the token once StoreFront is deployed", async () => {
@@ -72,7 +72,7 @@ describe("storefront contract", () => {
         const tokenURI = await storefront.tokenURI(1)
         expect(tokenURI).to.equal(metaDataHash)
     })
-
+    
     const salePrice = ethers.utils.parseUnits("1", "ether");
 
     it("Should create marketitem", async () => {
@@ -156,17 +156,27 @@ describe("storefront contract", () => {
    
     it("Auction: auction working or not,placebid,AcceptBidandEndAuction",async () => {
         let accounts = await ethers.getSigners() 
-        let [buyer1,buyer2 ] = [accounts[5] , accounts[6]]
+
+        const buyer1 = accounts[5]
+        const buyer2 = accounts[6]
+        const buyer3 = accounts[7]
+
+
         await storefront.connect(operator).approve(marketplace.address, 1)
         let val = ethers.utils.parseEther("1.1");
+
         let Time = 3600 
+
         //to check if the auction item  is created or not
         await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,Time);
          //to check if bidding can be done or not
         expect(await marketplace.connect(buyer1).placeBid(1,{value : val})).to.emit(marketplace ,"Bidplaced").withArgs(1,salePrice,buyer1.address)
 
+        let val2 = ethers.utils.parseEther("1.2")
+        expect(await marketplace.connect(buyer3).placeBid(1,{value : val2})).to.emit(marketplace ,"Bidplaced")
+
         //to check user won't be bid less than the previous highest bid
-       expect(marketplace.connect(buyer2).placeBid(1, {value : val })).to.be.revertedWith("value less than the highest Bid")
+       expect(marketplace.connect(buyer2).placeBid(1, {value : val })).to.be.revertedWith("Marketplace: value less than the highest Bid")
 
         //moving the time forward
        await network.provider.send("hardhat_mine", ["0x1200"]);
@@ -178,13 +188,16 @@ describe("storefront contract", () => {
         
         await  marketplace.connect(operator).acceptBidAndEndAuction(1);
         
-        expect(await storefront.ownerOf(1)).to.be.equal(buyer1.address);
+        expect(await storefront.ownerOf(1)).to.be.equal(buyer3.address);
         
     })
     it("concludeAuction , invokeStartAuction , _invokestartSale ",async () => {
         let accounts = await ethers.getSigners() 
         let [buyer1] = [accounts[5]]
-        
+        let buyer = accounts[7]
+
+        await storefront.connect(buyer).transferFrom(buyer.address,buyer1.address ,1 )
+
         await storefront.connect(buyer1).approve(marketplace.address,1)
         
         await marketplace.connect(buyer1).listItem(storefront.address,1,salePrice,true,600)
@@ -209,7 +222,6 @@ describe("storefront contract", () => {
         expect(await storefront.ownerOf(1)).to.be.equal(operator.address);
     })
      it("UpdatePrice and UpdateTime ",async () => {
-
         await storefront.connect(operator).approve(marketplace.address,1)
 
         await marketplace.connect(operator).listItem(storefront.address,1,salePrice,true,300);
@@ -241,6 +253,11 @@ describe("storefront contract", () => {
         expect(marketplace.connect(operator).updatePrice(1,val)).to.be.reverted
         expect(marketplace.connect(operator).updateAuctionTime(1,1000)).to.be.reverted
     
+    })
+    it("should destroy Asset",async () => {
+        await storefront.connect(creator).createAsset("www.xyz.com",300);
+        expect(await storefront.connect(creator).destroyAsset(3)).to.emit(storefront,"AssetDestroyed");
+        expect(storefront.ownerOf(3)).to.reverted;
     })
 
 })
