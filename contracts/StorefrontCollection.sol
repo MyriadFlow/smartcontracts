@@ -33,11 +33,11 @@ contract StorefrontCollection is
     using Counters for Counters.Counter;
 
     bytes32 public constant STOREFRONT_ADMIN_ROLE =
-        keccak256("StorefrontCollection_ADMIN_ROLE");
+        keccak256("STOREFRONT_ADMIN_ROLE");
     bytes32 public constant STOREFRONT_OPERATOR_ROLE =
-        keccak256("StorefrontCollection_OPERATOR_ROLE");
+        keccak256("STOREFRONT_OPERATOR_ROLE");
     bytes32 public constant STOREFRONT_CREATOR_ROLE =
-        keccak256("StorefrontCollection_CREATOR_ROLE");
+        keccak256("STOREFRONT_CREATOR_ROLE");
 
     Counters.Counter private _tokenIdTracker;
 
