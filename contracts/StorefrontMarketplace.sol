@@ -9,9 +9,7 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
-
 error ItemNotExist();
-
 
 contract StorefrontMarketplace is
     Context,
@@ -153,6 +151,17 @@ contract StorefrontMarketplace is
         platformFeeBasisPoint = _platformFee;
         marketplacePayoutAddress = _msgSender();
         marketplaceName = _marketplaceName;
+    }
+
+    /*  Change the Platform fees along with the payout address
+        Allows only Admins to perform this operation
+    */
+    function changeFeeAndPayoutAddress(
+        uint96 newPlatformFee,
+        address newPayoutAddress
+    ) public onlyRole(MARKETPLACE_ADMIN_ROLE) {
+        platformFeeBasisPoint = newPlatformFee;
+        marketplacePayoutAddress = newPayoutAddress;
     }
 
     /**
