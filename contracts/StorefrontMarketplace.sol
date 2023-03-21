@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 
 error ItemNotExist();
@@ -19,6 +20,8 @@ contract StorefrontMarketplace is
 {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
+    bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
+    bytes4 private constant _INTERFACE_ID_ERC1155 = 0xd9b67a26;
 
     bytes32 public constant MARKETPLACE_ADMIN_ROLE =
         keccak256("MARKETPLACE_ADMIN_ROLE");
@@ -46,6 +49,7 @@ contract StorefrontMarketplace is
         uint256 tokenId;
         address seller;
         uint256 price;
+        uint256 amount;
         uint256 auctioneEndTime;
         uint256 highestBid;
         address highestBidder;
@@ -145,6 +149,14 @@ contract StorefrontMarketplace is
         _;
     }
 
+    modifier onlyWhenNotERC1155(address contractAddress) {
+        require(
+            checkERC1155(contractAddress) == false,
+            "StoreFrontMarketplace: This Item cannot be intiated for Auction"
+        );
+        _;
+    }
+
     constructor(uint96 _platformFee, string memory _marketplaceName) {
         _setupRole(MARKETPLACE_ADMIN_ROLE, _msgSender());
         _setRoleAdmin(MARKETPLACE_ADMIN_ROLE, MARKETPLACE_ADMIN_ROLE);
@@ -153,15 +165,20 @@ contract StorefrontMarketplace is
         marketplaceName = _marketplaceName;
     }
 
-    /*  Change the Platform fees along with the payout address
-        Allows only Admins to perform this operation
-    */
+    /** @dev Change the Platform fees along with the payout address
+     *   Allows only Admins to perform this operation
+     */
     function changeFeeAndPayoutAddress(
         uint96 newPlatformFee,
         address newPayoutAddress
     ) public onlyRole(MARKETPLACE_ADMIN_ROLE) {
         platformFeeBasisPoint = newPlatformFee;
         marketplacePayoutAddress = newPayoutAddress;
+    }
+
+    function checkERC1155(address contractAddress) private view returns (bool) {
+        return
+            IERC1155(contractAddress).supportsInterface(_INTERFACE_ID_ERC1155);
     }
 
     /**
@@ -203,16 +220,34 @@ contract StorefrontMarketplace is
         idToMarketItem[itemId].status = ItemStatus.SOLD;
     }
 
-    /**
-     * @dev token owner can use this function for listing
-     */
     function listItem(
         address nftContract,
         uint256 tokenId,
         uint256 price,
         bool forAuction,
         uint256 time
-    ) external onlyItemOwner(nftContract, tokenId) returns (uint256) {
+    ) external onlyItemOwner(nftContract, tokenId) returns (uint256 value) {
+        if (checkERC1155(nftContract)) {
+            require(
+                forAuction == false,
+                "StoreFrontMarketplace: Item cannot be initiated for Auction"
+            );
+            value = _listItem(nftContract, tokenId, price, forAuction, time);
+        } else {
+            value = _listItem(nftContract, tokenId, price, forAuction, time);
+        }
+    }
+
+    /**
+     * @dev token owner can use this function for listing
+     */
+    function _listItem(
+        address nftContract,
+        uint256 tokenId,
+        uint256 price,
+        bool forAuction,
+        uint256 time
+    ) private returns (uint256) {
         require(
             price > 0,
             "StorefrontMarketplace: Price must be at least 1 wei"
@@ -253,6 +288,7 @@ contract StorefrontMarketplace is
                 tokenId,
                 payable(_msgSender()),
                 price,
+                1,
                 0,
                 0,
                 address(0),
@@ -276,6 +312,7 @@ contract StorefrontMarketplace is
                 tokenId,
                 _msgSender(),
                 price,
+                1,
                 endAt,
                 price,
                 address(0),

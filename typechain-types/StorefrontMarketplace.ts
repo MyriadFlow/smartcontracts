@@ -25,6 +25,7 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
     "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
     "acceptBidAndEndAuction(uint256)": FunctionFragment;
     "buyItem(uint256)": FunctionFragment;
+    "changeFeeAndPayoutAddress(uint96,address)": FunctionFragment;
     "concludeAuction(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "getRoleMember(bytes32,uint256)": FunctionFragment;
@@ -62,6 +63,10 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "buyItem",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "changeFeeAndPayoutAddress",
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
     functionFragment: "concludeAuction",
@@ -157,6 +162,10 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "buyItem", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "changeFeeAndPayoutAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "concludeAuction",
     data: BytesLike
@@ -404,6 +413,12 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    changeFeeAndPayoutAddress(
+      newPlatformFee: BigNumberish,
+      newPayoutAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     concludeAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -542,6 +557,12 @@ export interface StorefrontMarketplace extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  changeFeeAndPayoutAddress(
+    newPlatformFee: BigNumberish,
+    newPayoutAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   concludeAuction(
     itemId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -676,6 +697,12 @@ export interface StorefrontMarketplace extends BaseContract {
     ): Promise<void>;
 
     buyItem(itemId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    changeFeeAndPayoutAddress(
+      newPlatformFee: BigNumberish,
+      newPayoutAddress: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     concludeAuction(
       itemId: BigNumberish,
@@ -957,6 +984,12 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    changeFeeAndPayoutAddress(
+      newPlatformFee: BigNumberish,
+      newPayoutAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     concludeAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1079,6 +1112,12 @@ export interface StorefrontMarketplace extends BaseContract {
     buyItem(
       itemId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    changeFeeAndPayoutAddress(
+      newPlatformFee: BigNumberish,
+      newPayoutAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     concludeAuction(
