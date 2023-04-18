@@ -20,92 +20,48 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface StoreFrontEditionInterface extends utils.Interface {
   contractName: "StoreFrontEdition";
   functions: {
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
-    "STOREFRONT_ADMIN_ROLE()": FunctionFragment;
-    "STOREFRONT_CREATOR_ROLE()": FunctionFragment;
-    "STOREFRONT_OPERATOR_ROLE()": FunctionFragment;
-    "balanceOf(address,uint256)": FunctionFragment;
-    "balanceOfBatch(address[],uint256[])": FunctionFragment;
-    "createAsset(uint256,bytes)": FunctionFragment;
-    "delegateAssetCreation(uint256,bytes)": FunctionFragment;
-    "destroyAsset(uint256,uint256)": FunctionFragment;
-    "exists(uint256)": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "getRoleMember(bytes32,uint256)": FunctionFragment;
-    "getRoleMemberCount(bytes32)": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
+    "approve(address,uint256)": FunctionFragment;
+    "balanceOf(address)": FunctionFragment;
+    "createAsset(string,uint96)": FunctionFragment;
+    "delegateAssetCreation(address,string,uint96)": FunctionFragment;
+    "destroyAsset(uint256)": FunctionFragment;
+    "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "marketplace()": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
-    "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
-    "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
+    "name()": FunctionFragment;
+    "ownerOf(uint256)": FunctionFragment;
+    "royaltyInfo(uint256,uint256)": FunctionFragment;
+    "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "totalSupply(uint256)": FunctionFragment;
-    "uri(uint256)": FunctionFragment;
+    "symbol()": FunctionFragment;
+    "tokenByIndex(uint256)": FunctionFragment;
+    "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
+    "tokenURI(uint256)": FunctionFragment;
+    "totalSupply()": FunctionFragment;
+    "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
-    values?: undefined
+    functionFragment: "approve",
+    values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "STOREFRONT_ADMIN_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "STOREFRONT_CREATOR_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "STOREFRONT_OPERATOR_ROLE",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "balanceOf",
+    functionFragment: "createAsset",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "balanceOfBatch",
-    values: [string[], BigNumberish[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "createAsset",
-    values: [BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
     functionFragment: "delegateAssetCreation",
-    values: [BigNumberish, BytesLike]
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "destroyAsset",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "exists",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "getRoleAdmin",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRoleMember",
-    values: [BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRoleMemberCount",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "grantRole",
-    values: [BytesLike, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "hasRole",
-    values: [BytesLike, string]
+    functionFragment: "getApproved",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -115,21 +71,18 @@ export interface StoreFrontEditionInterface extends utils.Interface {
     functionFragment: "marketplace",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "renounceRole",
-    values: [BytesLike, string]
+    functionFragment: "ownerOf",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "revokeRole",
-    values: [BytesLike, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "safeBatchTransferFrom",
-    values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
+    functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
-    values: [string, string, BigNumberish, BigNumberish, BytesLike]
+    values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
@@ -139,33 +92,30 @@ export interface StoreFrontEditionInterface extends utils.Interface {
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "totalSupply",
+    functionFragment: "tokenByIndex",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "tokenOfOwnerByIndex",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenURI",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "totalSupply",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "transferFrom",
+    values: [string, string, BigNumberish]
+  ): string;
 
-  decodeFunctionResult(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "STOREFRONT_ADMIN_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "STOREFRONT_CREATOR_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "STOREFRONT_OPERATOR_ROLE",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "balanceOfBatch",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "createAsset",
     data: BytesLike
@@ -178,21 +128,10 @@ export interface StoreFrontEditionInterface extends utils.Interface {
     functionFragment: "destroyAsset",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getRoleAdmin",
+    functionFragment: "getApproved",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRoleMember",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRoleMemberCount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
@@ -201,13 +140,10 @@ export interface StoreFrontEditionInterface extends utils.Interface {
     functionFragment: "marketplace",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "renounceRole",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "safeBatchTransferFrom",
+    functionFragment: "royaltyInfo",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -222,45 +158,57 @@ export interface StoreFrontEditionInterface extends utils.Interface {
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenOfOwnerByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferFrom",
+    data: BytesLike
+  ): Result;
 
   events: {
+    "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,address,uint256)": EventFragment;
+    "AssetCreated(uint256,address,string)": EventFragment;
     "AssetDestroyed(uint256,address)": EventFragment;
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
-    "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
-    "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
-    "URI(string,uint256)": EventFragment;
+    "Transfer(address,address,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
+
+export type ApprovalEvent = TypedEvent<
+  [string, string, BigNumber],
+  { owner: string; approved: string; tokenId: BigNumber }
+>;
+
+export type ApprovalEventFilter = TypedEventFilter<ApprovalEvent>;
 
 export type ApprovalForAllEvent = TypedEvent<
   [string, string, boolean],
-  { account: string; operator: string; approved: boolean }
+  { owner: string; operator: string; approved: boolean }
 >;
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
 export type AssetCreatedEvent = TypedEvent<
-  [BigNumber, string, BigNumber],
-  { tokenID: BigNumber; creator: string; amount: BigNumber }
+  [BigNumber, string, string],
+  { tokenID: BigNumber; creator: string; metaDataURI: string }
 >;
 
 export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
@@ -272,60 +220,12 @@ export type AssetDestroyedEvent = TypedEvent<
 
 export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
 
-export type RoleAdminChangedEvent = TypedEvent<
-  [string, string, string],
-  { role: string; previousAdminRole: string; newAdminRole: string }
+export type TransferEvent = TypedEvent<
+  [string, string, BigNumber],
+  { from: string; to: string; tokenId: BigNumber }
 >;
 
-export type RoleAdminChangedEventFilter =
-  TypedEventFilter<RoleAdminChangedEvent>;
-
-export type RoleGrantedEvent = TypedEvent<
-  [string, string, string],
-  { role: string; account: string; sender: string }
->;
-
-export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-
-export type RoleRevokedEvent = TypedEvent<
-  [string, string, string],
-  { role: string; account: string; sender: string }
->;
-
-export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-
-export type TransferBatchEvent = TypedEvent<
-  [string, string, string, BigNumber[], BigNumber[]],
-  {
-    operator: string;
-    from: string;
-    to: string;
-    ids: BigNumber[];
-    values: BigNumber[];
-  }
->;
-
-export type TransferBatchEventFilter = TypedEventFilter<TransferBatchEvent>;
-
-export type TransferSingleEvent = TypedEvent<
-  [string, string, string, BigNumber, BigNumber],
-  {
-    operator: string;
-    from: string;
-    to: string;
-    id: BigNumber;
-    value: BigNumber;
-  }
->;
-
-export type TransferSingleEventFilter = TypedEventFilter<TransferSingleEvent>;
-
-export type URIEvent = TypedEvent<
-  [string, BigNumber],
-  { value: string; id: BigNumber }
->;
-
-export type URIEventFilter = TypedEventFilter<URIEvent>;
+export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
 export interface StoreFrontEdition extends BaseContract {
   contractName: "StoreFrontEdition";
@@ -355,105 +255,69 @@ export interface StoreFrontEdition extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+    approve(
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    STOREFRONT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    STOREFRONT_CREATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    STOREFRONT_OPERATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
-    balanceOf(
-      account: string,
-      id: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    balanceOfBatch(
-      accounts: string[],
-      ids: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<[BigNumber[]]>;
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     createAsset(
-      amount: BigNumberish,
-      data: BytesLike,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     delegateAssetCreation(
-      amount: BigNumberish,
-      data: BytesLike,
+      creator: string,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     destroyAsset(
       tokenId: BigNumberish,
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    exists(id: BigNumberish, overrides?: CallOverrides): Promise<[boolean]>;
-
-    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
+    getApproved(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
-
     isApprovedForAll(
-      account: string,
+      owner: string,
       operator: string,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     marketplace(overrides?: CallOverrides): Promise<[string]>;
 
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    name(overrides?: CallOverrides): Promise<[string]>;
 
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ownerOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
-    safeBatchTransferFrom(
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
+
+    "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
-      ids: BigNumberish[],
-      amounts: BigNumberish[],
-      data: BytesLike,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    safeTransferFrom(
+    "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
+      tokenId: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -469,113 +333,94 @@ export interface StoreFrontEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    totalSupply(
-      id: BigNumberish,
+    symbol(overrides?: CallOverrides): Promise<[string]>;
+
+    tokenByIndex(
+      index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    tokenURI(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
-  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+  approve(
+    to: string,
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  STOREFRONT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  STOREFRONT_CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  STOREFRONT_OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
-
-  balanceOf(
-    account: string,
-    id: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  balanceOfBatch(
-    accounts: string[],
-    ids: BigNumberish[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
+  balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   createAsset(
-    amount: BigNumberish,
-    data: BytesLike,
+    metadataURI: string,
+    royaltyPercentBasisPoint: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   delegateAssetCreation(
-    amount: BigNumberish,
-    data: BytesLike,
+    creator: string,
+    metadataURI: string,
+    royaltyPercentBasisPoint: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   destroyAsset(
     tokenId: BigNumberish,
-    amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
-
-  getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-  getRoleMember(
-    role: BytesLike,
-    index: BigNumberish,
+  getApproved(
+    tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
 
-  getRoleMemberCount(
-    role: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  grantRole(
-    role: BytesLike,
-    account: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  hasRole(
-    role: BytesLike,
-    account: string,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
   isApprovedForAll(
-    account: string,
+    owner: string,
     operator: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   marketplace(overrides?: CallOverrides): Promise<string>;
 
-  renounceRole(
-    role: BytesLike,
-    account: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  name(overrides?: CallOverrides): Promise<string>;
 
-  revokeRole(
-    role: BytesLike,
-    account: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  safeBatchTransferFrom(
+  royaltyInfo(
+    _tokenId: BigNumberish,
+    _salePrice: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber]>;
+
+  "safeTransferFrom(address,address,uint256)"(
     from: string,
     to: string,
-    ids: BigNumberish[],
-    amounts: BigNumberish[],
-    data: BytesLike,
+    tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  safeTransferFrom(
+  "safeTransferFrom(address,address,uint256,bytes)"(
     from: string,
     to: string,
-    id: BigNumberish,
-    amount: BigNumberish,
+    tokenId: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -591,110 +436,91 @@ export interface StoreFrontEdition extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+  symbol(overrides?: CallOverrides): Promise<string>;
 
-  uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  tokenByIndex(
+    index: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  tokenOfOwnerByIndex(
+    owner: string,
+    index: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  transferFrom(
+    from: string,
+    to: string,
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   callStatic: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    STOREFRONT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    STOREFRONT_CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    STOREFRONT_OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
-
-    balanceOf(
-      account: string,
-      id: BigNumberish,
+    approve(
+      to: string,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
 
-    balanceOfBatch(
-      accounts: string[],
-      ids: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     createAsset(
-      amount: BigNumberish,
-      data: BytesLike,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     delegateAssetCreation(
-      amount: BigNumberish,
-      data: BytesLike,
+      creator: string,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     destroyAsset(
       tokenId: BigNumberish,
-      amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    exists(id: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
-
-    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
+    getApproved(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
 
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
-
     isApprovedForAll(
-      account: string,
+      owner: string,
       operator: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     marketplace(overrides?: CallOverrides): Promise<string>;
 
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    name(overrides?: CallOverrides): Promise<string>;
 
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    safeBatchTransferFrom(
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
+
+    "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
-      ids: BigNumberish[],
-      amounts: BigNumberish[],
-      data: BytesLike,
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    safeTransferFrom(
+    "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
+      tokenId: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -710,35 +536,63 @@ export interface StoreFrontEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    totalSupply(
-      id: BigNumberish,
+    symbol(overrides?: CallOverrides): Promise<string>;
+
+    tokenByIndex(
+      index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
+    "Approval(address,address,uint256)"(
+      owner?: string | null,
+      approved?: string | null,
+      tokenId?: BigNumberish | null
+    ): ApprovalEventFilter;
+    Approval(
+      owner?: string | null,
+      approved?: string | null,
+      tokenId?: BigNumberish | null
+    ): ApprovalEventFilter;
+
     "ApprovalForAll(address,address,bool)"(
-      account?: string | null,
+      owner?: string | null,
       operator?: string | null,
       approved?: null
     ): ApprovalForAllEventFilter;
     ApprovalForAll(
-      account?: string | null,
+      owner?: string | null,
       operator?: string | null,
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,address,uint256)"(
-      tokenID?: BigNumberish | null,
+    "AssetCreated(uint256,address,string)"(
+      tokenID?: null,
       creator?: string | null,
-      amount?: BigNumberish | null
+      metaDataURI?: null
     ): AssetCreatedEventFilter;
     AssetCreated(
-      tokenID?: BigNumberish | null,
+      tokenID?: null,
       creator?: string | null,
-      amount?: BigNumberish | null
+      metaDataURI?: null
     ): AssetCreatedEventFilter;
 
     "AssetDestroyed(uint256,address)"(
@@ -750,179 +604,82 @@ export interface StoreFrontEdition extends BaseContract {
       ownerOrApproved?: null
     ): AssetDestroyedEventFilter;
 
-    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
-      role?: BytesLike | null,
-      previousAdminRole?: BytesLike | null,
-      newAdminRole?: BytesLike | null
-    ): RoleAdminChangedEventFilter;
-    RoleAdminChanged(
-      role?: BytesLike | null,
-      previousAdminRole?: BytesLike | null,
-      newAdminRole?: BytesLike | null
-    ): RoleAdminChangedEventFilter;
-
-    "RoleGranted(bytes32,address,address)"(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleGrantedEventFilter;
-    RoleGranted(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleGrantedEventFilter;
-
-    "RoleRevoked(bytes32,address,address)"(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleRevokedEventFilter;
-    RoleRevoked(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleRevokedEventFilter;
-
-    "TransferBatch(address,address,address,uint256[],uint256[])"(
-      operator?: string | null,
+    "Transfer(address,address,uint256)"(
       from?: string | null,
       to?: string | null,
-      ids?: null,
-      values?: null
-    ): TransferBatchEventFilter;
-    TransferBatch(
-      operator?: string | null,
+      tokenId?: BigNumberish | null
+    ): TransferEventFilter;
+    Transfer(
       from?: string | null,
       to?: string | null,
-      ids?: null,
-      values?: null
-    ): TransferBatchEventFilter;
-
-    "TransferSingle(address,address,address,uint256,uint256)"(
-      operator?: string | null,
-      from?: string | null,
-      to?: string | null,
-      id?: null,
-      value?: null
-    ): TransferSingleEventFilter;
-    TransferSingle(
-      operator?: string | null,
-      from?: string | null,
-      to?: string | null,
-      id?: null,
-      value?: null
-    ): TransferSingleEventFilter;
-
-    "URI(string,uint256)"(
-      value?: null,
-      id?: BigNumberish | null
-    ): URIEventFilter;
-    URI(value?: null, id?: BigNumberish | null): URIEventFilter;
+      tokenId?: BigNumberish | null
+    ): TransferEventFilter;
   };
 
   estimateGas: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    STOREFRONT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    STOREFRONT_CREATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    STOREFRONT_OPERATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
-    balanceOf(
-      account: string,
-      id: BigNumberish,
-      overrides?: CallOverrides
+    approve(
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    balanceOfBatch(
-      accounts: string[],
-      ids: BigNumberish[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     createAsset(
-      amount: BigNumberish,
-      data: BytesLike,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     delegateAssetCreation(
-      amount: BigNumberish,
-      data: BytesLike,
+      creator: string,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     destroyAsset(
       tokenId: BigNumberish,
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    exists(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
-    getRoleAdmin(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
+    getApproved(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     isApprovedForAll(
-      account: string,
+      owner: string,
       operator: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     marketplace(overrides?: CallOverrides): Promise<BigNumber>;
 
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ownerOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    safeBatchTransferFrom(
+    "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
-      ids: BigNumberish[],
-      amounts: BigNumberish[],
-      data: BytesLike,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    safeTransferFrom(
+    "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
+      tokenId: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -938,128 +695,101 @@ export interface StoreFrontEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totalSupply(
-      id: BigNumberish,
+    symbol(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenByIndex(
+      index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenURI(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    DEFAULT_ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    STOREFRONT_ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    STOREFRONT_CREATOR_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    STOREFRONT_OPERATOR_ROLE(
-      overrides?: CallOverrides
+    approve(
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     balanceOf(
-      account: string,
-      id: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    balanceOfBatch(
-      accounts: string[],
-      ids: BigNumberish[],
+      owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     createAsset(
-      amount: BigNumberish,
-      data: BytesLike,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     delegateAssetCreation(
-      amount: BigNumberish,
-      data: BytesLike,
+      creator: string,
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     destroyAsset(
       tokenId: BigNumberish,
-      amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    exists(
-      id: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleAdmin(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
+    getApproved(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     isApprovedForAll(
-      account: string,
+      owner: string,
       operator: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     marketplace(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    ownerOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    safeBatchTransferFrom(
+    "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
-      ids: BigNumberish[],
-      amounts: BigNumberish[],
-      data: BytesLike,
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    safeTransferFrom(
+    "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
-      id: BigNumberish,
-      amount: BigNumberish,
+      tokenId: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1075,14 +805,31 @@ export interface StoreFrontEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    totalSupply(
-      id: BigNumberish,
+    symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenByIndex(
+      index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    uri(
-      arg0: BigNumberish,
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    tokenURI(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    transferFrom(
+      from: string,
+      to: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

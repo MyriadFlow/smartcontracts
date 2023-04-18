@@ -1,19 +1,19 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect , assert } from "chai"
 import { ethers , network} from "hardhat"
-import { OfferStation , StorefrontCollection } from "../typechain-types"
+import { MyriadFlowOfferStation , FlowEdition  , FlowAccessControl} from "../typechain-types"
 
-describe("OfferStation contract", () => {
+describe("MyriadFlowOfferStation  contract", () => {
                                     
     let [owner, creator, creator2, buyer, operator ]: SignerWithAddress[] = new Array(5)
     before(async () => {
         [owner, operator, creator, creator2, buyer] = await ethers.getSigners()
         
     })
-    let offerstation: OfferStation
-    let storefront: StorefrontCollection
+    let accessControl : FlowAccessControl
+    let edition: FlowEdition
+    let offerstation: MyriadFlowOfferStation
     
-   
     const metadata = {
         name: "StoreFront V1",
         symbol: "SFv1",
@@ -21,30 +21,33 @@ describe("OfferStation contract", () => {
         marketplaceAddress: ""
     }
     before(async () => {
-        let offerStationFactory = await ethers.getContractFactory("OfferStation")
-        offerstation = await offerStationFactory.deploy(300 ,"1" , false )
+        let FlowAccessControlFactory = await ethers.getContractFactory("FlowAccessControl")
+        accessControl = await FlowAccessControlFactory.deploy();
 
-        let storefrontFactory = await ethers.getContractFactory("StorefrontCollection")
-        storefront = await storefrontFactory.deploy(metadata.name, metadata.symbol, offerstation.address)
+        let offerStationFactory = await ethers.getContractFactory("MyriadFlowOfferStation")
+        offerstation = await offerStationFactory.deploy(300 ,"1" , false , accessControl.address)
 
-        const STOREFRONT_OPERATOR_ROLE = await storefront.STOREFRONT_OPERATOR_ROLE()
+        let FlowEditionFactory = await ethers.getContractFactory("FlowEdition")
+        edition = await FlowEditionFactory.deploy(metadata.name, metadata.symbol, offerstation.address ,accessControl.address)
 
-         await storefront.grantRole(STOREFRONT_OPERATOR_ROLE, operator.address)
+        const STOREFRONT_OPERATOR_ROLE = await accessControl.FLOW_OPERATOR_ROLE()
+
+         await accessControl.grantRole(STOREFRONT_OPERATOR_ROLE, operator.address)
         
         
-         const STOREFRONT_CREATOR_ROLE = await storefront.STOREFRONT_CREATOR_ROLE()
+         const STOREFRONT_CREATOR_ROLE = await accessControl.FLOW_CREATOR_ROLE()
 
-         await storefront.connect(operator).grantRole(STOREFRONT_CREATOR_ROLE, creator.address)
+         await accessControl.connect(operator).grantRole(STOREFRONT_CREATOR_ROLE, creator.address)
 
     })
      it("User can offer to any NFT owner in the blockchain,withdraw and Update",async () => {
-        await storefront.connect(creator).createAsset("www.xyz.com",300);
-        const contractAddress = storefront.address
+        await edition.connect(creator).createAsset("www.xyz.com",300);
+        const contractAddress = edition.address
 
         expect(await offerstation.connect(buyer).createOffer(contractAddress,1 , {value : ethers.utils.parseEther("1.0")})).to.emit(offerstation,"ProposalIntiated")
 
         let proposalId = await offerstation.idToproposal(1)
-        expect(proposalId.nftContractAddress).to.be.equal(storefront.address)
+        expect(proposalId.nftContractAddress).to.be.equal(edition.address)
         expect(proposalId.tokenId).to.be.equal(1)
         expect(proposalId.status).to.be.equal(1)
         
@@ -69,14 +72,14 @@ describe("OfferStation contract", () => {
     })
     it("Accept Offer by Owner",async()=>{
 
-        const contractAddress = storefront.address
+        const contractAddress = edition.address
          //Accept Offer
         let val2 = ethers.utils.parseEther("1.0")
         await offerstation.createOffer(contractAddress,1 , {value : val2})
 
         expect(offerstation.acceptOffer(1)).to.be.revertedWith("offerstation: Proposal is already Closed")
 
-        expect(await storefront.ownerOf(1)).to.be.equal(creator.address)
+        expect(await edition.ownerOf(1)).to.be.equal(creator.address)
 
         const startingCreatorBalance =  await offerstation.provider.getBalance(
                 creator.address
@@ -91,7 +94,7 @@ describe("OfferStation contract", () => {
                 creator.address
             ) 
 
-        expect(await storefront.ownerOf(1)).to.be.equal(owner.address)
+        expect(await edition.ownerOf(1)).to.be.equal(owner.address)
        
         let amount = (val2.mul(70)).div(100) 
         
@@ -104,15 +107,17 @@ describe("OfferStation contract", () => {
 
     })
     it("When Paused no offer ",async () => {
-
-        const contractAddress = storefront.address
+        const contractAddress = edition.address
         let Pause = await offerstation.paused()
         expect(Pause).to.be.false;
         await offerstation.setPause();
         Pause = await offerstation.paused();
         expect(Pause).to.be.true;
         let val2 = ethers.utils.parseEther("1.0")
-        expect( offerstation.createOffer(contractAddress,1 , {value : val2})).to.be.revertedWith("OfferStation: You cannot offer , it is paused for sometime!")
+        expect( offerstation.createOffer(contractAddress,1 , {value : val2})).to.be.revertedWith("MyriadOfferStation: You cannot offer , it is paused for sometime!")
+        // only Admin can call
+        expect(offerstation.connect(creator2).setPause()).to.be.revertedWith("MyriadFlowOfferStation: User is not authorized");
+
         
     })
 })

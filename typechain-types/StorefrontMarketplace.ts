@@ -25,6 +25,7 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
     "MARKETPLACE_ADMIN_ROLE()": FunctionFragment;
     "acceptBidAndEndAuction(uint256)": FunctionFragment;
     "buyItem(uint256)": FunctionFragment;
+    "buySftItem(uint256,uint256)": FunctionFragment;
     "changeFeeAndPayoutAddress(uint96,address)": FunctionFragment;
     "concludeAuction(uint256)": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
@@ -34,8 +35,11 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
     "hasRole(bytes32,address)": FunctionFragment;
     "idToMarketItem(uint256)": FunctionFragment;
     "listItem(address,uint256,uint256,bool,uint256)": FunctionFragment;
+    "listItemSft(address,uint256,uint256,uint256)": FunctionFragment;
     "marketplaceName()": FunctionFragment;
     "marketplacePayoutAddress()": FunctionFragment;
+    "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
+    "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
     "placeBid(uint256)": FunctionFragment;
     "platformFeeBasisPoint()": FunctionFragment;
     "removeItem(uint256)": FunctionFragment;
@@ -63,6 +67,10 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "buyItem",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "buySftItem",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "changeFeeAndPayoutAddress",
@@ -101,12 +109,24 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
     values: [string, BigNumberish, BigNumberish, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "listItemSft",
+    values: [string, BigNumberish, BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "marketplaceName",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "marketplacePayoutAddress",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC1155BatchReceived",
+    values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "onERC1155Received",
+    values: [string, string, BigNumberish, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "placeBid",
@@ -162,6 +182,7 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "buyItem", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "buySftItem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "changeFeeAndPayoutAddress",
     data: BytesLike
@@ -190,11 +211,23 @@ export interface StorefrontMarketplaceInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "listItem", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "listItemSft",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "marketplaceName",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "marketplacePayoutAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155BatchReceived",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "onERC1155Received",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "placeBid", data: BytesLike): Result;
@@ -413,6 +446,12 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    buySftItem(
+      itemId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
@@ -461,6 +500,7 @@ export interface StorefrontMarketplace extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
+        BigNumber,
         string,
         number
       ] & {
@@ -469,6 +509,7 @@ export interface StorefrontMarketplace extends BaseContract {
         tokenId: BigNumber;
         seller: string;
         price: BigNumber;
+        amount: BigNumber;
         auctioneEndTime: BigNumber;
         highestBid: BigNumber;
         highestBidder: string;
@@ -485,9 +526,35 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    listItemSft(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     marketplaceName(overrides?: CallOverrides): Promise<[string]>;
 
     marketplacePayoutAddress(overrides?: CallOverrides): Promise<[string]>;
+
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     placeBid(
       itemId: BigNumberish,
@@ -557,6 +624,12 @@ export interface StorefrontMarketplace extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  buySftItem(
+    itemId: BigNumberish,
+    amount: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   changeFeeAndPayoutAddress(
     newPlatformFee: BigNumberish,
     newPayoutAddress: string,
@@ -605,6 +678,7 @@ export interface StorefrontMarketplace extends BaseContract {
       BigNumber,
       BigNumber,
       BigNumber,
+      BigNumber,
       string,
       number
     ] & {
@@ -613,6 +687,7 @@ export interface StorefrontMarketplace extends BaseContract {
       tokenId: BigNumber;
       seller: string;
       price: BigNumber;
+      amount: BigNumber;
       auctioneEndTime: BigNumber;
       highestBid: BigNumber;
       highestBidder: string;
@@ -629,9 +704,35 @@ export interface StorefrontMarketplace extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  listItemSft(
+    nftContract: string,
+    tokenId: BigNumberish,
+    price: BigNumberish,
+    amount: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   marketplaceName(overrides?: CallOverrides): Promise<string>;
 
   marketplacePayoutAddress(overrides?: CallOverrides): Promise<string>;
+
+  onERC1155BatchReceived(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish[],
+    arg3: BigNumberish[],
+    arg4: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  onERC1155Received(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    arg3: BigNumberish,
+    arg4: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   placeBid(
     itemId: BigNumberish,
@@ -698,6 +799,12 @@ export interface StorefrontMarketplace extends BaseContract {
 
     buyItem(itemId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
+    buySftItem(
+      itemId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
@@ -746,6 +853,7 @@ export interface StorefrontMarketplace extends BaseContract {
         BigNumber,
         BigNumber,
         BigNumber,
+        BigNumber,
         string,
         number
       ] & {
@@ -754,6 +862,7 @@ export interface StorefrontMarketplace extends BaseContract {
         tokenId: BigNumber;
         seller: string;
         price: BigNumber;
+        amount: BigNumber;
         auctioneEndTime: BigNumber;
         highestBid: BigNumber;
         highestBidder: string;
@@ -770,9 +879,35 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    listItemSft(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      amount: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     marketplaceName(overrides?: CallOverrides): Promise<string>;
 
     marketplacePayoutAddress(overrides?: CallOverrides): Promise<string>;
+
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     placeBid(itemId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
@@ -984,6 +1119,12 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    buySftItem(
+      itemId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
@@ -1037,9 +1178,35 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    listItemSft(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     marketplaceName(overrides?: CallOverrides): Promise<BigNumber>;
 
     marketplacePayoutAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     placeBid(
       itemId: BigNumberish,
@@ -1114,6 +1281,12 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    buySftItem(
+      itemId: BigNumberish,
+      amount: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     changeFeeAndPayoutAddress(
       newPlatformFee: BigNumberish,
       newPayoutAddress: string,
@@ -1167,10 +1340,36 @@ export interface StorefrontMarketplace extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    listItemSft(
+      nftContract: string,
+      tokenId: BigNumberish,
+      price: BigNumberish,
+      amount: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     marketplaceName(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     marketplacePayoutAddress(
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    onERC1155BatchReceived(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish[],
+      arg3: BigNumberish[],
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    onERC1155Received(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      arg3: BigNumberish,
+      arg4: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     placeBid(

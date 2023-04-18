@@ -21,23 +21,15 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface OfferStationInterface extends utils.Interface {
   contractName: "OfferStation";
   functions: {
-    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "OFFERSTATION_ADMIN_ROLE()": FunctionFragment;
     "acceptOffer(uint256)": FunctionFragment;
     "createOffer(address,uint256)": FunctionFragment;
-    "getRoleAdmin(bytes32)": FunctionFragment;
-    "getRoleMember(bytes32,uint256)": FunctionFragment;
-    "getRoleMemberCount(bytes32)": FunctionFragment;
-    "grantRole(bytes32,address)": FunctionFragment;
-    "hasRole(bytes32,address)": FunctionFragment;
     "idToproposal(uint256)": FunctionFragment;
     "increaseOffer(uint256)": FunctionFragment;
     "marketplacePayoutAddress()": FunctionFragment;
     "paused()": FunctionFragment;
     "platformFeeBasisPoint()": FunctionFragment;
     "proposalCounter()": FunctionFragment;
-    "renounceRole(bytes32,address)": FunctionFragment;
-    "revokeRole(bytes32,address)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "setPause()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -45,10 +37,6 @@ export interface OfferStationInterface extends utils.Interface {
     "withdrawOffer(uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "OFFERSTATION_ADMIN_ROLE",
     values?: undefined
@@ -60,26 +48,6 @@ export interface OfferStationInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "createOffer",
     values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRoleAdmin",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRoleMember",
-    values: [BytesLike, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getRoleMemberCount",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "grantRole",
-    values: [BytesLike, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "hasRole",
-    values: [BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "idToproposal",
@@ -103,14 +71,6 @@ export interface OfferStationInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceRole",
-    values: [BytesLike, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "revokeRole",
-    values: [BytesLike, string]
-  ): string;
-  encodeFunctionData(
     functionFragment: "royaltyInfo",
     values: [BigNumberish, BigNumberish]
   ): string;
@@ -126,10 +86,6 @@ export interface OfferStationInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(
-    functionFragment: "DEFAULT_ADMIN_ROLE",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "OFFERSTATION_ADMIN_ROLE",
     data: BytesLike
   ): Result;
@@ -141,20 +97,6 @@ export interface OfferStationInterface extends utils.Interface {
     functionFragment: "createOffer",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRoleAdmin",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRoleMember",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getRoleMemberCount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "idToproposal",
     data: BytesLike
@@ -177,11 +119,6 @@ export interface OfferStationInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "renounceRole",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
-  decodeFunctionResult(
     functionFragment: "royaltyInfo",
     data: BytesLike
   ): Result;
@@ -201,18 +138,12 @@ export interface OfferStationInterface extends utils.Interface {
     "ProposalInitiated(address,uint256,uint256,string,address,uint256)": EventFragment;
     "ProposalUpdated(uint256,uint256,uint256)": EventFragment;
     "ProposalWithdrawn(uint256)": EventFragment;
-    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
-    "RoleGranted(bytes32,address,address)": EventFragment;
-    "RoleRevoked(bytes32,address,address)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ProposalAccepted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalInitiated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalUpdated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalWithdrawn"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
 }
 
 export type ProposalAcceptedEvent = TypedEvent<
@@ -260,28 +191,6 @@ export type ProposalWithdrawnEvent = TypedEvent<
 export type ProposalWithdrawnEventFilter =
   TypedEventFilter<ProposalWithdrawnEvent>;
 
-export type RoleAdminChangedEvent = TypedEvent<
-  [string, string, string],
-  { role: string; previousAdminRole: string; newAdminRole: string }
->;
-
-export type RoleAdminChangedEventFilter =
-  TypedEventFilter<RoleAdminChangedEvent>;
-
-export type RoleGrantedEvent = TypedEvent<
-  [string, string, string],
-  { role: string; account: string; sender: string }
->;
-
-export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
-
-export type RoleRevokedEvent = TypedEvent<
-  [string, string, string],
-  { role: string; account: string; sender: string }
->;
-
-export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
-
 export interface OfferStation extends BaseContract {
   contractName: "OfferStation";
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -310,8 +219,6 @@ export interface OfferStation extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
-
     OFFERSTATION_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     acceptOffer(
@@ -324,31 +231,6 @@ export interface OfferStation extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<[boolean]>;
 
     idToproposal(
       arg0: BigNumberish,
@@ -376,18 +258,6 @@ export interface OfferStation extends BaseContract {
 
     proposalCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     royaltyInfo(
       _tokenId: BigNumberish,
       _salePrice: BigNumberish,
@@ -411,8 +281,6 @@ export interface OfferStation extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
   OFFERSTATION_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
   acceptOffer(
@@ -425,31 +293,6 @@ export interface OfferStation extends BaseContract {
     _tokenId: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-  getRoleMember(
-    role: BytesLike,
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<string>;
-
-  getRoleMemberCount(
-    role: BytesLike,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  grantRole(
-    role: BytesLike,
-    account: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  hasRole(
-    role: BytesLike,
-    account: string,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
 
   idToproposal(
     arg0: BigNumberish,
@@ -477,18 +320,6 @@ export interface OfferStation extends BaseContract {
 
   proposalCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
-  renounceRole(
-    role: BytesLike,
-    account: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  revokeRole(
-    role: BytesLike,
-    account: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   royaltyInfo(
     _tokenId: BigNumberish,
     _salePrice: BigNumberish,
@@ -512,8 +343,6 @@ export interface OfferStation extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
-
     OFFERSTATION_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
 
     acceptOffer(
@@ -526,31 +355,6 @@ export interface OfferStation extends BaseContract {
       _tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<string>;
-
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
 
     idToproposal(
       arg0: BigNumberish,
@@ -577,18 +381,6 @@ export interface OfferStation extends BaseContract {
     platformFeeBasisPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     royaltyInfo(
       _tokenId: BigNumberish,
@@ -663,44 +455,9 @@ export interface OfferStation extends BaseContract {
     ProposalWithdrawn(
       offerId?: BigNumberish | null
     ): ProposalWithdrawnEventFilter;
-
-    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
-      role?: BytesLike | null,
-      previousAdminRole?: BytesLike | null,
-      newAdminRole?: BytesLike | null
-    ): RoleAdminChangedEventFilter;
-    RoleAdminChanged(
-      role?: BytesLike | null,
-      previousAdminRole?: BytesLike | null,
-      newAdminRole?: BytesLike | null
-    ): RoleAdminChangedEventFilter;
-
-    "RoleGranted(bytes32,address,address)"(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleGrantedEventFilter;
-    RoleGranted(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleGrantedEventFilter;
-
-    "RoleRevoked(bytes32,address,address)"(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleRevokedEventFilter;
-    RoleRevoked(
-      role?: BytesLike | null,
-      account?: string | null,
-      sender?: string | null
-    ): RoleRevokedEventFilter;
   };
 
   estimateGas: {
-    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
-
     OFFERSTATION_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     acceptOffer(
@@ -712,34 +469,6 @@ export interface OfferStation extends BaseContract {
       _nftContractAddress: string,
       _tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    getRoleAdmin(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     idToproposal(
@@ -759,18 +488,6 @@ export interface OfferStation extends BaseContract {
     platformFeeBasisPoint(overrides?: CallOverrides): Promise<BigNumber>;
 
     proposalCounter(overrides?: CallOverrides): Promise<BigNumber>;
-
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     royaltyInfo(
       _tokenId: BigNumberish,
@@ -796,10 +513,6 @@ export interface OfferStation extends BaseContract {
   };
 
   populateTransaction: {
-    DEFAULT_ADMIN_ROLE(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     OFFERSTATION_ADMIN_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -813,34 +526,6 @@ export interface OfferStation extends BaseContract {
       _nftContractAddress: string,
       _tokenId: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    getRoleAdmin(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleMember(
-      role: BytesLike,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    getRoleMemberCount(
-      role: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    grantRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    hasRole(
-      role: BytesLike,
-      account: string,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     idToproposal(
@@ -864,18 +549,6 @@ export interface OfferStation extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     proposalCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    renounceRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    revokeRole(
-      role: BytesLike,
-      account: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
       _tokenId: BigNumberish,
