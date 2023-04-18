@@ -105,6 +105,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlowAccessControl__factory>;
     getContractFactory(
+      name: "IFlowAccessControl",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IFlowAccessControl__factory>;
+    getContractFactory(
       name: "FlowCollection",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlowCollection__factory>;
@@ -116,10 +120,6 @@ declare module "hardhat/types/runtime" {
       name: "FlowMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlowMarketplace__factory>;
-    getContractFactory(
-      name: "IFlowAccessControl",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IFlowAccessControl__factory>;
     getContractFactory(
       name: "MyriadFlowOfferStation",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -241,6 +241,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.FlowAccessControl>;
     getContractAt(
+      name: "IFlowAccessControl",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IFlowAccessControl>;
+    getContractAt(
       name: "FlowCollection",
       address: string,
       signer?: ethers.Signer
@@ -255,11 +260,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.FlowMarketplace>;
-    getContractAt(
-      name: "IFlowAccessControl",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IFlowAccessControl>;
     getContractAt(
       name: "MyriadFlowOfferStation",
       address: string,
