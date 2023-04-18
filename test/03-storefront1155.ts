@@ -33,10 +33,6 @@ describe("FlowCollection  && FlowMarketplace contract", () => {
         let flowCollectionFactory = await ethers.getContractFactory("FlowCollection")
         flowCollection = await flowCollectionFactory.deploy("www.xyz.com",marketplace.address,flowAccessControl.address)
     })
-    it("Should return the right name and symbol of the token once StoreFront is deployed", async () => {
-        expect(await flowCollection.uri(1)).to.equal("www.xyz.com")
-    })
-
     it("Should get the right owner", async () => {
         const STOREFRONT_ADMIN_ROLE = await flowAccessControl.FLOW_ADMIN_ROLE()
         expect(await flowAccessControl.getRoleMember(STOREFRONT_ADMIN_ROLE, 0)).to.be.equal(owner.address)
@@ -81,7 +77,7 @@ describe("FlowCollection  && FlowMarketplace contract", () => {
         const data: BytesLike = "0x123456";
 
         expect(
-            await flowCollection.connect(operator).delegateAssetCreation(creator.address,10,data)
+            await flowCollection.connect(operator).delegateAssetCreation(creator.address,10,data,"Www.xyz.com")
         )
             .to.emit(flowCollection, "AssetCreated")
             .withArgs(1, creator.address, metaDataHash)
