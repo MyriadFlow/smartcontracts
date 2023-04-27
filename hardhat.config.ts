@@ -24,11 +24,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 // API_KEY & PRIVATE_KEY
 const ROPSTEN_RPC_URL = process.env.ROPSTEN_RPC_URL || "https://eth-ropsten.alchemyapi.io/v2/your-api-key"
-const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "https://eth-rinkeby.alchemyapi.io/v2/your-api-key"
+const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "https://rpc-mumbai.maticvigil.com"
 const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://rpc-mumbai.maticvigil.com"
 const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL || "https://ETH-RPC-URL"
 const MNEMONIC = process.env.MNEMONIC || "mnemonic"
-const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "PolygonScan API key"
+const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "API Key"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
 
 
