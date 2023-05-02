@@ -21,6 +21,7 @@ describe("FlowMarketplace && FlowEdition Contract", () => {
         baseTokenURI: "",
         marketplaceAddress: ""
     }
+    
     before(async () => {
         const FlowAccessControlFactory = await ethers.getContractFactory("FlowAccessControl")
         flowAccessControl = await FlowAccessControlFactory.deploy()
@@ -267,6 +268,22 @@ describe("FlowMarketplace && FlowEdition Contract", () => {
         await flowEdition.connect(creator).createAsset("www.xyz.com",300);
         expect(await flowEdition.connect(creator).destroyAsset(3)).to.emit(flowEdition,"AssetDestroyed");
         expect(flowEdition.ownerOf(3)).to.reverted;
+    })
+    it("To check ERC4907",async () => {
+        await flowEdition.createAsset("www.abcd.con",300);
+        let val = ethers.utils.parseUnits("100","wei");
+        await flowEdition.setRentInfo(4,true)
+        await flowEdition.setprice(4,val)
+    
+
+        expect(await flowEdition.connect(creator).rent(4,1,{value : val})).to.emit(flowEdition,"UpdateUser");
+        expect(await flowEdition.userOf(4)).to.be.equal(creator.address)  
+    
+        //// SET USER FUNCTION
+        await flowEdition.createAsset("www.abcde.con",400);
+        expect(await flowEdition.setUser(5,buyer.address,3000)).to.emit(flowEdition,"UpdateUser")
+        expect(await flowEdition.userOf(5)).to.be.equal(buyer.address)
+
     })
 
 })

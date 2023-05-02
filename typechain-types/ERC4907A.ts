@@ -18,61 +18,32 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface FlowEditionInterface extends utils.Interface {
-  contractName: "FlowEdition";
+export interface ERC4907AInterface extends utils.Interface {
+  contractName: "ERC4907A";
   functions: {
-    "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "createAsset(string,uint96)": FunctionFragment;
-    "delegateAssetCreation(address,string,uint96)": FunctionFragment;
-    "destroyAsset(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "marketplace()": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "rent(uint256,uint256)": FunctionFragment;
-    "rentables(uint256)": FunctionFragment;
-    "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setRentInfo(uint256,bool)": FunctionFragment;
     "setUser(uint256,address,uint64)": FunctionFragment;
-    "setprice(uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "tokenByIndex(uint256)": FunctionFragment;
-    "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "amountRequired",
-    values: [BigNumberish, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "createAsset",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "delegateAssetCreation",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "destroyAsset",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
@@ -81,26 +52,10 @@ export interface FlowEditionInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "marketplace",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "rent",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "rentables",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "royaltyInfo",
-    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -111,30 +66,14 @@ export interface FlowEditionInterface extends utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "setRentInfo",
-    values: [BigNumberish, boolean]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setUser",
     values: [BigNumberish, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setprice",
-    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "tokenByIndex",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "tokenOfOwnerByIndex",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
     values: [BigNumberish]
@@ -155,26 +94,9 @@ export interface FlowEditionInterface extends utils.Interface {
     functionFragment: "userOf",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "amountRequired",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "createAsset",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "delegateAssetCreation",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "destroyAsset",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -183,18 +105,8 @@ export interface FlowEditionInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "marketplace",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "royaltyInfo",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
@@ -203,25 +115,12 @@ export interface FlowEditionInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "setRentInfo",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "setUser", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setprice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenByIndex",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenOfOwnerByIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -236,23 +135,18 @@ export interface FlowEditionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,address,string)": EventFragment;
-    "AssetDestroyed(uint256,address)": EventFragment;
-    "RentalInfo(uint256,bool,uint256,address)": EventFragment;
+    "ConsecutiveTransfer(uint256,uint256,address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
-    "UpdateUser(uint256,address,uint256)": EventFragment;
+    "UpdateUser(uint256,address,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ConsecutiveTransfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
 }
@@ -271,26 +165,13 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type AssetCreatedEvent = TypedEvent<
-  [BigNumber, string, string],
-  { tokenID: BigNumber; creator: string; metaDataURI: string }
+export type ConsecutiveTransferEvent = TypedEvent<
+  [BigNumber, BigNumber, string, string],
+  { fromTokenId: BigNumber; toTokenId: BigNumber; from: string; to: string }
 >;
 
-export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
-
-export type AssetDestroyedEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; ownerOrApproved: string }
->;
-
-export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
-
-export type RentalInfoEvent = TypedEvent<
-  [BigNumber, boolean, BigNumber, string],
-  { tokenId: BigNumber; isRentable: boolean; price: BigNumber; renter: string }
->;
-
-export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
+export type ConsecutiveTransferEventFilter =
+  TypedEventFilter<ConsecutiveTransferEvent>;
 
 export type TransferEvent = TypedEvent<
   [string, string, BigNumber],
@@ -306,13 +187,13 @@ export type UpdateUserEvent = TypedEvent<
 
 export type UpdateUserEventFilter = TypedEventFilter<UpdateUserEvent>;
 
-export interface FlowEdition extends BaseContract {
-  contractName: "FlowEdition";
+export interface ERC4907A extends BaseContract {
+  contractName: "ERC4907A";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: FlowEditionInterface;
+  interface: ERC4907AInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -334,37 +215,13 @@ export interface FlowEdition extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amount: BigNumber }>;
-
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    destroyAsset(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -377,8 +234,6 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    marketplace(overrides?: CallOverrides): Promise<[string]>;
-
     name(overrides?: CallOverrides): Promise<[string]>;
 
     ownerOf(
@@ -386,54 +241,24 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [boolean, string, BigNumber, BigNumber] & {
-        isRentable: boolean;
-        user: string;
-        expires: BigNumber;
-        hourlyRate: BigNumber;
-      }
-    >;
-
-    royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber]>;
-
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _data: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -444,29 +269,12 @@ export interface FlowEdition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -479,7 +287,7 @@ export interface FlowEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     userExpires(
@@ -488,43 +296,15 @@ export interface FlowEdition extends BaseContract {
     ): Promise<[BigNumber]>;
 
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
-
-  amountRequired(
-    tokenId: BigNumberish,
-    time: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   approve(
     to: string,
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  createAsset(
-    metadataURI: string,
-    royaltyPercentBasisPoint: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  delegateAssetCreation(
-    creator: string,
-    metadataURI: string,
-    royaltyPercentBasisPoint: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  destroyAsset(
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   getApproved(
     tokenId: BigNumberish,
@@ -537,60 +317,28 @@ export interface FlowEdition extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  marketplace(overrides?: CallOverrides): Promise<string>;
-
   name(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-  rent(
-    _tokenId: BigNumberish,
-    _timeInHours: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  rentables(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [boolean, string, BigNumber, BigNumber] & {
-      isRentable: boolean;
-      user: string;
-      expires: BigNumber;
-      hourlyRate: BigNumber;
-    }
-  >;
-
-  royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<[string, BigNumber]>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: string,
     to: string,
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256,bytes)"(
     from: string,
     to: string,
     tokenId: BigNumberish,
-    data: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    _data: BytesLike,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setApprovalForAll(
     operator: string,
     approved: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setRentInfo(
-    tokenId: BigNumberish,
-    isRentable: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -601,29 +349,12 @@ export interface FlowEdition extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setprice(
-    tokenId: BigNumberish,
-    pricePerHour: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
-
-  tokenByIndex(
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  tokenOfOwnerByIndex(
-    owner: string,
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -633,7 +364,7 @@ export interface FlowEdition extends BaseContract {
     from: string,
     to: string,
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   userExpires(
@@ -643,17 +374,7 @@ export interface FlowEdition extends BaseContract {
 
   userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -661,24 +382,6 @@ export interface FlowEdition extends BaseContract {
     ): Promise<void>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    destroyAsset(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -691,35 +394,9 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    marketplace(overrides?: CallOverrides): Promise<string>;
-
     name(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [boolean, string, BigNumber, BigNumber] & {
-        isRentable: boolean;
-        user: string;
-        expires: BigNumber;
-        hourlyRate: BigNumber;
-      }
-    >;
-
-    royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[string, BigNumber]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -732,19 +409,13 @@ export interface FlowEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
+      _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -755,29 +426,12 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -796,8 +450,6 @@ export interface FlowEdition extends BaseContract {
     ): Promise<BigNumber>;
 
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -823,38 +475,18 @@ export interface FlowEdition extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,address,string)"(
-      tokenID?: null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): AssetCreatedEventFilter;
-    AssetCreated(
-      tokenID?: null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): AssetCreatedEventFilter;
-
-    "AssetDestroyed(uint256,address)"(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-    AssetDestroyed(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-
-    "RentalInfo(uint256,bool,uint256,address)"(
-      tokenId?: null,
-      isRentable?: null,
-      price?: null,
-      renter?: string | null
-    ): RentalInfoEventFilter;
-    RentalInfo(
-      tokenId?: null,
-      isRentable?: null,
-      price?: null,
-      renter?: string | null
-    ): RentalInfoEventFilter;
+    "ConsecutiveTransfer(uint256,uint256,address,address)"(
+      fromTokenId?: BigNumberish | null,
+      toTokenId?: null,
+      from?: string | null,
+      to?: string | null
+    ): ConsecutiveTransferEventFilter;
+    ConsecutiveTransfer(
+      fromTokenId?: BigNumberish | null,
+      toTokenId?: null,
+      from?: string | null,
+      to?: string | null
+    ): ConsecutiveTransferEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: string | null,
@@ -867,7 +499,7 @@ export interface FlowEdition extends BaseContract {
       tokenId?: BigNumberish | null
     ): TransferEventFilter;
 
-    "UpdateUser(uint256,address,uint256)"(
+    "UpdateUser(uint256,address,uint64)"(
       tokenId?: BigNumberish | null,
       user?: string | null,
       expires?: null
@@ -880,37 +512,13 @@ export interface FlowEdition extends BaseContract {
   };
 
   estimateGas: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    destroyAsset(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -923,8 +531,6 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    marketplace(overrides?: CallOverrides): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
@@ -932,47 +538,24 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _data: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -983,29 +566,12 @@ export interface FlowEdition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -1018,7 +584,7 @@ export interface FlowEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     userExpires(
@@ -1030,46 +596,18 @@ export interface FlowEdition extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     balanceOf(
       owner: string,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    destroyAsset(
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     getApproved(
@@ -1083,8 +621,6 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    marketplace(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
@@ -1092,47 +628,24 @@ export interface FlowEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     "safeTransferFrom(address,address,uint256)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _data: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1143,29 +656,12 @@ export interface FlowEdition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -1178,7 +674,7 @@ export interface FlowEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     userExpires(
@@ -1189,10 +685,6 @@ export interface FlowEdition extends BaseContract {
     userOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }

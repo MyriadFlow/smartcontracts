@@ -1,22 +1,8 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `npx hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 import hre, { ethers , run } from "hardhat"
 import yaml from "js-yaml"
 import fs from "fs"
 async function main() {
     const [_, buyer] = await hre.ethers.getSigners()
-    // Hardhat always runs the compile task when running scripts with its command
-    // line interface.
-    //
-    // If this script is run directly using `node` you may want to call compile
-    // manually to make sure everything is compiled
-    // await hre.run('compile');
-
-    // We get the contract to deploy
-
     /// FLOW ACCESSCONTROL
      const FlowAccessControlFactory = await hre.ethers.getContractFactory("FlowAccessControl");
   const FlowAccessControl = await FlowAccessControlFactory.deploy();
@@ -27,7 +13,7 @@ async function main() {
   
     /// FLOW MARKETPLACE
     const Marketplace = await hre.ethers.getContractFactory("FlowMarketplace");
-    const marketplace = await Marketplace.deploy(300,"TheNftBazaar",FlowAccessControl.address);
+    const marketplace = await Marketplace.deploy(200,"TheNftBazaar2",FlowAccessControl.address);
     await marketplace.deployed();
     console.log("FlowMarketplace Deployed to: ", marketplace.address);
 
@@ -39,7 +25,7 @@ async function main() {
 
     // FLOW EDITION CONTRACT
     const FlowEdition = await hre.ethers.getContractFactory("FlowEdition");
-    const flowEdition = await FlowEdition.deploy("StoreFront V4", "SFv4", txReceipt.contractAddress, FlowAccessControl.address);
+    const flowEdition = await FlowEdition.deploy("FlowEdition V4", "FEv4",marketplace.address, FlowAccessControl.address);
     await flowEdition.deployed();
     console.log("FlowEdition Deployed to:", flowEdition.address);
 
@@ -66,14 +52,13 @@ async function main() {
         await verify(FlowAccessControl.address, []);
         //FlowMarketplace
         await marketplace.deployTransaction.wait(6);
-        await verify(marketplace.address, [300,"TheNftBazaar",FlowAccessControl.address]);
+        await verify(marketplace.address, [200,"TheNftBazaar2",FlowAccessControl.address]);
         //FlowCollection
         await flowEdition.deployTransaction.wait(6);
-        await verify(flowEdition.address, ["FlowEdition V1", "FEv1", txReceipt.contractAddress, FlowAccessControl.address]);
+        await verify(flowEdition.address, ["FlowEdition V1", "FEv1", marketplace.address, FlowAccessControl.address]);
         //updateGraphAddress(flowEdition.address, marketplace.address, marketplace.deployTransaction.blockNumber, false)
     }
 }
-
 const verify = async (contractAddress: string, args: any[]) => {
   console.log("Verifying contract...");
   try {

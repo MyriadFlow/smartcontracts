@@ -24,25 +24,25 @@ async function main() {
         //FlowCollection
         await flowCollection.deployTransaction.wait(6);
         await verify(flowCollection.address, ["www.xyz.com", marketplaceAddr,flowAccessControlAddr]);
-        updateGraphAddress(flowCollection.address, flowCollection.deployTransaction.blockNumber, false)
+        //updateGraphAddress(flowCollection.address, flowCollection.deployTransaction.blockNumber, false)
     }
 }
 
 const verify = async (contractAddress: string, args: any[]) => {
-  console.log("Verifying contract...");
+  console.log("Verifying contract...")
   try {
     await run("verify:verify", {
       address: contractAddress,
       constructorArguments: args,
-    });
+    })
   } catch (e: any) {
     if (e.message.toLowerCase().includes("already verified")) {
-      console.log("Already Verified!");
+      console.log("Already verified!")
     } else {
-      console.log(e);
+      console.log(e)
     }
   }
-};
+}
 
 function updateGraphAddress(flowEditonAddr: string,startBlock: number | undefined, local: boolean) {
     const urlCollectionSubgraphLocal = local ? `subgraph/nftCollection/subgraph.local.yaml` : `subgraph/nftCollection/subgraph.yaml`
