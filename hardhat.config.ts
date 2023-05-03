@@ -1,5 +1,4 @@
 require("dotenv").config();
-import "@nomicfoundation/hardhat-toolbox";
 import dotenv from "dotenv"
 dotenv.config();
 import "@nomiclabs/hardhat-etherscan"
@@ -7,8 +6,10 @@ import "@nomiclabs/hardhat-truffle5"
 import "@nomiclabs/hardhat-waffle"
 import "hardhat-gas-reporter"
 import "solidity-coverage"
+
 import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
+
 import { task } from "hardhat/config"
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
