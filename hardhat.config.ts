@@ -1,4 +1,5 @@
 require("dotenv").config();
+import "@nomicfoundation/hardhat-toolbox";
 import dotenv from "dotenv"
 dotenv.config();
 import "@nomiclabs/hardhat-etherscan"
