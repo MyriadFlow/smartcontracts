@@ -6,19 +6,21 @@ async function main() {
     // We get the contract to deploy
     const marketplaceAddr = "0x0335DD44f170657FEe88D693989C4f01324a9116"
     const flowAccessControlAddr ="0xbc9cD4bD303af002C0D65EDc5D6F5738be89B7D5"
+    let salePrice =  await ethers.utils.parseEther("0.01")
+    let preSalePrice =  await ethers.utils.parseEther("0.005")
     // FLOW EDITION CONTRACT
-    const FlowEdition = await hre.ethers.getContractFactory("FlowEdition");
-    const flowEdition = await FlowEdition.deploy("FlowEdition V1", "FEv4", marketplaceAddr,flowAccessControlAddr);
-    await flowEdition.deployed();
-    console.log("FlowEdition Deployed to:", flowEdition.address);
+    const FlowGenEditionFactory = await hre.ethers.getContractFactory("FlowGenEdition");
+    const flowGenEdition = await FlowGenEditionFactory.deploy("FlowGenEdition V1", "FEv4", marketplaceAddr,flowAccessControlAddr ,salePrice,preSalePrice,86400,1000,50,"www.abc.com");
+    await flowGenEdition.deployed();
+    console.log("FlowEdition Deployed to:", flowGenEdition.address);
 
     if (hre.network.name == "hardhat") {
-        await flowEdition.createAsset("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF", 500)
+        await flowGenEdition.mint(1,{value : preSalePrice});
         //updateGraphAddress(flowEdition.address, flowEdition.deployTransaction.blockNumber, true)
     } else {
         //FlowCollection
-        await flowEdition.deployTransaction.wait(6);
-        await verify(flowEdition.address, ["FlowEdition V1", "FEv1", marketplaceAddr, flowAccessControlAddr]);
+        await flowGenEdition.deployTransaction.wait(6);
+        await verify(flowGenEdition.address, ["FlowEdition V1", "FEv1", marketplaceAddr, flowAccessControlAddr,salePrice,preSalePrice,84600,1000,50,"www.abc.com"]);
         //updateGraphAddress(flowEdition.address,  flowEdition.deployTransaction.blockNumber, false)
     }
 }
