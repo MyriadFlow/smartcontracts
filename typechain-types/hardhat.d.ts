@@ -113,9 +113,53 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlowCollection__factory>;
     getContractFactory(
+      name: "IERC4907",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC4907__factory>;
+    getContractFactory(
+      name: "ERC721AIERC721Receiver",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721AIERC721Receiver__factory>;
+    getContractFactory(
+      name: "ERC721A",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721A__factory>;
+    getContractFactory(
+      name: "ERC4907A",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC4907A__factory>;
+    getContractFactory(
+      name: "ERC721ABurnable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721ABurnable__factory>;
+    getContractFactory(
+      name: "ERC721AQueryable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ERC721AQueryable__factory>;
+    getContractFactory(
+      name: "IERC4907A",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC4907A__factory>;
+    getContractFactory(
+      name: "IERC721ABurnable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721ABurnable__factory>;
+    getContractFactory(
+      name: "IERC721AQueryable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721AQueryable__factory>;
+    getContractFactory(
+      name: "IERC721A",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IERC721A__factory>;
+    getContractFactory(
       name: "FlowEdition",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FlowEdition__factory>;
+    getContractFactory(
+      name: "FlowGenEdition",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlowGenEdition__factory>;
     getContractFactory(
       name: "FlowMarketplace",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -251,10 +295,65 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.FlowCollection>;
     getContractAt(
+      name: "IERC4907",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC4907>;
+    getContractAt(
+      name: "ERC721AIERC721Receiver",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721AIERC721Receiver>;
+    getContractAt(
+      name: "ERC721A",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721A>;
+    getContractAt(
+      name: "ERC4907A",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC4907A>;
+    getContractAt(
+      name: "ERC721ABurnable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721ABurnable>;
+    getContractAt(
+      name: "ERC721AQueryable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ERC721AQueryable>;
+    getContractAt(
+      name: "IERC4907A",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC4907A>;
+    getContractAt(
+      name: "IERC721ABurnable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721ABurnable>;
+    getContractAt(
+      name: "IERC721AQueryable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721AQueryable>;
+    getContractAt(
+      name: "IERC721A",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IERC721A>;
+    getContractAt(
       name: "FlowEdition",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.FlowEdition>;
+    getContractAt(
+      name: "FlowGenEdition",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlowGenEdition>;
     getContractAt(
       name: "FlowMarketplace",
       address: string,
