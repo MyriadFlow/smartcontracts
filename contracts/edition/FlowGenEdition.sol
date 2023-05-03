@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.17;
-
-import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../common/ERC721A/extensions/ERC721ABurnable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "../accesscontrol/interfaces/IFlowAccessControl.sol";
 import "../common/ERC4907/IERC4907.sol";
 
-contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
+contract FlowGenEdition is
+    IERC4907,
+    Context,
+    ERC2981,
+    ERC721A,
+    ERC721ABurnable
+{
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
@@ -37,8 +41,6 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
     // INTERFACES
     IFlowAccessControl flowRoles;
 
-    using Strings for uint256;
-
     modifier onlyAdmin() {
         require(
             flowRoles.isAdmin(_msgSender()),
@@ -60,11 +62,6 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
         uint256 price,
         address indexed renter
     );
-    event UpdateUser(
-        uint256 indexed tokenId,
-        address indexed user,
-        uint64 expires
-    );
 
     constructor(
         string memory name,
@@ -75,7 +72,8 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
         uint256 _preSalePrice,
         uint256 _countDownTime, // unix time (secs)
         uint256 _maxSupply,
-        uint256 _royaltyBPS
+        uint256 _royaltyBPS,
+        string memory _baseUri
     ) ERC721A(name, symbol) {
         flowRoles = IFlowAccessControl(accessControlAddress);
         marketplace = marketplaceAddress;
@@ -83,8 +81,8 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
         preSalePrice = _preSalePrice;
         countDownTime = block.timestamp + _countDownTime;
         maxSupply = _maxSupply;
-
-        // SET DEFAULT ROYALTY TO 5%
+        baseURI = _baseUri;
+        // SET DEFAULT ROYALTY
         _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS));
     }
 
@@ -134,33 +132,22 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
 
     /********************* ERC4907 *********************************/
     /// @dev Owner can set the rental status of the token
-    function setRentInfo(uint256 tokenId, bool isRentable) external {
+    function setRentInfo(
+        uint256 tokenId,
+        bool isRentable,
+        uint256 pricePerHour
+    ) external {
         address owner = ownerOf(tokenId);
         require(
             owner == _msgSender() || isApprovedForAll(owner, _msgSender()),
             "FlowGenEdition: Caller is not token owner "
         );
         rentables[tokenId].isRentable = isRentable;
+        rentables[tokenId].hourlyRate = pricePerHour;
         emit RentalInfo(
             tokenId,
             isRentable,
             rentables[tokenId].hourlyRate,
-            _msgSender()
-        );
-    }
-
-    ///@dev Owner can set the rental price of the token
-    function setprice(uint256 tokenId, uint256 pricePerHour) external {
-        address owner = ownerOf(tokenId);
-        require(
-            owner == _msgSender() || isApprovedForAll(owner, _msgSender()),
-            "FlowGenEdition: Caller is not token owner "
-        );
-        rentables[tokenId].hourlyRate = pricePerHour;
-        emit RentalInfo(
-            tokenId,
-            rentables[tokenId].isRentable,
-            pricePerHour,
             _msgSender()
         );
     }
@@ -223,20 +210,9 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
 
     /// @dev IERC4907 implementation
     function userOf(uint256 tokenId) public view returns (address) {
-        // console.log(
-        //     "user1 is %s and tokenId is %s",
-        //     rentables[tokenId].user,
-        //     tokenId
-        // );
-        // console.log("time1 is %s", rentables[tokenId].expires);
-        // console.log("blocktimestamp1 is %s", block.timestamp);
         if (rentables[tokenId].expires >= block.timestamp) {
-            // console.log("user2 is %s", rentables[tokenId].user);
-            // console.log("time2 is %s", rentables[tokenId].expires);
-            // console.log("blocktimestamp2 is %s", block.timestamp);
             return rentables[tokenId].user;
         } else {
-            // console.log("Hey");
             return address(0);
         }
     }
@@ -257,23 +233,8 @@ contract FlowGenEdition is Context, ERC2981, ERC721A, ERC721ABurnable {
 
     /////////////////////////////////////////////////
 
-    function _beforeTokenTransfers(
-        address from,
-        address to,
-        uint256 startTokenId,
-        uint256 quantity
-    ) internal virtual override(ERC721A) {
-        // console.log("HI");
-        for (uint256 i = startTokenId; i <= quantity; i++) {
-            require(
-                userOf(i) == address(0),
-                "FlowGenEdition : Item is already subscribed"
-            );
-            if (from != to && rentables[i].user != address(0)) {
-                delete rentables[startTokenId];
-                emit UpdateUser(startTokenId, address(0), 0);
-            }
-        }
+    function _baseURI() internal view override returns (string memory) {
+        return baseURI;
     }
 
     function supportsInterface(

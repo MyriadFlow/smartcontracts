@@ -23,7 +23,7 @@ import "../accesscontrol/interfaces/IFlowAccessControl.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
+contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
@@ -33,7 +33,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
     struct RentableItems {
         bool isRentable; //to check is renting is available
         address user; // address of user role
-        uint256 expires; // unix timestamp, user expires
+        uint64 expires; // unix timestamp, user expires
         uint256 hourlyRate; // amountPerHour
     }
 
@@ -80,13 +80,6 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         bool isRentable,
         uint256 price,
         address indexed renter
-    );
-
-    ///@dev IERC4907 implementation
-    event UpdateUser(
-        uint256 indexed tokenId,
-        address indexed user,
-        uint256 expires
     );
 
     using Strings for uint256;
@@ -208,29 +201,19 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
     }
 
     /********************* ERC4907 *********************************/
-    /// @dev Owner can set the rental status of the token
-    function setRentInfo(uint256 tokenId, bool isRentable) external {
+    /// @notice Owner can set the NFT's rental price and status
+    function setRentInfo(
+        uint256 tokenId,
+        bool isRentable,
+        uint256 pricePerHour
+    ) public {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
             "FlowEdition: Caller is not token owner or approved"
         );
         rentables[tokenId].isRentable = isRentable;
-        emit RentalInfo(tokenId, isRentable, 0, _msgSender());
-    }
-
-    ///@dev Owner can set the rental price of the token
-    function setprice(uint256 tokenId, uint256 pricePerHour) external {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "FlowEdition: Caller is not token owner or approved"
-        );
         rentables[tokenId].hourlyRate = pricePerHour;
-        emit RentalInfo(
-            tokenId,
-            rentables[tokenId].isRentable,
-            pricePerHour,
-            _msgSender()
-        );
+        emit RentalInfo(tokenId, isRentable, pricePerHour, _msgSender());
     }
 
     /// @notice set the user and expires of an NFT
@@ -247,11 +230,11 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         );
         require(
             userOf(tokenId) == address(0),
-            "FlowEdition: Item is already subscribed"
+            "FlowEdition: item is already subscribed"
         );
         RentableItems storage info = rentables[tokenId];
         info.user = user;
-        info.expires = block.timestamp + expires;
+        info.expires = expires;
         emit UpdateUser(tokenId, user, expires);
     }
 
@@ -284,13 +267,13 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();
-        info.expires = block.timestamp + (_timeInHours * 3600);
+        info.expires = uint64(block.timestamp + (_timeInHours * 3600));
         emit UpdateUser(_tokenId, _msgSender(), info.expires);
     }
 
     /// @dev IERC4907 implementation
     function userOf(uint256 tokenId) public view returns (address) {
-        if (uint256(rentables[tokenId].expires) >= block.timestamp) {
+        if (userExpires(tokenId) >= block.timestamp) {
             return rentables[tokenId].user;
         } else {
             return address(0);
@@ -343,12 +326,6 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         uint256 batchSize
     ) internal virtual override(ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
-
-        require(
-            userOf(tokenId) == address(0),
-            "FlowEdition : Item is subscribed"
-        );
-
         if (from != to && rentables[tokenId].user != address(0)) {
             delete rentables[tokenId];
             emit UpdateUser(tokenId, address(0), 0);

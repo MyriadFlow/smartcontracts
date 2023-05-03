@@ -37,9 +37,8 @@ export interface FlowEditionInterface extends utils.Interface {
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setRentInfo(uint256,bool)": FunctionFragment;
+    "setRentInfo(uint256,bool,uint256)": FunctionFragment;
     "setUser(uint256,address,uint64)": FunctionFragment;
-    "setprice(uint256,uint256)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -112,15 +111,11 @@ export interface FlowEditionInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setRentInfo",
-    values: [BigNumberish, boolean]
+    values: [BigNumberish, boolean, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setUser",
     values: [BigNumberish, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setprice",
-    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -208,7 +203,6 @@ export interface FlowEditionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setUser", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "setprice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -245,7 +239,7 @@ export interface FlowEditionInterface extends utils.Interface {
     "AssetDestroyed(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
-    "UpdateUser(uint256,address,uint256)": EventFragment;
+    "UpdateUser(uint256,address,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
@@ -434,6 +428,7 @@ export interface FlowEdition extends BaseContract {
     setRentInfo(
       tokenId: BigNumberish,
       isRentable: boolean,
+      pricePerHour: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -441,12 +436,6 @@ export interface FlowEdition extends BaseContract {
       tokenId: BigNumberish,
       user: string,
       expires: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -591,6 +580,7 @@ export interface FlowEdition extends BaseContract {
   setRentInfo(
     tokenId: BigNumberish,
     isRentable: boolean,
+    pricePerHour: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -598,12 +588,6 @@ export interface FlowEdition extends BaseContract {
     tokenId: BigNumberish,
     user: string,
     expires: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setprice(
-    tokenId: BigNumberish,
-    pricePerHour: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -745,6 +729,7 @@ export interface FlowEdition extends BaseContract {
     setRentInfo(
       tokenId: BigNumberish,
       isRentable: boolean,
+      pricePerHour: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -752,12 +737,6 @@ export interface FlowEdition extends BaseContract {
       tokenId: BigNumberish,
       user: string,
       expires: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -867,7 +846,7 @@ export interface FlowEdition extends BaseContract {
       tokenId?: BigNumberish | null
     ): TransferEventFilter;
 
-    "UpdateUser(uint256,address,uint256)"(
+    "UpdateUser(uint256,address,uint64)"(
       tokenId?: BigNumberish | null,
       user?: string | null,
       expires?: null
@@ -973,6 +952,7 @@ export interface FlowEdition extends BaseContract {
     setRentInfo(
       tokenId: BigNumberish,
       isRentable: boolean,
+      pricePerHour: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -980,12 +960,6 @@ export interface FlowEdition extends BaseContract {
       tokenId: BigNumberish,
       user: string,
       expires: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1133,6 +1107,7 @@ export interface FlowEdition extends BaseContract {
     setRentInfo(
       tokenId: BigNumberish,
       isRentable: boolean,
+      pricePerHour: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1140,12 +1115,6 @@ export interface FlowEdition extends BaseContract {
       tokenId: BigNumberish,
       user: string,
       expires: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setprice(
-      tokenId: BigNumberish,
-      pricePerHour: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

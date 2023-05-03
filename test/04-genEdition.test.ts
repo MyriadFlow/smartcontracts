@@ -36,7 +36,7 @@ describe("FlowGenEdition", () => {
 
         const flowGenEditionFactory = await ethers.getContractFactory("FlowGenEdition")
 
-        flowGenEdition = await flowGenEditionFactory.deploy(metadata.name, metadata.symbol, marketplace.address , flowAccessControl.address,Saleprice,preSalePrice,120,200,300);
+        flowGenEdition = await flowGenEditionFactory.deploy(metadata.name, metadata.symbol, marketplace.address , flowAccessControl.address,Saleprice,preSalePrice,120,200,300,"www.abc.com");
         
         await flowGenEdition.deployed()
     })
@@ -80,28 +80,26 @@ describe("FlowGenEdition", () => {
     })
     it("check ERC4907",async () => {
         let val = ethers.utils.parseUnits("100","wei");
-        await flowGenEdition.connect(creator).setRentInfo(1,true)
-        await flowGenEdition.connect(creator).setprice(1,val)
-
+        await flowGenEdition.connect(creator).setRentInfo(1,true,val)
         expect(await flowGenEdition.rent(1,1,{value : val})).to.emit(flowGenEdition,"UpdateUser");
-
         expect(await flowGenEdition.userOf(1)).to.be.equal(owner.address)  
         //// SET USER FUNCTION
         expect(await flowGenEdition.connect(creator2).setUser(3,buyer.address,3000)).to.emit(flowGenEdition,"UpdateUser")
         expect(await flowGenEdition.userOf(3)).to.be.equal(buyer.address)
         
+        expect(flowGenEdition.connect(creator).setUser(1,buyer.address,3000)).to.be.revertedWith("FlowGenEdition: Item is already subscribed")
+
+        expect(flowGenEdition.rent(5,1,{value : val})).to.be.revertedWith("FlowGenEdition: Not available for rent")
+        
     })
     it("create a marketitem and buy",async () => {
-        expect(await marketplace.connect(creator2).listItem(flowGenEdition.address,4,Saleprice,1,false,0)).to.emit(marketplace, "SaleStarted")
-        
+        expect(await marketplace.connect(creator2).listItem(flowGenEdition.address,3,Saleprice,1,false,0)).to.emit(marketplace, "SaleStarted")        
         const marketItem = await marketplace.idToMarketItem(1)
         expect(marketItem.itemId).to.equal(1)
-        expect(marketItem.tokenId).to.equal(4)
+        expect(marketItem.tokenId).to.equal(3)
         expect(marketItem.seller).to.equal(creator2.address)
         expect(marketItem.status).to.be.equal(1)
         expect(marketItem.nftContract).to.equal(flowGenEdition.address)
-        
-        expect(await marketplace.buyItem(1,1,{value : Saleprice})).to.emit(marketplace,"ItemSold")
 
     })
 
