@@ -3,10 +3,10 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../flow-accesscontrol/interfaces/IFlowAccessControl.sol";
+import "../common/ERC4907/IERC4907.sol";
+import "../accesscontrol/interfaces/IFlowAccessControl.sol";
 
 /**
  * @dev {ERC721} token, including:
@@ -23,15 +23,26 @@ import "../flow-accesscontrol/interfaces/IFlowAccessControl.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
+contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
 
+    address public marketplace;
+
+    struct RentableItems {
+        bool isRentable; //to check is renting is available
+        address user; // address of user role
+        uint64 expires; // unix timestamp, user expires
+        uint256 hourlyRate; // amountPerHour
+    }
+
+    ///@dev storing the data of the user who are renting the NFT
+    mapping(uint256 => RentableItems) public rentables;
+
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    address public marketplace;
     IFlowAccessControl flowRoles;
 
     modifier onlyOperator() {
@@ -50,12 +61,26 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         _;
     }
 
+    modifier onlyAdmin() {
+        require(
+            flowRoles.isAdmin(_msgSender()),
+            "MyriadFlowOfferStation: User is not authorized"
+        );
+        _;
+    }
+
     event AssetCreated(
         uint256 tokenID,
         address indexed creator,
         string metaDataURI
     );
     event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+    event RentalInfo(
+        uint256 tokenId,
+        bool isRentable,
+        uint256 price,
+        address indexed renter
+    );
 
     using Strings for uint256;
 
@@ -175,6 +200,102 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         _resetTokenRoyalty(tokenId);
     }
 
+    /********************* ERC4907 *********************************/
+    /// @notice Owner can set the NFT's rental price and status
+    function setRentInfo(
+        uint256 tokenId,
+        bool isRentable,
+        uint256 pricePerHour
+    ) public {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "FlowEdition: Caller is not token owner or approved"
+        );
+        rentables[tokenId].isRentable = isRentable;
+        rentables[tokenId].hourlyRate = pricePerHour;
+        emit RentalInfo(tokenId, isRentable, pricePerHour, _msgSender());
+    }
+
+    /// @notice set the user and expires of an NFT
+    /// @dev This function is used to gift a person by the owner,
+    /// The zero address indicates there is no user
+    /// Throws if `tokenId` is not valid NFT
+    /// @param user  The new user of the NFT
+    /// @param expires  UNIX timestamp, The new user could use the NFT before expires
+
+    function setUser(uint256 tokenId, address user, uint64 expires) public {
+        require(
+            _isApprovedOrOwner(_msgSender(), tokenId),
+            "FlowEdition: Not token owner Or approved"
+        );
+        require(
+            userOf(tokenId) == address(0),
+            "FlowEdition: item is already subscribed"
+        );
+        RentableItems storage info = rentables[tokenId];
+        info.user = user;
+        info.expires = expires;
+        emit UpdateUser(tokenId, user, expires);
+    }
+
+    /// @notice to use for renting an item
+    /// @dev The zero address indicates there is no user
+    /// Throws if `tokenId` is not valid NFT,
+    /// time cannot be less than 1 hour or more than 6 months
+    /// @param _timeInHours  is in hours , Ex- 1,2,3
+    function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
+        require(
+            rentables[_tokenId].isRentable,
+            "FlowEdition: Not available for rent"
+        );
+        require(
+            userOf(_tokenId) == address(0),
+            "FlowEdition: NFT Already Subscribed"
+        );
+        require(
+            _timeInHours > 0,
+            "FlowEdition: Time can't be less than 1 hour"
+        );
+        require(
+            _timeInHours <= 4320,
+            "FlowEdition: Time can't be more than 6 months"
+        );
+
+        uint256 amount = amountRequired(_tokenId, _timeInHours);
+
+        require(msg.value >= amount, "FlowEdition: Insufficient Funds");
+
+        RentableItems storage info = rentables[_tokenId];
+        info.user = _msgSender();
+        info.expires = uint64(block.timestamp + (_timeInHours * 3600));
+        emit UpdateUser(_tokenId, _msgSender(), info.expires);
+    }
+
+    /// @dev IERC4907 implementation
+    function userOf(uint256 tokenId) public view returns (address) {
+        if (userExpires(tokenId) >= block.timestamp) {
+            return rentables[tokenId].user;
+        } else {
+            return address(0);
+        }
+    }
+
+    /// @dev IERC4907 implementation
+    function userExpires(uint256 tokenId) public view returns (uint256) {
+        return rentables[tokenId].expires;
+    }
+
+    /// @notice to calculate the amount of money required
+    /// to rent an item for a certain time
+    function amountRequired(
+        uint256 tokenId,
+        uint256 time
+    ) public view returns (uint256 amount) {
+        amount = rentables[tokenId].hourlyRate * time;
+    }
+
+    /////////////////////////////////////////////////
+
     /**
      * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
      *
@@ -190,6 +311,14 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         _tokenURIs[tokenId] = _tokenURI;
     }
 
+    function withdraw() external onlyAdmin {
+        // get the balance of the contract
+        (bool callSuccess, ) = payable(_msgSender()).call{
+            value: address(this).balance
+        }("");
+        require(callSuccess, "FlowEdition: Withdrawal failed");
+    }
+
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -197,6 +326,10 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
         uint256 batchSize
     ) internal virtual override(ERC721Enumerable) {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        if (from != to && rentables[tokenId].user != address(0)) {
+            delete rentables[tokenId];
+            emit UpdateUser(tokenId, address(0), 0);
+        }
     }
 
     /**
@@ -205,6 +338,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981 {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
+        if (interfaceId == type(IERC4907).interfaceId) return true;
         return super.supportsInterface(interfaceId);
     }
 }

@@ -9,11 +9,11 @@ import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../flow-accesscontrol/interfaces/IFlowAccessControl.sol";
+import "../accesscontrol/interfaces/IFlowAccessControl.sol";
 
 error ItemExist();
 
-// create a function 
+// create a function
 contract FlowMarketplace is
     Context,
     ReentrancyGuard,
