@@ -1,0 +1,15 @@
+{
+    "contractName" : "FlowAccessControl",
+    "constructorParams":{ 
+        "param1": "NFT MELA",
+        "param2" : "NM",
+        "param3" : "0xa34a5a599D6087b0f10247F08986B8dD34Df800c",
+        "param4" : "0x8b955563551609A060C27b1E1cb00d3e676716f3" ,
+        "param5" :"1000000000000000000",
+        "param6" : "100000000000000000",
+        "param7" : 0,
+        "param8" : 2000,
+        "param9" : 300,
+        "param10": "www.abc.com"
+    }
+}
