@@ -1,7 +1,5 @@
 /// Deploy.json would be different for every contract
-
 /// INPUt :  Contract Name , Constructor Params
-
 /// OUTPUT -ChainId: .Address{Contract Address} : 0X0ERT  ,Verified : true or false
 
 const fs = require("fs")
@@ -10,8 +8,7 @@ const { ethers, run, network } = require("hardhat")
 const scripts = `scripts/deploy/deploy.json`
 const data = fs.readFileSync(scripts, "utf8")
 const jsonContent = JSON.parse(data)
-console.log(jsonContent)
-console.log(hre.network.config.networkId)
+// console.log(jsonContent)
 
 let contractAddress
 let Verified = false
@@ -42,6 +39,7 @@ async function flowMarketPlaceDeploy() {
         constructorParam.param2,
         constructorParam.param3
     )
+
     await marketplace.deployed()
     console.log("FlowMarketplace Deployed to: ", marketplace.address)
 
@@ -64,7 +62,7 @@ async function flowMarketPlaceDeploy() {
     return Addr
 }
 
-async function flowCollectioneDeploy() {
+async function flowCollectionDeploy() {
     const constructorParam = jsonContent.constructorParams
     const FlowCollection = await hre.ethers.getContractFactory("FlowCollection")
     const flowCollection = await FlowCollection.deploy(
@@ -98,11 +96,11 @@ async function flowEditionDeploy() {
         constructorParam.param4
     )
     await flowEdition.deployed()
-    console.log("FlowEdition Deployed to:", flowCollection.address)
+    console.log("FlowEdition Deployed to:", flowEdition.address)
     const Addr = flowEdition.address
     /// VERIFY
     if (hre.network.name != "hardhat") {
-        await flowCollection.deployTransaction.wait(6)
+        await flowEdition.deployTransaction.wait(6)
         await verify(Addr, [
             constructorParam.param1,
             constructorParam.param2,
@@ -163,22 +161,22 @@ async function main() {
     }
     // FLOW COLLECTION CONTRACT
     if (jsonContent.contractName == "FlowCollection") {
-        contractAddress = await flowCollectioneDeploy()
+        contractAddress = await flowCollectionDeploy()
     }
 
     // FLOW EDITION CONTRACT
     if (jsonContent.contractName == "FlowEdition") {
-        contractAddress = await flowCollectioneDeploy()
+        contractAddress = await flowEditionDeploy()
     }
 
     // FLOW GEN-EDITION CONTRACT
     if (jsonContent.contractName == "FlowGenEdition") {
-        contractAddress = await flowCollectioneDeploy()
+        contractAddress = await flowGenEditionDeploy()
     }
 
-    const chainId = hre.network.config.networkId
-    console.log(hre.network.config.networkId)
-    // console.log(hre.network.name)
+    console.log(`The chainId is ${network.config.networkId}`)
+    //console.log(network)
+    const chainId = network.config.networkId
     const data = { chainId, contractAddress, Verified }
     const jsonString = JSON.stringify(data)
     // Log the JSON string
