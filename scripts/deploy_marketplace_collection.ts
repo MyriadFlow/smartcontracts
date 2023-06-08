@@ -18,10 +18,10 @@ async function main() {
     // We get the contract to deploy
 
     /// FLOW ACCESSCONTROL
-     const FlowAccessControlFactory = await hre.ethers.getContractFactory("FlowAccessControl");
-  const FlowAccessControl = await FlowAccessControlFactory.deploy();
-  await FlowAccessControl.deployed()
-  console.log(
+    const FlowAccessControlFactory = await hre.ethers.getContractFactory("FlowAccessControl");
+    const FlowAccessControl = await FlowAccessControlFactory.deploy();
+    await FlowAccessControl.deployed()
+    console.log(
     `FlowAccessControl Deployed  to : ${FlowAccessControl.address}`
   );
   
