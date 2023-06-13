@@ -2,16 +2,13 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
-
-///Storefront -> ADMIN,CREATOR AND OPERATOR
-
 /**
  * @dev This Contract Module helps to deploy the
  * base Roles for the other flow contracts .
  * Every other Flow contract will retrieve the roles of the
  * ADMIN, OPERATOR, CREATOR, etc. from this.
  */
-contract FlowAccessControl is AccessControlEnumerable {
+contract AccessMaster is AccessControlEnumerable {
     bytes32 public constant FLOW_ADMIN_ROLE = keccak256("FLOW_ADMIN_ROLE");
     bytes32 public constant FLOW_OPERATOR_ROLE =
         keccak256("FLOW_OPERATOR_ROLE");

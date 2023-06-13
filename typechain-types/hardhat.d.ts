@@ -101,17 +101,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC165__factory>;
     getContractFactory(
-      name: "FlowAccessControl",
+      name: "AccessMaster",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.FlowAccessControl__factory>;
+    ): Promise<Contracts.AccessMaster__factory>;
     getContractFactory(
-      name: "IFlowAccessControl",
+      name: "IACCESSMASTER",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IFlowAccessControl__factory>;
-    getContractFactory(
-      name: "FlowCollection",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.FlowCollection__factory>;
+    ): Promise<Contracts.IACCESSMASTER__factory>;
     getContractFactory(
       name: "IERC4907",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -153,21 +149,25 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721A__factory>;
     getContractFactory(
-      name: "FlowEdition",
+      name: "FusionSeries",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.FlowEdition__factory>;
+    ): Promise<Contracts.FusionSeries__factory>;
     getContractFactory(
-      name: "FlowGenEdition",
+      name: "InstaGen",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.FlowGenEdition__factory>;
-    getContractFactory(
-      name: "FlowMarketplace",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.FlowMarketplace__factory>;
+    ): Promise<Contracts.InstaGen__factory>;
     getContractFactory(
       name: "MyriadFlowOfferStation",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.MyriadFlowOfferStation__factory>;
+    getContractFactory(
+      name: "SignatureSeries",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SignatureSeries__factory>;
+    getContractFactory(
+      name: "TradeHub",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TradeHub__factory>;
 
     getContractAt(
       name: "AccessControl",
@@ -280,20 +280,15 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC165>;
     getContractAt(
-      name: "FlowAccessControl",
+      name: "AccessMaster",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.FlowAccessControl>;
+    ): Promise<Contracts.AccessMaster>;
     getContractAt(
-      name: "IFlowAccessControl",
+      name: "IACCESSMASTER",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IFlowAccessControl>;
-    getContractAt(
-      name: "FlowCollection",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.FlowCollection>;
+    ): Promise<Contracts.IACCESSMASTER>;
     getContractAt(
       name: "IERC4907",
       address: string,
@@ -345,25 +340,30 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721A>;
     getContractAt(
-      name: "FlowEdition",
+      name: "FusionSeries",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.FlowEdition>;
+    ): Promise<Contracts.FusionSeries>;
     getContractAt(
-      name: "FlowGenEdition",
+      name: "InstaGen",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.FlowGenEdition>;
-    getContractAt(
-      name: "FlowMarketplace",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.FlowMarketplace>;
+    ): Promise<Contracts.InstaGen>;
     getContractAt(
       name: "MyriadFlowOfferStation",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.MyriadFlowOfferStation>;
+    getContractAt(
+      name: "SignatureSeries",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SignatureSeries>;
+    getContractAt(
+      name: "TradeHub",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TradeHub>;
 
     // default types
     getContractFactory(

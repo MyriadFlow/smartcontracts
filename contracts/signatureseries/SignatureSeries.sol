@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "../common/ERC4907/IERC4907.sol";
-import "../accesscontrol/interfaces/IFlowAccessControl.sol";
+import "../accessmaster/interfaces/IAccessMaster.sol";
 
 /**
  * @dev {ERC721} token, including:
@@ -23,7 +23,7 @@ import "../accesscontrol/interfaces/IFlowAccessControl.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
+contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
@@ -43,12 +43,12 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    IFlowAccessControl flowRoles;
+    IACCESSMASTER flowRoles;
 
     modifier onlyOperator() {
         require(
             flowRoles.isOperator(_msgSender()),
-            "FlowEdition: User is not authorized "
+            "SignatureSeries: User is not authorized "
         );
         _;
     }
@@ -56,7 +56,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     modifier onlyCreator() {
         require(
             flowRoles.isCreator(_msgSender()),
-            "FlowEdition: User is not authorized"
+            "SignatureSeries: User is not authorized"
         );
         _;
     }
@@ -97,7 +97,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
         address marketplaceAddress,
         address flowContract
     ) ERC721(name, symbol) {
-        flowRoles = IFlowAccessControl(flowContract);
+        flowRoles = IACCESSMASTER(flowContract);
         marketplace = marketplaceAddress;
     }
 
@@ -126,7 +126,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
         // Set royalty Info
         require(
             royaltyPercentBasisPoint <= 1000,
-            "FlowCollection: Royalty can't be more than 10%"
+            "SignatureSeries: Royalty can't be more than 10%"
         );
         _setTokenRoyalty(
             currentTokenID,
@@ -167,7 +167,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
         // Set royalty Info
         require(
             royaltyPercentBasisPoint <= 1000,
-            "FlowCollection: Royalty can't be more than 10%"
+            "SignatureSeries: Royalty can't be more than 10%"
         );
         _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
 
@@ -184,7 +184,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function tokenURI(
         uint256 tokenId
     ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "FlowCollection: Non-Existent Asset");
+        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
         string memory _tokenURI = _tokenURIs[tokenId];
 
         return _tokenURI;
@@ -193,7 +193,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function destroyAsset(uint256 tokenId) public {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "FlowCollection: Caller is not token owner or approved"
+            "SignatureSeries: Caller is not token owner or approved"
         );
         _burn(tokenId);
         emit AssetDestroyed(tokenId, _msgSender());
@@ -209,7 +209,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     ) public {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "FlowEdition: Caller is not token owner or approved"
+            "SignatureSeries: Caller is not token owner or approved"
         );
         rentables[tokenId].isRentable = isRentable;
         rentables[tokenId].hourlyRate = pricePerHour;
@@ -226,11 +226,11 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function setUser(uint256 tokenId, address user, uint64 expires) public {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
-            "FlowEdition: Not token owner Or approved"
+            "SignatureSeries: Not token owner Or approved"
         );
         require(
             userOf(tokenId) == address(0),
-            "FlowEdition: item is already subscribed"
+            "SignatureSeries: item is already subscribed"
         );
         RentableItems storage info = rentables[tokenId];
         info.user = user;
@@ -246,24 +246,24 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
         require(
             rentables[_tokenId].isRentable,
-            "FlowEdition: Not available for rent"
+            "SignatureSeries: Not available for rent"
         );
         require(
             userOf(_tokenId) == address(0),
-            "FlowEdition: NFT Already Subscribed"
+            "SignatureSeries: NFT Already Subscribed"
         );
         require(
             _timeInHours > 0,
-            "FlowEdition: Time can't be less than 1 hour"
+            "SignatureSeries: Time can't be less than 1 hour"
         );
         require(
             _timeInHours <= 4320,
-            "FlowEdition: Time can't be more than 6 months"
+            "SignatureSeries: Time can't be more than 6 months"
         );
 
         uint256 amount = amountRequired(_tokenId, _timeInHours);
 
-        require(msg.value >= amount, "FlowEdition: Insufficient Funds");
+        require(msg.value >= amount, "SignatureSeries: Insufficient Funds");
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();
@@ -307,7 +307,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
         uint256 tokenId,
         string memory _tokenURI
     ) internal virtual {
-        require(_exists(tokenId), "FlowCollection: Non-Existent Asset");
+        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
         _tokenURIs[tokenId] = _tokenURI;
     }
 
@@ -316,7 +316,7 @@ contract FlowEdition is Context, ERC721Enumerable, ERC2981, IERC4907 {
         (bool callSuccess, ) = payable(_msgSender()).call{
             value: address(this).balance
         }("");
-        require(callSuccess, "FlowEdition: Withdrawal failed");
+        require(callSuccess, "SignatureSeries: Withdrawal failed");
     }
 
     function _beforeTokenTransfer(

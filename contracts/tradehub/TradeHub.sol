@@ -9,12 +9,12 @@ import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../accesscontrol/interfaces/IFlowAccessControl.sol";
+import "../accessmaster/interfaces/IAccessMaster.sol";
 
 error ItemExist();
 
 // create a function
-contract FlowMarketplace is
+contract TradeHub is
     Context,
     ReentrancyGuard,
     ERC721Holder,
@@ -60,7 +60,7 @@ contract FlowMarketplace is
 
     mapping(address => mapping(uint256 => uint256)) private _marketItem;
 
-    IFlowAccessControl flowRoles;
+    IACCESSMASTER flowRoles;
 
     event SaleStarted(
         uint256 indexed itemId,
@@ -117,35 +117,35 @@ contract FlowMarketplace is
     modifier onlyWhenItemIsForSale(uint256 itemId) {
         require(
             idToMarketItem[itemId].status == ItemStatus.SALE,
-            "FlowMarketplace: Market item is not for sale"
+            "TradeHub: Market item is not for sale"
         );
         _;
     }
     modifier onlyWhenItemIsForAuction(uint256 itemId) {
         require(
             idToMarketItem[itemId].status == ItemStatus.AUCTION,
-            "FlowMarketplace: The auction has not started yet"
+            "TradeHub: The auction has not started yet"
         );
         _;
     }
     modifier onlySeller(uint256 itemId) {
         require(
             idToMarketItem[itemId].seller == _msgSender(),
-            "FlowMarketplace: Sender is not seller of this item"
+            "TradeHub: Sender is not seller of this item"
         );
         _;
     }
     modifier onlyWhenNoBidder(uint256 itemId) {
         require(
             idToMarketItem[itemId].highestBidder == address(0),
-            "FlowMarketplace : Auction is still running"
+            "TradeHub : Auction is still running"
         );
         _;
     }
     modifier onlyWhenItemIsEligible(address nftContract) {
         require(
             checkERC1155(nftContract) || checkERC721(nftContract),
-            "FlowMarketplace: Contract is not eligible for listing"
+            "TradeHub: Contract is not eligible for listing"
         );
         _;
     }
@@ -153,7 +153,7 @@ contract FlowMarketplace is
     modifier onlyAdmin() {
         require(
             flowRoles.isAdmin(_msgSender()),
-            "FlowMarketplace: User is not authorized"
+            "TradeHub: User is not authorized"
         );
         _;
     }
@@ -163,7 +163,7 @@ contract FlowMarketplace is
         string memory _name,
         address flowContract
     ) {
-        flowRoles = IFlowAccessControl(flowContract);
+        flowRoles = IACCESSMASTER(flowContract);
         platformFeeBasisPoint = _platformFee;
         marketplacePayoutAddress = _msgSender();
         name = _name;
@@ -307,7 +307,7 @@ contract FlowMarketplace is
         bool forAuction,
         uint256 time
     ) external onlyWhenItemIsEligible(nftContract) returns (uint256 itemId) {
-        require(price > 0, "FlowMarketplace: Price must be at least 1 wei");
+        require(price > 0, "TradeHub: Price must be at least 1 wei");
 
         if (checkERC721(nftContract)) {
             quantity = 1;
@@ -316,7 +316,7 @@ contract FlowMarketplace is
         if (forAuction == true) {
             require(
                 time >= 60,
-                "FlowMarketplace: Time cannot be less than 1 min"
+                "TradeHub: Time cannot be less than 1 min"
             );
         }
         itemId = _getItemId(nftContract, tokenId);
@@ -328,7 +328,7 @@ contract FlowMarketplace is
             require(
                 IERC1155(nftContract).balanceOf(_msgSender(), tokenId) >=
                     quantity,
-                "FlowMarketplace: Insufficient qunatity for listing!"
+                "TradeHub: Insufficient qunatity for listing!"
             );
             _transferItem(
                 nftContract,
@@ -341,7 +341,7 @@ contract FlowMarketplace is
             // {ERC721} token listing
             require(
                 IERC721(nftContract).ownerOf(tokenId) == _msgSender(),
-                "FlowMarketplace: Sender does not own the item"
+                "TradeHub: Sender does not own the item"
             );
             _transferItem(nftContract, _msgSender(), address(this), tokenId, 1);
         }
@@ -458,11 +458,11 @@ contract FlowMarketplace is
         MarketItem memory _item = idToMarketItem[itemId];
         require(
             quantity <= _item.supply,
-            "FlowMarketplace: greater quantity than available"
+            "TradeHub: greater quantity than available"
         );
         require(
             msg.value == _item.price * quantity,
-            "FlowMarketplace: Pay Market Price to buy the NFT"
+            "TradeHub: Pay Market Price to buy the NFT"
         );
         string memory metadataURI = _getMetaDataURI(
             _item.nftContract,
@@ -502,7 +502,7 @@ contract FlowMarketplace is
         address nftContract = idToMarketItem[itemId].nftContract;
         require(
             time >= 60,
-            "FlowMarketplace: Timer cannot be less than One Minute"
+            "TradeHub: Timer cannot be less than One Minute"
         );
 
         uint256 price = idToMarketItem[itemId].highestBid;
@@ -536,11 +536,11 @@ contract FlowMarketplace is
     ) external payable onlyWhenItemIsForAuction(itemId) {
         require(
             block.timestamp < idToMarketItem[itemId].auctioneEndTime,
-            "FlowMarketplace: Time limit has been reached"
+            "TradeHub: Time limit has been reached"
         );
         require(
             msg.value > idToMarketItem[itemId].highestBid,
-            "FlowMarketplace: value less than the highest Bid"
+            "TradeHub: value less than the highest Bid"
         );
 
         address lastHighestBidder = idToMarketItem[itemId].highestBidder;
@@ -615,7 +615,7 @@ contract FlowMarketplace is
     ) public onlyWhenItemIsForAuction(itemId) {
         require(
             idToMarketItem[itemId].auctioneEndTime <= block.timestamp,
-            "FlowMarketplace: Auction is still running"
+            "TradeHub: Auction is still running"
         );
         _endAuction(itemId);
     }
