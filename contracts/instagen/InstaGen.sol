@@ -3,10 +3,10 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../common/ERC721A/extensions/ERC721ABurnable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../accesscontrol/interfaces/IFlowAccessControl.sol";
 import "../common/ERC4907/IERC4907.sol";
+import "../accessmaster/interfaces/IAccessMaster.sol";
 
-contract FlowGenEdition is
+contract InstaGen is
     IERC4907,
     Context,
     ERC2981,
@@ -39,12 +39,12 @@ contract FlowGenEdition is
     mapping(uint256 => RentableItems) public rentables;
 
     // INTERFACES
-    IFlowAccessControl flowRoles;
+    IACCESSMASTER flowRoles;
 
     modifier onlyAdmin() {
         require(
             flowRoles.isAdmin(_msgSender()),
-            "MyriadFlowOfferStation: User is not authorized"
+            "InstaGen: User is not authorized"
         );
         _;
     }
@@ -75,7 +75,7 @@ contract FlowGenEdition is
         uint256 _royaltyBPS,
         string memory _baseUri
     ) ERC721A(name, symbol) {
-        flowRoles = IFlowAccessControl(accessControlAddress);
+        flowRoles = IACCESSMASTER(accessControlAddress);
         marketplace = marketplaceAddress;
         salePrice = _salePrice;
         preSalePrice = _preSalePrice;
@@ -91,17 +91,17 @@ contract FlowGenEdition is
     ) external payable returns (uint256, uint256) {
         require(
             totalSupply() + quantity <= maxSupply,
-            "FlowGenEdition: exceeding max token supply!"
+            "InstaGen: exceeding max token supply!"
         );
         if (countDownTime > block.timestamp) {
             require(
                 msg.value >= quantity * preSalePrice,
-                "FlowGenEdition: Not enough funds!"
+                "InstaGen: Not enough funds!"
             );
         } else {
             require(
                 msg.value >= quantity * salePrice,
-                "FlowGenEdition: Not enough funds!"
+                "InstaGen: Not enough funds!"
             );
         }
         _safeMint(_msgSender(), quantity);
@@ -115,7 +115,7 @@ contract FlowGenEdition is
         require(
             ownerOf(tokenId) == _msgSender() ||
                 isApprovedForAll(owner, _msgSender()),
-            "FlowGenEdition: Not Owner Or Approved"
+            "InstaGen: Not Owner Or Approved"
         );
         _burn(tokenId, true);
         _resetTokenRoyalty(tokenId);
@@ -127,7 +127,7 @@ contract FlowGenEdition is
         (bool callSuccess, ) = payable(_msgSender()).call{
             value: address(this).balance
         }("");
-        require(callSuccess, "FlowGenEdition: Withdrawal failed");
+        require(callSuccess, "InstaGen: Withdrawal failed");
     }
 
     /********************* ERC4907 *********************************/
@@ -140,7 +140,7 @@ contract FlowGenEdition is
         address owner = ownerOf(tokenId);
         require(
             owner == _msgSender() || isApprovedForAll(owner, _msgSender()),
-            "FlowGenEdition: Caller is not token owner "
+            "InstaGen: Caller is not token owner "
         );
         rentables[tokenId].isRentable = isRentable;
         rentables[tokenId].hourlyRate = pricePerHour;
@@ -163,11 +163,11 @@ contract FlowGenEdition is
         address owner = ownerOf(tokenId);
         require(
             owner == _msgSender() || isApprovedForAll(owner, _msgSender()),
-            "FlowGenEdition: Caller is not token owner "
+            "InstaGen: Caller is not token owner "
         );
         require(
             userOf(tokenId) == address(0),
-            "FlowGenEdition: Item is already subscribed"
+            "InstaGen: Item is already subscribed"
         );
         RentableItems storage info = rentables[tokenId];
         info.user = user;
@@ -183,24 +183,24 @@ contract FlowGenEdition is
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
         require(
             rentables[_tokenId].isRentable,
-            "FlowGenEdition: Not available for rent"
+            "InstaGen: Not available for rent"
         );
         require(
             userOf(_tokenId) == address(0),
-            "FlowGenEdition: NFT Already Subscribed"
+            "InstaGen: NFT Already Subscribed"
         );
         require(
             _timeInHours > 0,
-            "FlowGenEdition: Time can't be less than 1 hour"
+            "InstaGen: Time can't be less than 1 hour"
         );
         require(
             _timeInHours <= 4320,
-            "FlowGenEdition: Time can't be more than 6 months"
+            "InstaGen: Time can't be more than 6 months"
         );
 
         uint256 amount = amountRequired(_tokenId, _timeInHours);
 
-        require(msg.value >= amount, "FlowGenEdition: Insufficient Funds");
+        require(msg.value >= amount, "InstaGen: Insufficient Funds");
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();

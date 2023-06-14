@@ -2,9 +2,9 @@
 pragma solidity 0.8.17;
 
 /**
- * @dev External interface of FlowAccessControl declared to support ERC165 detection.
+ * @dev External interface of AccessMaster declared to support ERC165 detection.
  */
-interface IFlowAccessControl {
+interface IACCESSMASTER {
     /// @dev checks if the address {User} is Admin or not.
     function isAdmin(address user) external view returns (bool);
 

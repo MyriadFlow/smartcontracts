@@ -4,22 +4,22 @@ import fs from "fs"
 async function main() {
     const [_, buyer] = await hre.ethers.getSigners()
     // We get the contract to deploy
-    const marketplaceAddr = "0x0335DD44f170657FEe88D693989C4f01324a9116"
-    const flowAccessControlAddr ="0xbc9cD4bD303af002C0D65EDc5D6F5738be89B7D5"
+    const tradehubAddr = "0x0335DD44f170657FEe88D693989C4f01324a9116"
+    const accessMasterAddr ="0xbc9cD4bD303af002C0D65EDc5D6F5738be89B7D5"
     // FLOW EDITION CONTRACT
-    const FlowEdition = await hre.ethers.getContractFactory("FlowEdition");
-    const flowEdition = await FlowEdition.deploy("FlowEdition V1", "FEv4", marketplaceAddr,flowAccessControlAddr);
-    await flowEdition.deployed();
-    console.log("FlowEdition Deployed to:", flowEdition.address);
+    const SignatureSeries = await hre.ethers.getContractFactory("SignatureSeries");
+    const signatureSeries = await SignatureSeries.deploy("SignatureSeries V1", "FEv4", tradehubAddr,accessMasterAddr);
+    await signatureSeries.deployed();
+    console.log("SignatureSeries Deployed to:", signatureSeries.address);
 
     if (hre.network.name == "hardhat") {
-        await flowEdition.createAsset("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF", 500)
-        //updateGraphAddress(flowEdition.address, flowEdition.deployTransaction.blockNumber, true)
+        await signatureSeries.createAsset("https://ipfs.infura.io/ipfs/QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF", 500)
+        //updateGraphAddress(signatureSeries.address, signatureSeries.deployTransaction.blockNumber, true)
     } else {
         //FlowCollection
-        await flowEdition.deployTransaction.wait(6);
-        await verify(flowEdition.address, ["FlowEdition V1", "FEv1", marketplaceAddr, flowAccessControlAddr]);
-        //updateGraphAddress(flowEdition.address,  flowEdition.deployTransaction.blockNumber, false)
+        await signatureSeries.deployTransaction.wait(6);
+        await verify(signatureSeries.address, ["SignatureSeries V1", "FEv1", tradehubAddr, accessMasterAddr]);
+        //updateGraphAddress(signatureSeries.address,  signatureSeries.deployTransaction.blockNumber, false)
     }
 }
 
@@ -39,11 +39,11 @@ const verify = async (contractAddress: string, args: any[]) => {
   }
 };
 
-function updateGraphAddress(flowEditonAddr: string, startBlock: number | undefined ,local: boolean) {
+function updateGraphAddress(signatureSeriesAddr: string, startBlock: number | undefined ,local: boolean) {
     const urlEditionSubgraphLocal = local ? `subgraph/nftEdition/subgraph.local.yaml` : `subgraph/nftEdition/subgraph.yaml`
     const umlEditionSubgraphLocal = yaml.load(fs.readFileSync(urlEditionSubgraphLocal, 'utf8')) as any
 
-    umlEditionSubgraphLocal.dataSources[0].source.address = flowEditonAddr
+    umlEditionSubgraphLocal.dataSources[0].source.address = signatureSeriesAddr
     if (startBlock){
         umlEditionSubgraphLocal.dataSources[0].source.startBlock = startBlock
     }

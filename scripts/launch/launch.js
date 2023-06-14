@@ -1,58 +1,53 @@
-/// Deploy.json would be different for every contract
-/// INPUt :  Contract Name , Constructor Params
-/// OUTPUT -ChainId: .Address{Contract Address} : 0X0ERT  ,Verified : true or false
-
 const fs = require("fs")
 const { ethers, run, network } = require("hardhat")
 
-const scripts = `scripts/deploy/deploy.json`
+const scripts = `scripts/launch/launch.json`
 const data = fs.readFileSync(scripts, "utf8")
 const jsonContent = JSON.parse(data)
-// console.log(jsonContent)
 
 let contractAddress
 let Verified = false
 
-async function flowAccessControlDeploy() {
-    const FlowAccessControlFactory = await hre.ethers.getContractFactory(
-        "FlowAccessControl"
+async function AccessMasterDeploy() {
+    const AccessMasterFactory = await hre.ethers.getContractFactory(
+        "AccessMaster"
     )
-    const FlowAccessControl = await FlowAccessControlFactory.deploy()
-    await FlowAccessControl.deployed()
-    console.log(`FlowAccessControl Deployed  to : ${FlowAccessControl.address}`)
-    let Addr = FlowAccessControl.address
+    const AccessMaster = await AccessMasterFactory.deploy()
+    await AccessMaster.deployed()
+    console.log(`AccessMaster Deployed  to : ${AccessMaster.address}`)
+    let Addr = AccessMaster.address
 
     ///VERIFY
     if (hre.network.name != "hardhat") {
-        await FlowAccessControl.deployTransaction.wait(6)
-        await verify(FlowAccessControl.address, [])
+        await AccessMaster.deployTransaction.wait(6)
+        await verify(AccessMaster.address, [])
     }
     return Addr
 }
 
-async function flowMarketPlaceDeploy() {
+async function TradeHubDeploy() {
     const constructorParam = jsonContent.constructorParams
 
-    const Marketplace = await hre.ethers.getContractFactory("FlowMarketplace")
-    const marketplace = await Marketplace.deploy(
+    const TradeHub = await hre.ethers.getContractFactory("TradeHub")
+    const tradehub = await TradeHub.deploy(
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3
     )
 
-    await marketplace.deployed()
-    console.log("FlowMarketplace Deployed to: ", marketplace.address)
+    await tradehub.deployed()
+    console.log("TradeHub Deployed to: ", tradehub.address)
 
-    const Addr = marketplace.address
+    const Addr = tradehub.address
 
-    const txHash = marketplace.deployTransaction.hash
+    const txHash = tradehub.deployTransaction.hash
     console.log(`Tx hash: ${txHash}\nWaiting for transaction to be mined...`)
     const txReceipt = await hre.ethers.provider.waitForTransaction(txHash)
-    console.log("Confirming Marketplace Address:", txReceipt.contractAddress)
+    console.log("Confirming TradeHub Address:", txReceipt.contractAddress)
 
     /// VERIFY
     if (hre.network.name != "hardhat") {
-        await marketplace.deployTransaction.wait(6)
+        await tradehub.deployTransaction.wait(6)
         await verify(Addr, [
             constructorParam.param1,
             constructorParam.param2,
@@ -62,20 +57,20 @@ async function flowMarketPlaceDeploy() {
     return Addr
 }
 
-async function flowCollectionDeploy() {
+async function fusionSeriesDeploy() {
     const constructorParam = jsonContent.constructorParams
-    const FlowCollection = await hre.ethers.getContractFactory("FlowCollection")
-    const flowCollection = await FlowCollection.deploy(
+    const FusionSeries = await hre.ethers.getContractFactory("FusionSeries")
+    const fusionseries = await FusionSeries.deploy(
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3
     )
-    await flowCollection.deployed()
-    console.log("FlowCollection Deployed to:", flowCollection.address)
-    const Addr = flowCollection.address
+    await fusionseries.deployed()
+    console.log("FusionSeries Deployed to:", fusionseries.address)
+    const Addr = fusionseries.address
     /// VERIFY
     if (hre.network.name != "hardhat") {
-        await flowCollection.deployTransaction.wait(6)
+        await fusionseries.deployTransaction.wait(6)
         await verify(Addr, [
             constructorParam.param1,
             constructorParam.param2,
@@ -86,21 +81,23 @@ async function flowCollectionDeploy() {
     return Addr
 }
 
-async function flowEditionDeploy() {
+async function signatureSeriesDeploy() {
     const constructorParam = jsonContent.constructorParams
-    const FlowEdition = await hre.ethers.getContractFactory("FlowEdition")
-    const flowEdition = await FlowEdition.deploy(
+    const SignatureSeries = await hre.ethers.getContractFactory(
+        "SignatureSeries"
+    )
+    const signatureSeries = await SignatureSeries.deploy(
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3,
         constructorParam.param4
     )
-    await flowEdition.deployed()
-    console.log("FlowEdition Deployed to:", flowEdition.address)
-    const Addr = flowEdition.address
+    await signatureSeries.deployed()
+    console.log("SignatureSeries Deployed to:", signatureSeries.address)
+    const Addr = signatureSeries.address
     /// VERIFY
     if (hre.network.name != "hardhat") {
-        await flowEdition.deployTransaction.wait(6)
+        await signatureSeries.deployTransaction.wait(6)
         await verify(Addr, [
             constructorParam.param1,
             constructorParam.param2,
@@ -112,10 +109,10 @@ async function flowEditionDeploy() {
     return Addr
 }
 
-async function flowGenEditionDeploy() {
+async function instaGenDeploy() {
     const constructorParam = jsonContent.constructorParams
-    const FlowGenEdition = await hre.ethers.getContractFactory("FlowGenEdition")
-    const flowGenEdition = await FlowGenEdition.deploy(
+    const InstaGen = await hre.ethers.getContractFactory("InstaGen")
+    const instaGen = await InstaGen.deploy(
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3,
@@ -127,12 +124,12 @@ async function flowGenEditionDeploy() {
         constructorParam.param9,
         constructorParam.param10
     )
-    await flowGenEdition.deployed()
-    console.log("FlowGenEdition Deployed to:", flowGenEdition.address)
-    const Addr = flowGenEdition.address
+    await instaGen.deployed()
+    console.log("InstaGen Deployed to:", instaGen.address)
+    const Addr = instaGen.address
     /// VERIFY
     if (hre.network.name != "hardhat") {
-        await flowGenEdition.deployTransaction.wait(6)
+        await instaGen.deployTransaction.wait(6)
         await verify(Addr, [
             constructorParam.param1,
             constructorParam.param2,
@@ -151,32 +148,37 @@ async function flowGenEditionDeploy() {
 }
 
 async function main() {
-    //FlowAccessControl
-    if (jsonContent.contractName == "FlowAccessControl") {
-        contractAddress = await flowAccessControlDeploy()
+    //AccessMaster
+    if (jsonContent.contractName == "AccessMaster") {
+        contractAddress = await AccessMasterDeploy()
     }
     /// FLOW MARKETPLACE
-    if (jsonContent.contractName == "FlowMarketplace") {
-        contractAddress = await flowMarketPlaceDeploy()
+    if (jsonContent.contractName == "TradeHub") {
+        contractAddress = await TradeHubDeploy()
     }
     // FLOW COLLECTION CONTRACT
-    if (jsonContent.contractName == "FlowCollection") {
-        contractAddress = await flowCollectionDeploy()
+    if (jsonContent.contractName == "FusionSeries") {
+        contractAddress = await fusionSeriesDeploy()
     }
 
     // FLOW EDITION CONTRACT
-    if (jsonContent.contractName == "FlowEdition") {
-        contractAddress = await flowEditionDeploy()
+    if (jsonContent.contractName == "SignatureSeries") {
+        contractAddress = await signatureSeriesDeploy()
     }
 
     // FLOW GEN-EDITION CONTRACT
-    if (jsonContent.contractName == "FlowGenEdition") {
-        contractAddress = await flowGenEditionDeploy()
+    if (jsonContent.contractName == "InstaGen") {
+        contractAddress = await instaGenDeploy()
     }
+    let chainId
 
-    console.log(`The chainId is ${network.config.networkId}`)
-    //console.log(network)
-    const chainId = network.config.networkId
+    if (network.config.chainId != undefined) {
+        chainId = network.config.chainId
+    } else {
+        chainId = network.config.networkId
+    }
+    
+    console.log(`The chainId is ${chainId}`)
     const data = { chainId, contractAddress, Verified }
     const jsonString = JSON.stringify(data)
     // Log the JSON string

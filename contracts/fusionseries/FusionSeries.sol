@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
-import "../accesscontrol/interfaces/IFlowAccessControl.sol";
+import "../accessmaster/interfaces/IAccessMaster.sol";
 
 /**
  * @dev {ERC1155} token, including:
@@ -23,7 +23,7 @@ import "../accesscontrol/interfaces/IFlowAccessControl.sol";
 
 // collection URI override
 
-contract FlowCollection is Context, ERC1155Supply {
+contract FusionSeries is Context, ERC1155Supply {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIdTracker;
@@ -33,12 +33,12 @@ contract FlowCollection is Context, ERC1155Supply {
 
     address public marketplace;
 
-    IFlowAccessControl flowRoles;
+    IACCESSMASTER flowRoles;
 
     modifier onlyOperator() {
         require(
             flowRoles.isOperator(_msgSender()),
-            "FlowCollection: Unauthorized!"
+            "FusionSeries: Unauthorized!"
         );
         _;
     }
@@ -46,7 +46,7 @@ contract FlowCollection is Context, ERC1155Supply {
     modifier onlyCreator() {
         require(
             flowRoles.isCreator(_msgSender()),
-            "FlowCollection: Unauthorized!"
+            "FusionSeries: Unauthorized!"
         );
         _;
     }
@@ -70,7 +70,7 @@ contract FlowCollection is Context, ERC1155Supply {
         address flowContract
     ) ERC1155(baseURI) {
         marketplace = marketplaceAddress;
-        flowRoles = IFlowAccessControl(flowContract);
+        flowRoles = IACCESSMASTER(flowContract);
     }
 
     /**
@@ -131,7 +131,7 @@ contract FlowCollection is Context, ERC1155Supply {
     function destroyAsset(uint256 tokenId, uint256 amount) public {
         require(
             balanceOf(_msgSender(), tokenId) == amount,
-            "FlowCollection: Caller is not token owner or approved"
+            "FusionSeries: Caller is not token owner or approved"
         );
         _burn(_msgSender(), tokenId, amount);
         emit AssetDestroyed(tokenId, _msgSender());
