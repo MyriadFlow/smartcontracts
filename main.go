@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -74,7 +73,7 @@ func main() {
 
 		filePath := "scripts/launch/launch.json"
 
-		_, err := ioutil.ReadFile(filePath)
+		_, err := os.ReadFile(filePath)
 		if err != nil {
 			fmt.Println("Failed to read file:", err)
 			return
@@ -82,7 +81,7 @@ func main() {
 
 		newContent := m[contract]
 
-		err = ioutil.WriteFile(filePath, []byte(newContent), 0644)
+		err = os.WriteFile(filePath, []byte(newContent), 0644)
 		if err != nil {
 			fmt.Println("Failed to write to file:", err)
 			return
