@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
 	"os/exec"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 
@@ -37,8 +39,6 @@ func main() {
 			return
 		}
 
-		fmt.Println("File content has been updated.")
-
 		err = os.Chdir(".")
 		if err != nil {
 			fmt.Println("Failed to change directory:", err)
@@ -46,10 +46,7 @@ func main() {
 		}
 
 		// Execute the yarn launch command
-		cmd := exec.Command("yarn", "launch")
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-		err = cmd.Run()
+		out, err := exec.Command("yarn", "launch").Output()
 		if err != nil {
 			log.WithFields(log.Fields{
 				"err": "Failed to execute command",
@@ -57,7 +54,20 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"data": "Failed to execute command", "error": err})
 			return
 		}
-		c.JSON(http.StatusOK, gin.H{"data": `contract is deployed successfully`})
+		type res struct {
+			ContractName    string `json:"contractName"`
+			ChainID         int    `json:"chainId"`
+			ContractAddress string `json:"contractAddress"`
+			Verified        bool   `json:"verified"`
+		}
+
+		response := new(res)
+		arr := strings.Split(string(out), "\n")
+		contractName := strings.Split(arr[3], " ")[0]
+		response.ContractName = contractName
+		_ = json.Unmarshal([]byte(arr[5]), response)
+
+		c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractName": response.ContractName, "contractAddress": response.ContractAddress, "verified": response.Verified})
 	})
 	router.Run(":8080")
 }
