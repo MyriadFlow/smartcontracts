@@ -101,4 +101,4 @@ jobs:
                       podman stop smartcontracts && podman rm smartcontracts && podman image rm smartcontracts
                       echo ${{ secrets.GHCR_TOKEN }} | podman login ghcr.io -u secrets.GHCR_USERNAME --password-stdin
                       podman pull ghcr.io/myriadflow/smartcontracts:main
-                      podman run --name="smartcontracts" --env-file=.env --net=bridge -d ghcr.io/myriadflow/smartcontracts:main
+                      podman run --name="smartcontracts" --env-file=.env --net=bridge -p 8080:8080 -d ghcr.io/myriadflow/smartcontracts:main
