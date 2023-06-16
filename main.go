@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -53,8 +54,20 @@ func main() {
 			c.JSON(http.StatusInternalServerError, gin.H{"data": "Failed to execute command", "error": err})
 			return
 		}
-		ok := strings.Split(string(out), "\n")
-		c.JSON(http.StatusOK, gin.H{"data": ok[3:6]})
+		type res struct {
+			ContractName    string `json:"contractName"`
+			ChainID         int    `json:"chainId"`
+			ContractAddress string `json:"contractAddress"`
+			Verified        bool   `json:"verified"`
+		}
+
+		response := new(res)
+		arr := strings.Split(string(out), "\n")
+		contractName := strings.Split(arr[3], " ")[0]
+		response.ContractName = contractName
+		_ = json.Unmarshal([]byte(arr[5]), response)
+
+		c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractName": response.ContractName, "contractAddress": response.ContractAddress, "verified": response.Verified})
 	})
 	router.Run(":8080")
 }
