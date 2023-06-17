@@ -72,6 +72,10 @@ yarn deploy maticmum
 
 > `StoreFront Deployed to: 0xe5c5FDBde18F94a50C47BC7b7f8dBe484A476B78`
 
+## API documentation
+
+see documentation [here](API.md)
+
 ## Etherscan Verification
 
 To try out Etherscan verification, we need to deploy a contract to an Ethereum network that's supported by Etherscan, such as `Polygon Testnet - maticmum`.
@@ -99,20 +103,18 @@ graph auth --product hosted-service $GRAPH_TOKEN
 graph deploy --product hosted-service myriadflow/marketplacev1
 ```
 
-- MarketplaceV1:
+-   MarketplaceV1:
 
-> `Build completed: QmdPYT6USJwaNQKExAsYggHfLeSoK6wWwYz1YmX5ui6YeM`
-> `Deployed to https://thegraph.com/explorer/subgraph/myriadflow/marketplacev1`
+> `Build completed: QmdPYT6USJwaNQKExAsYggHfLeSoK6wWwYz1YmX5ui6YeM` > `Deployed to https://thegraph.com/explorer/subgraph/myriadflow/marketplacev1`
 
-- StoreFront-V1:
+-   StoreFront-V1:
 
-> `Build completed: QmSbPdM1RxBVouxG9THHdDtWchLZBsNzHZGurEMi4nJyfu`
-> `Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1`
+> `Build completed: QmSbPdM1RxBVouxG9THHdDtWchLZBsNzHZGurEMi4nJyfu` > `Deployed to https://thegraph.com/explorer/subgraph/myriadflow/storefront-v1`
 
-- Subgraph endpoints:
+-   Subgraph endpoints:
 
-Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/marketplacev1
-Queries (HTTP):      https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v1
+Queries (HTTP): https://api.thegraph.com/subgraphs/name/myriadflow/marketplacev1
+Queries (HTTP): https://api.thegraph.com/subgraphs/name/myriadflow/storefront-v1
 
 # Quick Deployment
 

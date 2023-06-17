@@ -65,28 +65,10 @@ jobs:
                   docker push $GITHUB_REF_IMAGE
                   docker push $GITHUB_BRANCH_IMAGE
 
-    dockerhub:
-        name: Deploy to Docker Hub
+    deploy:
+        needs: ghcr
+        name: Deploy to Dev server
         runs-on: ubuntu-latest
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v3
-
-            - name: Login to DockerHub
-              uses: docker/login-action@v1
-              with:
-                  username: ${{ secrets.DOCKERHUB_USERNAME }}
-                  password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-            - name: Build and push
-              id: docker_build
-              uses: docker/build-push-action@v2
-              with:
-                  context: .
-                  file: ./Dockerfile
-                  push: true
-                  tags: lazarusnetwork/smartcontracts:latest
             - name: Deploy on Dev Server
               if: github.ref == 'refs/heads/main'
               uses: appleboy/ssh-action@v0.1.7
