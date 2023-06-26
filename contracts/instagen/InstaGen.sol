@@ -3,16 +3,25 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../common/ERC721A/extensions/ERC721ABurnable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../common/ERC4907/IERC4907.sol";
+import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
-contract InstaGen is
-    IERC4907,
-    Context,
-    ERC2981,
-    ERC721A,
-    ERC721ABurnable
-{
+/**
+ * @dev {ERC721A} token, including:
+ *
+ *  - ability for holders to burn (destroy) their tokens
+ *  - a creator role that allows for token minting (creation)
+ *  - token ID and URI autogeneration
+ *  - ability for holders to give for rent
+ *
+ * This contract uses {AccessControl} to lock permissioned functions using the
+ * different roles - head to its documentation for details.
+ *
+ * The account that deploys the contract will be granted the creator and pauser
+ * roles, as well as the default admin role, which will let it grant both creator
+ * and pauser roles to other accounts.
+ */
+contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
@@ -90,7 +99,7 @@ contract InstaGen is
         uint256 quantity
     ) external payable returns (uint256, uint256) {
         require(
-            totalSupply() + quantity <= maxSupply,
+            _totalMinted() + quantity <= maxSupply,
             "InstaGen: exceeding max token supply!"
         );
         if (countDownTime > block.timestamp) {
@@ -106,10 +115,17 @@ contract InstaGen is
         }
         _safeMint(_msgSender(), quantity);
         setApprovalForAll(marketplace, true);
-        emit AssetCreated(totalSupply(), quantity, _msgSender());
-        return (totalSupply(), quantity);
+        emit AssetCreated(_totalMinted(), quantity, _msgSender());
+        return (_totalMinted(), quantity);
     }
 
+    /**
+     * @notice Burns `tokenId`. See {ERC721-_burn}.
+     *
+     * @dev Requirements:
+     *
+     * - The caller must own `tokenId` or be an approved operator.
+     */
     function burnNFT(uint256 tokenId) external {
         address owner = ownerOf(tokenId);
         require(
@@ -189,10 +205,7 @@ contract InstaGen is
             userOf(_tokenId) == address(0),
             "InstaGen: NFT Already Subscribed"
         );
-        require(
-            _timeInHours > 0,
-            "InstaGen: Time can't be less than 1 hour"
-        );
+        require(_timeInHours > 0, "InstaGen: Time can't be less than 1 hour");
         require(
             _timeInHours <= 4320,
             "InstaGen: Time can't be more than 6 months"
@@ -208,6 +221,8 @@ contract InstaGen is
         emit UpdateUser(_tokenId, _msgSender(), info.expires);
     }
 
+    /** Getter Functions **/
+    
     /// @dev IERC4907 implementation
     function userOf(uint256 tokenId) public view returns (address) {
         if (rentables[tokenId].expires >= block.timestamp) {

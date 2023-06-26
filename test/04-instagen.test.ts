@@ -100,9 +100,31 @@ describe("TradeHub and InstaGen contracts", () => {
         expect(marketItem.seller).to.equal(creator2.address)
         expect(marketItem.status).to.be.equal(1)
         expect(marketItem.nftContract).to.equal(instagen.address)
-
     })
+      it("withdraws ETH from the contract", async () => {
+            // Assert
+            const startingNftBalance = await instagen.provider.getBalance(
+                instagen.address
+            )
+            const startingDeployerBalance = await instagen.provider.getBalance(
+                owner.address
+            )
+            // Act
+            const transactionResponse = await instagen.withdraw()
+            const transactionReceipt = await transactionResponse.wait()
+            const { gasUsed, effectiveGasPrice } = transactionReceipt
+            const gasCost = gasUsed.mul(effectiveGasPrice)
 
-
-
+            const endingNftBalance = await instagen.provider.getBalance(
+                instagen.address
+            )
+            const endingDeployerBalance = await instagen.provider.getBalance(
+                owner.address
+            )
+            expect(endingNftBalance).to.be.equal(0)
+            assert.equal(
+                startingNftBalance.add(startingDeployerBalance).toString(),
+                endingDeployerBalance.add(gasCost).toString()
+            )
+        })
 })

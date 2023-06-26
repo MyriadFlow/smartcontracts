@@ -283,6 +283,33 @@ describe("TradeHub && SignatureSeries Contract", () => {
         expect(signatureseries.connect(creator).rent(5,1,{value : val})).to.be.revertedWith("SignatureSeries: Not available for rent")
 
     })
+    it("withdraws ETH from the contract", async () => {
+            // Assert
+            const startingNftBalance = await signatureseries.provider.getBalance(
+                signatureseries.address
+            )
+            const startingDeployerBalance = await signatureseries.provider.getBalance(
+                owner.address
+            )
+            // Act
+            const transactionResponse = await signatureseries.withdraw()
+            const transactionReceipt = await transactionResponse.wait()
+            const { gasUsed, effectiveGasPrice } = transactionReceipt
+            const gasCost = gasUsed.mul(effectiveGasPrice)
+
+            const endingNftBalance = await signatureseries.provider.getBalance(
+                signatureseries.address
+            )
+            const endingDeployerBalance = await signatureseries.provider.getBalance(
+                owner.address
+            )
+            expect(endingNftBalance).to.be.equal(0)
+            assert.equal(
+                startingNftBalance.add(startingDeployerBalance).toString(),
+                endingDeployerBalance.add(gasCost).toString()
+            )
+        })
+
 
 })
 
