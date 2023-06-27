@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -78,11 +79,22 @@ type res struct {
 
 func main() {
 	router := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+
+	router.Use(cors.New(config))
 	router.POST("/FlowAccessControl", DeployFlowAccessControl)
 	router.POST("/TradeHub", DeployTradeHub)
 	router.POST("/FusionSeries", DeployFusionSeries)
 	router.POST("/SignatureSeries", DeploySignatureSeries)
-	router.POST("InstaGen", DeployInstaGen)
+	router.POST("/InstaGen", DeployInstaGen)
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "api is up",
+		})
+	})
+
+	router.Use(cors.New(config))
 	router.Run(":8080")
 }
 
@@ -104,7 +116,7 @@ func DeployTradeHub(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeployFlowAccessControl(c *gin.Context) {
 	var req FlowAccessControl
@@ -123,7 +135,7 @@ func DeployFlowAccessControl(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeployFusionSeries(c *gin.Context) {
 	var req FusionSeries
@@ -142,7 +154,7 @@ func DeployFusionSeries(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeploySignatureSeries(c *gin.Context) {
 	var req SignatureSeries
@@ -161,7 +173,7 @@ func DeploySignatureSeries(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeployInstaGen(c *gin.Context) {
 	var req InstaGen
@@ -180,7 +192,7 @@ func DeployInstaGen(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 
 func genResponse(jsonByte []byte, network string) (*res, error) {
