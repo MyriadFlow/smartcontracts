@@ -104,7 +104,7 @@ func DeployTradeHub(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeployFlowAccessControl(c *gin.Context) {
 	var req FlowAccessControl
@@ -123,7 +123,7 @@ func DeployFlowAccessControl(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeployFusionSeries(c *gin.Context) {
 	var req FusionSeries
@@ -142,7 +142,7 @@ func DeployFusionSeries(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeploySignatureSeries(c *gin.Context) {
 	var req SignatureSeries
@@ -161,7 +161,7 @@ func DeploySignatureSeries(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 func DeployInstaGen(c *gin.Context) {
 	var req InstaGen
@@ -180,7 +180,7 @@ func DeployInstaGen(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 
-	c.JSON(http.StatusOK, gin.H{"chainId": response.ChainID, "contractAddress": response.ContractAddress, "verified": response.Verified})
+	c.JSON(http.StatusOK, response)
 }
 
 func genResponse(jsonByte []byte, network string) (*res, error) {
