@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -78,11 +79,17 @@ type res struct {
 
 func main() {
 	router := gin.Default()
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+
+	router.Use(cors.New(config))
 	router.POST("/FlowAccessControl", DeployFlowAccessControl)
 	router.POST("/TradeHub", DeployTradeHub)
 	router.POST("/FusionSeries", DeployFusionSeries)
 	router.POST("/SignatureSeries", DeploySignatureSeries)
 	router.POST("InstaGen", DeployInstaGen)
+
+	router.Use(cors.New(config))
 	router.Run(":8080")
 }
 
