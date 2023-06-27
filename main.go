@@ -87,7 +87,12 @@ func main() {
 	router.POST("/TradeHub", DeployTradeHub)
 	router.POST("/FusionSeries", DeployFusionSeries)
 	router.POST("/SignatureSeries", DeploySignatureSeries)
-	router.POST("InstaGen", DeployInstaGen)
+	router.POST("/InstaGen", DeployInstaGen)
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "api is up",
+		})
+	})
 
 	router.Use(cors.New(config))
 	router.Run(":8080")
