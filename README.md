@@ -1,6 +1,6 @@
-# storefront-contracts
+# MYRIADFLOW CONTRACTS
 
-Smart Contracts for MyriadFlow StoreFront
+Smart Contracts for MyriadFlow 
 
 You'll find here the NFT contracts, tests for that contract, a script that deploys those contracts. It also comes with a variety of other tools, preconfigured to work with the project code.
 
@@ -9,10 +9,10 @@ You'll find here the NFT contracts, tests for that contract, a script that deplo
 1. Clone the repo by using
 
 ```shell
-git clone https://github.com/MyriadFlow/storefront_contracts.git
+git clone https://github.com/MyriadFlow/smartcontracts
 ```
 
-2. Install the dependencies by using the command `yarn install`.
+2. Install the dependencies by using the command `yarn`.
    This way your environment will be reproducible, and you will avoid future version conflicts.
 
 ## Configuration
@@ -46,6 +46,11 @@ Compile the smart contract by using
 ```shell
 yarn hardhat compile
 ```
+or
+```shell
+yarn compile
+```
+
 
 ## Testing Contracts
 
@@ -55,22 +60,23 @@ To run the tests, we can use command:
 
 ```shell
 yarn test
+&&
 yarn coverage
 ```
 
 ## Deploying Contracts
 
-Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we use `deploy.js` and run it with
+Next, to deploy the contract we will use a Hardhat script. Inside `scripts/` we use `launch.js` and run it with suitable network, you like
 
 ```shell
-yarn deploy maticmum
+yarn launch --network maticmum
 ```
 
 ## Contract Deployments - V3
 
-> `Marketplace Deployed to: 0xc2d4d1E0103cfe42c35398Edce983f4c8999F429`
+> `TradeHub Deployed to: 0xc2d4d1E0103cfe42c35398Edce983f4c8999F429`
 
-> `StoreFront Deployed to: 0xe5c5FDBde18F94a50C47BC7b7f8dBe484A476B78`
+> `SignatureSeries Deployed to: 0xe5c5FDBde18F94a50C47BC7b7f8dBe484A476B78`
 
 ## API documentation
 

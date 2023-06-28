@@ -147,28 +147,65 @@ async function instaGenDeploy() {
     return Addr
 }
 
+async function eternumPassDeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const EternumPass = await hre.ethers.getContractFactory("EternumPass")
+    const eternumpass = await EternumPass.deploy(
+        constructorParam.param1,
+        constructorParam.param2,
+        constructorParam.param3,
+        constructorParam.param4,
+        constructorParam.param5,
+        constructorParam.param6,
+        constructorParam.param7,
+        constructorParam.param8,
+        constructorParam.param9
+    )
+    await eternumpass.deployed()
+    console.log("EternumPass Deployed to:", eternumpass.address)
+    const Addr = eternumpass.address
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await eternumpass.deployTransaction.wait(6)
+        await verify(Addr, [
+            constructorParam.param1,
+            constructorParam.param2,
+            constructorParam.param3,
+            constructorParam.param4,
+            constructorParam.param5,
+            constructorParam.param6,
+            constructorParam.param7,
+            constructorParam.param8,
+            constructorParam.param9,
+        ])
+    }
+    return Addr
+}
+
 async function main() {
     //AccessMaster
     if (jsonContent.contractName == "AccessMaster") {
         contractAddress = await AccessMasterDeploy()
     }
-    /// FLOW MARKETPLACE
+    /// TRADEHUB CONTRACT
     if (jsonContent.contractName == "TradeHub") {
         contractAddress = await TradeHubDeploy()
     }
-    // FLOW COLLECTION CONTRACT
+    // FUSION-SERIES CONTRACT
     if (jsonContent.contractName == "FusionSeries") {
         contractAddress = await fusionSeriesDeploy()
     }
-
-    // FLOW EDITION CONTRACT
+    // SIGNATURE-SERIES CONTRACT
     if (jsonContent.contractName == "SignatureSeries") {
         contractAddress = await signatureSeriesDeploy()
     }
-
-    // FLOW GEN-EDITION CONTRACT
+    // INSTAGEN CONTRACT
     if (jsonContent.contractName == "InstaGen") {
         contractAddress = await instaGenDeploy()
+    }
+    //ETERNUMPASS CONTRACT
+    if (jsonContent.contractName == "EternumPass") {
+        contractAddress = await eternumPassDeploy()
     }
     let chainId
 
@@ -177,7 +214,7 @@ async function main() {
     } else {
         chainId = network.config.networkId
     }
-    
+
     console.log(`The chainId is ${chainId}`)
     const data = { chainId, contractAddress, Verified }
     const jsonString = JSON.stringify(data)

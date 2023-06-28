@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../common/ERC4907/IERC4907.sol";
+import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
 /**
@@ -15,6 +15,7 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  *  - a creator role that allows for token minting (creation)
  *  - a pauser role that allows to stop all token transfers
  *  - token ID and URI autogeneration
+ *  - ability for holders to give for rent
  *
  * This contract uses {AccessControl} to lock permissioned functions using the
  * different roles - head to its documentation for details.
@@ -28,7 +29,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
 
     Counters.Counter private _tokenIdTracker;
 
-    address public marketplace;
+    address public tradeHub;
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -94,11 +95,11 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     constructor(
         string memory name,
         string memory symbol,
-        address marketplaceAddress,
+        address tradeHubAddress,
         address flowContract
     ) ERC721(name, symbol) {
         flowRoles = IACCESSMASTER(flowContract);
-        marketplace = marketplaceAddress;
+        tradeHub = tradeHubAddress;
     }
 
     /**
@@ -122,7 +123,6 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         uint256 currentTokenID = _tokenIdTracker.current();
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
-
         // Set royalty Info
         require(
             royaltyPercentBasisPoint <= 1000,
@@ -133,9 +133,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
             _msgSender(),
             royaltyPercentBasisPoint
         );
-
-        // Approve marketplace to transfer NFTs
-        setApprovalForAll(marketplace, true);
+        // Approve tradeHub to transfer NFTs
+        setApprovalForAll(tradeHub, true);
 
         emit AssetCreated(currentTokenID, _msgSender(), metadataURI);
         return currentTokenID;
@@ -171,25 +170,20 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         );
         _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
 
-        // Approve marketplace to transfer NFTs
-        setApprovalForAll(marketplace, true);
+        // Approve tradeHub to transfer NFTs
+        setApprovalForAll(tradeHub, true);
 
         emit AssetCreated(currentTokenID, creator, metadataURI);
         return currentTokenID;
     }
 
     /**
-     * @dev See {IERC721Metadata-tokenURI}.
+     * @notice Burns `tokenId`. See {ERC721-_burn}.
+     *
+     * @dev Requirements:
+     *
+     * - The caller must own `tokenId` or be an approved operator.
      */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
-        string memory _tokenURI = _tokenURIs[tokenId];
-
-        return _tokenURI;
-    }
-
     function destroyAsset(uint256 tokenId) public {
         require(
             _isApprovedOrOwner(_msgSender(), tokenId),
@@ -198,6 +192,30 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         _burn(tokenId);
         emit AssetDestroyed(tokenId, _msgSender());
         _resetTokenRoyalty(tokenId);
+    }
+
+    /**
+     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
+     *
+     * Requirements:
+     *
+     * - `tokenId` must exist.
+     */
+    function _setTokenURI(
+        uint256 tokenId,
+        string memory _tokenURI
+    ) internal virtual {
+        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
+        _tokenURIs[tokenId] = _tokenURI;
+    }
+
+    /// @notice only Admin can withdraw the funds collected
+    function withdraw() external onlyAdmin {
+        // get the balance of the contract
+        (bool callSuccess, ) = payable(_msgSender()).call{
+            value: address(this).balance
+        }("");
+        require(callSuccess, "SignatureSeries: Withdrawal failed");
     }
 
     /********************* ERC4907 *********************************/
@@ -234,8 +252,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         );
         RentableItems storage info = rentables[tokenId];
         info.user = user;
-        info.expires = expires;
-        emit UpdateUser(tokenId, user, expires);
+        info.expires = expires + uint64(block.timestamp);
+        emit UpdateUser(tokenId, user, info.expires);
     }
 
     /// @notice to use for renting an item
@@ -280,6 +298,20 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         }
     }
 
+    /** Getter Functions **/
+
+    /**
+     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
+     */
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
+        string memory _tokenURI = _tokenURIs[tokenId];
+
+        return _tokenURI;
+    }
+
     /// @dev IERC4907 implementation
     function userExpires(uint256 tokenId) public view returns (uint256) {
         return rentables[tokenId].expires;
@@ -295,29 +327,6 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     }
 
     /////////////////////////////////////////////////
-
-    /**
-     * @dev Sets `_tokenURI` as the tokenURI of `tokenId`.
-     *
-     * Requirements:
-     *
-     * - `tokenId` must exist.
-     */
-    function _setTokenURI(
-        uint256 tokenId,
-        string memory _tokenURI
-    ) internal virtual {
-        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
-        _tokenURIs[tokenId] = _tokenURI;
-    }
-
-    function withdraw() external onlyAdmin {
-        // get the balance of the contract
-        (bool callSuccess, ) = payable(_msgSender()).call{
-            value: address(this).balance
-        }("");
-        require(callSuccess, "SignatureSeries: Withdrawal failed");
-    }
 
     function _beforeTokenTransfer(
         address from,

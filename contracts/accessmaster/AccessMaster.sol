@@ -36,7 +36,7 @@ contract AccessMaster is AccessControlEnumerable {
         return hasRole(FLOW_OPERATOR_ROLE, user);
     }
 
-    /// @dev to check if the address {User} is the OPERATOR
+    /// @dev to check if the address {User} is the CREATOR
     function isCreator(address user) external view returns (bool) {
         return hasRole(FLOW_CREATOR_ROLE, user);
     }
