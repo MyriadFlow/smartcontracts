@@ -7,7 +7,7 @@ COPY main.go .
 RUN go build -o smartcontracts .
 
 
-FROM node:lts-alpine3.18
+FROM node:lts-slim
 WORKDIR /usr/src/app
 COPY --from=goBuilder /app/smartcontracts .
 COPY package*.json ./
