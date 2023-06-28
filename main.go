@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -222,15 +224,21 @@ func genResponse(jsonByte []byte, network string) (*res, error) {
 	}
 
 	// Execute the yarn launch command
-	out, err := exec.Command("yarn", "launch", "--network", network).Output()
+	cmd := exec.Command("yarn", "launch", "--network", network)
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err = cmd.Start()
 	if err != nil {
-		fmt.Println("error launching")
-		return nil, err
+		log.Fatal(err)
 	}
+	err = cmd.Wait()
+	log.Printf("Command finished with error: %v", err)
 
 	response := new(res)
-	arr := strings.Split(string(out), "\n")
-	fmt.Println(arr)
+	arr := strings.Split(outb.String(), "\n")
+	fmt.Println(outb.String())
+	fmt.Println(arr[len(arr)-3])
 	if err := json.Unmarshal([]byte(arr[len(arr)-3]), response); err != nil {
 		fmt.Println("error unmarshaling")
 		return nil, err
