@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -72,7 +73,7 @@ type InstaGen struct {
 	Network string `json:"network"`
 }
 type res struct {
-	ChainID         int    `json:"chainId"`
+	ChainId         int    `json:"chainId"`
 	ContractAddress string `json:"contractAddress"`
 	Verified        bool   `json:"verified"`
 }
@@ -133,6 +134,7 @@ func DeployFlowAccessControl(c *gin.Context) {
 	response, err := genResponse(jsonByte, network)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -152,6 +154,7 @@ func DeployFusionSeries(c *gin.Context) {
 	response, err := genResponse(jsonByte, network)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -171,6 +174,7 @@ func DeploySignatureSeries(c *gin.Context) {
 	response, err := genResponse(jsonByte, network)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
@@ -190,24 +194,25 @@ func DeployInstaGen(c *gin.Context) {
 	response, err := genResponse(jsonByte, network)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, response)
 }
 
 func genResponse(jsonByte []byte, network string) (*res, error) {
-	jsonData := string(jsonByte)
 	filePath := "scripts/launch/launch.json"
 
 	_, err := os.ReadFile(filePath)
 	if err != nil {
+		fmt.Println("error reading")
 		return nil, err
 	}
 
-	newContent := string(jsonData)
-
-	err = os.WriteFile(filePath, []byte(newContent), 0644)
+	err = os.WriteFile(filePath, []byte(jsonByte), 0644)
 	if err != nil {
+		fmt.Println("error writing")
+
 		return nil, err
 	}
 
@@ -219,12 +224,14 @@ func genResponse(jsonByte []byte, network string) (*res, error) {
 	// Execute the yarn launch command
 	out, err := exec.Command("yarn", "launch", "--network", network).Output()
 	if err != nil {
+		fmt.Println("error launching")
 		return nil, err
 	}
 
 	response := new(res)
 	arr := strings.Split(string(out), "\n")
 	if err := json.Unmarshal([]byte(arr[len(arr)-3]), response); err != nil {
+		fmt.Println("error unmarshaling")
 		return nil, err
 	}
 	return response, nil
