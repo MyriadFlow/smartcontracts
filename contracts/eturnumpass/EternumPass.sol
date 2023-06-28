@@ -42,6 +42,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     uint256 public subscriptionPricePerMonth;
     uint256 private _tokenIdCounter;
     string public baseURI;
+    address tradeHubAddress;
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -109,7 +110,8 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         uint256 _subscriptionPricePerMonth,
         uint96 royaltyBasisPoint,
         bool _isOperatorSubscription,
-        address flowContract
+        address flowContract,
+        address _tradeHubAddrr
     ) ERC721(_name, _symbol) {
         flowRoles = IACCESSMASTER(flowContract);
         baseURI = _initialURI;
@@ -119,6 +121,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         // Setting default royalty
         _setDefaultRoyalty(_msgSender(), royaltyBasisPoint);
         isOperatorSubscription = _isOperatorSubscription;
+        tradeHubAddress = _tradeHubAddrr;
     }
 
     ///@notice Function to update the plateformFeeBasisPoint
@@ -184,6 +187,8 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         if (isOperatorSubscription) {
             _addSubScription(tokenId);
         }
+        // Approve marketplace to transfer NFTs
+        setApprovalForAll(tradeHubAddress, true);
 
         emit NFTMinted(tokenId, _msgSender());
 

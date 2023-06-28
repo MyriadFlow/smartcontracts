@@ -31,7 +31,7 @@ contract FusionSeries is Context, ERC1155Supply {
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    address public marketplace;
+    address public tradeHub;
 
     IACCESSMASTER flowRoles;
 
@@ -58,7 +58,7 @@ contract FusionSeries is Context, ERC1155Supply {
     );
     event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
-    // marketplace should be there
+    // tradeHub should be there
     /**
      * @dev Grants `FLOW_ADMIN_ROLE`, `FLOW_CREATOR_ROLE` and `FLOW_OPERATOR_ROLE` to the
      * account that deploys the contract.
@@ -66,10 +66,10 @@ contract FusionSeries is Context, ERC1155Supply {
      */
     constructor(
         string memory baseURI,
-        address marketplaceAddress,
+        address tradeHubAddress,
         address flowContract
     ) ERC1155(baseURI) {
-        marketplace = marketplaceAddress;
+        tradeHub = tradeHubAddress;
         flowRoles = IACCESSMASTER(flowContract);
     }
 
@@ -94,7 +94,7 @@ contract FusionSeries is Context, ERC1155Supply {
         uint256 currentTokenID = _tokenIdTracker.current();
         _mint(_msgSender(), currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
-        setApprovalForAll(marketplace, true);
+        setApprovalForAll(tradeHub, true);
         emit AssetCreated(currentTokenID, _msgSender(), amount);
         return currentTokenID;
     }
@@ -120,7 +120,7 @@ contract FusionSeries is Context, ERC1155Supply {
         uint256 currentTokenID = _tokenIdTracker.current();
         _mint(creator, currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
-        setApprovalForAll(marketplace, true);
+        setApprovalForAll(tradeHub, true);
         emit AssetCreated(currentTokenID, _msgSender(), amount);
         return currentTokenID;
     }

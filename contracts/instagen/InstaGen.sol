@@ -34,7 +34,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
 
     // PUBLIC && PRIVATE VARIABLES
     string private baseURI;
-    address public marketplace;
+    address public tradeHub;
     uint256 public salePrice;
 
     struct RentableItems {
@@ -75,7 +75,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     constructor(
         string memory name,
         string memory symbol,
-        address marketplaceAddress,
+        address tradeHubAddress,
         address accessControlAddress,
         uint256 _salePrice,
         uint256 _preSalePrice,
@@ -85,7 +85,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         string memory _baseUri
     ) ERC721A(name, symbol) {
         flowRoles = IACCESSMASTER(accessControlAddress);
-        marketplace = marketplaceAddress;
+        tradeHub = tradeHubAddress;
         salePrice = _salePrice;
         preSalePrice = _preSalePrice;
         countDownTime = block.timestamp + _countDownTime;
@@ -98,6 +98,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     function mint(
         uint256 quantity
     ) external payable returns (uint256, uint256) {
+        uint prevQuantity = _totalMinted();
         require(
             _totalMinted() + quantity <= maxSupply,
             "InstaGen: exceeding max token supply!"
@@ -114,9 +115,9 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
             );
         }
         _safeMint(_msgSender(), quantity);
-        setApprovalForAll(marketplace, true);
+        setApprovalForAll(tradeHub, true);
         emit AssetCreated(_totalMinted(), quantity, _msgSender());
-        return (_totalMinted(), quantity);
+        return (prevQuantity, quantity);
     }
 
     /**
@@ -222,7 +223,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     }
 
     /** Getter Functions **/
-    
+
     /// @dev IERC4907 implementation
     function userOf(uint256 tokenId) public view returns (address) {
         if (rentables[tokenId].expires >= block.timestamp) {

@@ -29,7 +29,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
 
     Counters.Counter private _tokenIdTracker;
 
-    address public marketplace;
+    address public tradeHub;
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -95,11 +95,11 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     constructor(
         string memory name,
         string memory symbol,
-        address marketplaceAddress,
+        address tradeHubAddress,
         address flowContract
     ) ERC721(name, symbol) {
         flowRoles = IACCESSMASTER(flowContract);
-        marketplace = marketplaceAddress;
+        tradeHub = tradeHubAddress;
     }
 
     /**
@@ -133,8 +133,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
             _msgSender(),
             royaltyPercentBasisPoint
         );
-        // Approve marketplace to transfer NFTs
-        setApprovalForAll(marketplace, true);
+        // Approve tradeHub to transfer NFTs
+        setApprovalForAll(tradeHub, true);
 
         emit AssetCreated(currentTokenID, _msgSender(), metadataURI);
         return currentTokenID;
@@ -170,8 +170,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         );
         _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
 
-        // Approve marketplace to transfer NFTs
-        setApprovalForAll(marketplace, true);
+        // Approve tradeHub to transfer NFTs
+        setApprovalForAll(tradeHub, true);
 
         emit AssetCreated(currentTokenID, creator, metadataURI);
         return currentTokenID;
