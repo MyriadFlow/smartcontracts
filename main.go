@@ -230,6 +230,7 @@ func genResponse(jsonByte []byte, network string) (*res, error) {
 
 	response := new(res)
 	arr := strings.Split(string(out), "\n")
+	fmt.Println(arr[len(arr)-3])
 	if err := json.Unmarshal([]byte(arr[len(arr)-3]), response); err != nil {
 		fmt.Println("error unmarshaling")
 		return nil, err
