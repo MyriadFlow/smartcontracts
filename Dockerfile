@@ -10,8 +10,9 @@ RUN go build -o smartcontracts .
 FROM node:lts-slim
 WORKDIR /usr/src/app
 COPY --from=goBuilder /app/smartcontracts .
-COPY package*.json ./
-RUN npm install
-COPY . .
+COPY package.json yarn.lock ./
+RUN yarn install
+RUN yarn compile
+COPY . ./
 EXPOSE 8080
 CMD [ "./smartcontracts" ]
