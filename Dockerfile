@@ -7,12 +7,11 @@ COPY main.go .
 RUN go build -o smartcontracts .
 
 
-FROM node:bookworm
+FROM node:lts-bookworm
 WORKDIR /usr/src/app
 COPY --from=goBuilder /app/smartcontracts .
 COPY package.json yarn.lock ./
 RUN yarn install
-RUN yarn compile
 COPY . ./
+RUN yarn compile
 EXPOSE 8080
-CMD [ "./smartcontracts" ]
