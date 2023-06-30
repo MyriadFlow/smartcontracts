@@ -1,4 +1,4 @@
-FROM golang:alpine3.18 AS goBuilder
+FROM golang:bookworm AS goBuilder
 WORKDIR /app
 COPY go.mod .
 COPY go.sum .
@@ -7,7 +7,7 @@ COPY main.go .
 RUN go build -o smartcontracts .
 
 
-FROM node:lts-slim
+FROM node:bookworm
 WORKDIR /usr/src/app
 COPY --from=goBuilder /app/smartcontracts .
 COPY package.json yarn.lock ./
