@@ -11,7 +11,8 @@ FROM node:lts-bookworm
 WORKDIR /usr/src/app
 COPY --from=goBuilder /app/smartcontracts .
 COPY package.json yarn.lock ./
-RUN yarn install
 COPY . ./
+RUN yarn install
 RUN yarn compile
 EXPOSE 8080
+CMD [ "./smartcontracts" ]
