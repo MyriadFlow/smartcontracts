@@ -14,7 +14,7 @@ The JSON file should have the following format:
 
 ```shell
 {
-    "contractName" : "FlowAccessControl",
+    "contractName" : "AccessMaster",
     "constructorParams":{
     }
 }
@@ -96,9 +96,9 @@ The JSON file should have the following format:
         "param7" : "500",
         "param8" : true,
         "param9" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
+        "param10" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
     }
 }
-
 ```
 
 The `contracts` array contains objects representing each contract. Each contract object has two properties:
