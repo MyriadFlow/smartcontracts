@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -91,11 +90,6 @@ type EternumPass struct {
 		} `json:"constructorParams"`
 	}
 	Network string `json:"network"`
-}
-type res struct {
-	ChainId         int    `json:"chainId"`
-	ContractAddress string `json:"contractAddress"`
-	Verified        bool   `json:"verified"`
 }
 
 func main() {
@@ -241,7 +235,7 @@ func DeployEternumPass(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func genResponse(jsonByte []byte, network string) (*res, error) {
+func genResponse(jsonByte []byte, network string) ([]byte, error) {
 	filePath := "scripts/launch/launch.json"
 
 	_, err := os.ReadFile(filePath)
@@ -269,18 +263,9 @@ func genResponse(jsonByte []byte, network string) (*res, error) {
 	cmd.Stderr = &errb
 	err = cmd.Start()
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	err = cmd.Wait()
 	log.Printf("Command finished with error: %v", err)
-
-	response := new(res)
-	arr := strings.Split(outb.String(), "\n")
-	fmt.Println(outb.String())
-	fmt.Println(arr[len(arr)-3])
-	if err := json.Unmarshal([]byte(arr[len(arr)-3]), response); err != nil {
-		fmt.Println("error unmarshaling")
-		return nil, err
-	}
-	return response, nil
+	return outb.Bytes(), nil
 }
