@@ -78,15 +78,16 @@ type EternumPass struct {
 	Data struct {
 		ContractName      string `json:"contractName"`
 		ConstructorParams struct {
-			Param1 string `json:"param1"`
-			Param2 string `json:"param2"`
-			Param3 string `json:"param3"`
-			Param4 string `json:"param4"`
-			Param5 string `json:"param5"`
-			Param6 string `json:"param6"`
-			Param7 string `json:"param7"`
-			Param8 bool   `json:"param8"`
-			Param9 string `json:"param9"`
+			Param1  string `json:"param1"`
+			Param2  string `json:"param2"`
+			Param3  string `json:"param3"`
+			Param4  string `json:"param4"`
+			Param5  string `json:"param5"`
+			Param6  string `json:"param6"`
+			Param7  string `json:"param7"`
+			Param8  bool   `json:"param8"`
+			Param9  string `json:"param9"`
+			Param10 string `json:"param10"`
 		} `json:"constructorParams"`
 	}
 	Network string `json:"network"`
@@ -104,11 +105,6 @@ func main() {
 	router.POST("/SignatureSeries", DeploySignatureSeries)
 	router.POST("/InstaGen", DeployInstaGen)
 	router.POST("/EternumPass", DeployEternumPass)
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "api is up",
-		})
-	})
 
 	router.Use(cors.New(config))
 	router.Run(":8080")
