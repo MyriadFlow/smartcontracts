@@ -29,7 +29,6 @@ export interface SignatureSeriesInterface extends utils.Interface {
     "destroyAsset(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "marketplace()": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
     "rent(uint256,uint256)": FunctionFragment;
@@ -45,6 +44,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
+    "tradeHub()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
@@ -79,10 +79,6 @@ export interface SignatureSeriesInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "marketplace",
-    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -138,6 +134,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
     functionFragment: "totalSupply",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "tradeHub", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
@@ -176,10 +173,6 @@ export interface SignatureSeriesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "marketplace",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -221,6 +214,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "tradeHub", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -371,8 +365,6 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    marketplace(overrides?: CallOverrides): Promise<[string]>;
-
     name(overrides?: CallOverrides): Promise<[string]>;
 
     ownerOf(
@@ -464,6 +456,8 @@ export interface SignatureSeries extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    tradeHub(overrides?: CallOverrides): Promise<[string]>;
+
     transferFrom(
       from: string,
       to: string,
@@ -525,8 +519,6 @@ export interface SignatureSeries extends BaseContract {
     operator: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
-
-  marketplace(overrides?: CallOverrides): Promise<string>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -613,6 +605,8 @@ export interface SignatureSeries extends BaseContract {
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+  tradeHub(overrides?: CallOverrides): Promise<string>;
+
   transferFrom(
     from: string,
     to: string,
@@ -674,8 +668,6 @@ export interface SignatureSeries extends BaseContract {
       operator: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    marketplace(overrides?: CallOverrides): Promise<string>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -761,6 +753,8 @@ export interface SignatureSeries extends BaseContract {
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tradeHub(overrides?: CallOverrides): Promise<string>;
 
     transferFrom(
       from: string,
@@ -902,8 +896,6 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    marketplace(overrides?: CallOverrides): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
@@ -988,6 +980,8 @@ export interface SignatureSeries extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+    tradeHub(overrides?: CallOverrides): Promise<BigNumber>;
+
     transferFrom(
       from: string,
       to: string,
@@ -1056,8 +1050,6 @@ export interface SignatureSeries extends BaseContract {
       operator: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    marketplace(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1142,6 +1134,8 @@ export interface SignatureSeries extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tradeHub(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferFrom(
       from: string,

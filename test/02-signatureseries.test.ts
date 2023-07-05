@@ -33,7 +33,7 @@ describe("TradeHub && SignatureSeries Contract", () => {
         const SignatureSeriesFactory = await ethers.getContractFactory("SignatureSeries")
         signatureseries = await SignatureSeriesFactory.deploy(metadata.name, metadata.symbol, tradehub.address , accessmaster.address)
     })
-    it("Should return the right name and symbol of the token once StoreFront is deployed", async () => {
+    it("Should return the right name and symbol of the token once SignatureSeries is deployed", async () => {
         expect(await signatureseries.name()).to.equal(metadata.name)
         expect(await signatureseries.symbol()).to.equal(metadata.symbol)
     })
