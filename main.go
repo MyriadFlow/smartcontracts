@@ -14,7 +14,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type FlowAccessControl struct {
+type AccessMaster struct {
 	Data struct {
 		ContractName      string `json:"contractName"`
 		ConstructorParams struct {
@@ -74,6 +74,24 @@ type InstaGen struct {
 	}
 	Network string `json:"network"`
 }
+
+type EternumPass struct {
+	Data struct {
+		ContractName      string `json:"contractName"`
+		ConstructorParams struct {
+			Param1 string `json:"param1"`
+			Param2 string `json:"param2"`
+			Param3 string `json:"param3"`
+			Param4 string `json:"param4"`
+			Param5 string `json:"param5"`
+			Param6 string `json:"param6"`
+			Param7 string `json:"param7"`
+			Param8 bool   `json:"param8"`
+			Param9 string `json:"param9"`
+		} `json:"constructorParams"`
+	}
+	Network string `json:"network"`
+}
 type res struct {
 	ChainId         int    `json:"chainId"`
 	ContractAddress string `json:"contractAddress"`
@@ -86,11 +104,12 @@ func main() {
 	config.AllowAllOrigins = true
 
 	router.Use(cors.New(config))
-	router.POST("/FlowAccessControl", DeployFlowAccessControl)
+	router.POST("/AccessMaster", DeployAccessMaster)
 	router.POST("/TradeHub", DeployTradeHub)
 	router.POST("/FusionSeries", DeployFusionSeries)
 	router.POST("/SignatureSeries", DeploySignatureSeries)
 	router.POST("/InstaGen", DeployInstaGen)
+	router.POST("/EternumPass", DeployEternumPass)
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "api is up",
@@ -121,8 +140,8 @@ func DeployTradeHub(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response)
 }
-func DeployFlowAccessControl(c *gin.Context) {
-	var req FlowAccessControl
+func DeployAccessMaster(c *gin.Context) {
+	var req AccessMaster
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -182,6 +201,26 @@ func DeploySignatureSeries(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 func DeployInstaGen(c *gin.Context) {
+	var req InstaGen
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	network := req.Network
+	jsonByte, err := json.Marshal(req.Data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	response, err := genResponse(jsonByte, network)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+func DeployEternumPass(c *gin.Context) {
 	var req InstaGen
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
