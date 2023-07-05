@@ -159,7 +159,8 @@ async function eternumPassDeploy() {
         constructorParam.param6,
         constructorParam.param7,
         constructorParam.param8,
-        constructorParam.param9
+        constructorParam.param9,
+        constructorParam.param10
     )
     await eternumpass.deployed()
     console.log("EternumPass Deployed to:", eternumpass.address)
@@ -177,6 +178,7 @@ async function eternumPassDeploy() {
             constructorParam.param7,
             constructorParam.param8,
             constructorParam.param9,
+            constructorParam.param10,
         ])
     }
     return Addr
