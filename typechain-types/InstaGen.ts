@@ -29,7 +29,6 @@ export interface InstaGenInterface extends utils.Interface {
     "countDownTime()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "marketplace()": FunctionFragment;
     "maxSupply()": FunctionFragment;
     "mint(uint256)": FunctionFragment;
     "name()": FunctionFragment;
@@ -47,6 +46,7 @@ export interface InstaGenInterface extends utils.Interface {
     "symbol()": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
+    "tradeHub()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
@@ -78,10 +78,6 @@ export interface InstaGenInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
     values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "marketplace",
-    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
   encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
@@ -136,6 +132,7 @@ export interface InstaGenInterface extends utils.Interface {
     functionFragment: "totalSupply",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "tradeHub", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
@@ -168,10 +165,6 @@ export interface InstaGenInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "isApprovedForAll",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "marketplace",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
@@ -212,6 +205,7 @@ export interface InstaGenInterface extends utils.Interface {
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "tradeHub", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
@@ -366,8 +360,6 @@ export interface InstaGen extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    marketplace(overrides?: CallOverrides): Promise<[string]>;
-
     maxSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     mint(
@@ -459,6 +451,8 @@ export interface InstaGen extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    tradeHub(overrides?: CallOverrides): Promise<[string]>;
+
     transferFrom(
       from: string,
       to: string,
@@ -514,8 +508,6 @@ export interface InstaGen extends BaseContract {
     operator: string,
     overrides?: CallOverrides
   ): Promise<boolean>;
-
-  marketplace(overrides?: CallOverrides): Promise<string>;
 
   maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -602,6 +594,8 @@ export interface InstaGen extends BaseContract {
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+  tradeHub(overrides?: CallOverrides): Promise<string>;
+
   transferFrom(
     from: string,
     to: string,
@@ -651,8 +645,6 @@ export interface InstaGen extends BaseContract {
       operator: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
-
-    marketplace(overrides?: CallOverrides): Promise<string>;
 
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -738,6 +730,8 @@ export interface InstaGen extends BaseContract {
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tradeHub(overrides?: CallOverrides): Promise<string>;
 
     transferFrom(
       from: string,
@@ -886,8 +880,6 @@ export interface InstaGen extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    marketplace(overrides?: CallOverrides): Promise<BigNumber>;
-
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
@@ -972,6 +964,8 @@ export interface InstaGen extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+    tradeHub(overrides?: CallOverrides): Promise<BigNumber>;
+
     transferFrom(
       from: string,
       to: string,
@@ -1034,8 +1028,6 @@ export interface InstaGen extends BaseContract {
       operator: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    marketplace(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     maxSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1120,6 +1112,8 @@ export interface InstaGen extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tradeHub(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     transferFrom(
       from: string,

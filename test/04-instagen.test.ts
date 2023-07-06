@@ -40,7 +40,7 @@ describe("TradeHub and InstaGen contracts", () => {
         
         await instagen.deployed()
     })
-    it("Should return the right name and symbol of the token, and other constructor parameters once FlowGenEdution is deployed", async () => {
+    it("Should return the right name and symbol of the token, and other constructor parameters once Instagen is deployed", async () => {
         expect(await instagen.name()).to.equal(metadata.name)
         expect(await instagen.symbol()).to.equal(metadata.symbol)
         expect(await instagen.salePrice()).to.equal(Saleprice)

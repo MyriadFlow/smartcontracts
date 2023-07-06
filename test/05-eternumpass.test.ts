@@ -28,9 +28,9 @@ describe("Eternumpass Contract", () => {
         const AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
         accessmaster = await AccessMasterFactory.deploy()
         const  EternumPassFactory = await ethers.getContractFactory("EternumPass")        
-        eternumpass = await EternumPassFactory.deploy(metadata.name, metadata.symbol,baseURI,publicSalePrice,30,subscriptionPerMonth,500,true,accessmaster.address);
+        eternumpass = await EternumPassFactory.deploy(metadata.name, metadata.symbol,baseURI,publicSalePrice,30,subscriptionPerMonth,500,true,accessmaster.address,"0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298");
     })
-    it("Should return the right name and symbol of the token once StoreFront is deployed", async () => {
+    it("Should return the right name and symbol of the token once EternumPass is deployed", async () => {
         expect(await eternumpass.name()).to.equal(metadata.name)
         expect(await eternumpass.symbol()).to.equal(metadata.symbol)
     })

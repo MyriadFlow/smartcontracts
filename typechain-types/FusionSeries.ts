@@ -27,13 +27,13 @@ export interface FusionSeriesInterface extends utils.Interface {
     "destroyAsset(uint256,uint256)": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "marketplace()": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setURI(string)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "totalSupply(uint256)": FunctionFragment;
+    "tradeHub()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
   };
 
@@ -66,10 +66,6 @@ export interface FusionSeriesInterface extends utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "marketplace",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "safeBatchTransferFrom",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
   ): string;
@@ -90,6 +86,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     functionFragment: "totalSupply",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "tradeHub", values?: undefined): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -115,10 +112,6 @@ export interface FusionSeriesInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "marketplace",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "safeBatchTransferFrom",
     data: BytesLike
   ): Result;
@@ -139,6 +132,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "tradeHub", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
 
   events: {
@@ -281,8 +275,6 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    marketplace(overrides?: CallOverrides): Promise<[string]>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -321,6 +313,8 @@ export interface FusionSeries extends BaseContract {
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    tradeHub(overrides?: CallOverrides): Promise<[string]>;
 
     uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
   };
@@ -366,8 +360,6 @@ export interface FusionSeries extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  marketplace(overrides?: CallOverrides): Promise<string>;
-
   safeBatchTransferFrom(
     from: string,
     to: string,
@@ -403,6 +395,8 @@ export interface FusionSeries extends BaseContract {
   ): Promise<boolean>;
 
   totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+  tradeHub(overrides?: CallOverrides): Promise<string>;
 
   uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -448,8 +442,6 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    marketplace(overrides?: CallOverrides): Promise<string>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -485,6 +477,8 @@ export interface FusionSeries extends BaseContract {
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tradeHub(overrides?: CallOverrides): Promise<string>;
 
     uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
   };
@@ -600,8 +594,6 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    marketplace(overrides?: CallOverrides): Promise<BigNumber>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -640,6 +632,8 @@ export interface FusionSeries extends BaseContract {
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tradeHub(overrides?: CallOverrides): Promise<BigNumber>;
 
     uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
   };
@@ -689,8 +683,6 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    marketplace(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -729,6 +721,8 @@ export interface FusionSeries extends BaseContract {
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    tradeHub(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     uri(
       tokenId: BigNumberish,
