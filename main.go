@@ -211,7 +211,7 @@ func DeployInstaGen(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 func DeployEternumPass(c *gin.Context) {
-	var req InstaGen
+	var req EternumPass
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -227,7 +227,6 @@ func DeployEternumPass(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, response)
 }
 
