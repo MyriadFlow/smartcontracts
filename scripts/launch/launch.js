@@ -184,6 +184,37 @@ async function eternumPassDeploy() {
     return Addr
 }
 
+async function flowSubscriptionDeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const EternumPass = await hre.ethers.getContractFactory("FlowSubscription")
+    const eternumpass = await EternumPass.deploy(
+        constructorParam.param1,
+        constructorParam.param2,
+        constructorParam.param3,
+        constructorParam.param4,
+        constructorParam.param5,
+        constructorParam.param6,
+        constructorParam.param7
+    )
+    await eternumpass.deployed()
+    console.log("FlowSubscription Deployed to:", eternumpass.address)
+    const Addr = eternumpass.address
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await eternumpass.deployTransaction.wait(6)
+        await verify(Addr, [
+            constructorParam.param1,
+            constructorParam.param2,
+            constructorParam.param3,
+            constructorParam.param4,
+            constructorParam.param5,
+            constructorParam.param6,
+            constructorParam.param7,
+        ])
+    }
+    return Addr
+}
+
 async function main() {
     //AccessMaster
     if (jsonContent.contractName == "AccessMaster") {
@@ -208,6 +239,10 @@ async function main() {
     //ETERNUMPASS CONTRACT
     if (jsonContent.contractName == "EternumPass") {
         contractAddress = await eternumPassDeploy()
+    }
+    // FLOWSUBSCRIPTION
+    if (jsonContent.contractName == "FlowSubscription") {
+        contractAddress = await flowSubscriptionDeploy()
     }
     let chainId
 

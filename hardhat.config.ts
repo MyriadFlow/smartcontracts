@@ -25,10 +25,10 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 // API_KEY & PRIVATE_KEY
 const ROPSTEN_RPC_URL = process.env.ROPSTEN_RPC_URL || "https://eth-ropsten.alchemyapi.io/v2/your-api-key"
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL || "https://rpc-mumbai.maticvigil.com"
-const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://rpc-mumbai.maticvigil.com"
+const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://polygon-mumbai.g.alchemy.com/v2/tr0pG2ASpL0-Ucmm969f_1yFgDIiAc6y"
 const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL || "https://ETH-RPC-URL"
-const MNEMONIC = process.env.MNEMONIC || "mnemonic"
-const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "API Key"
+const MNEMONIC = process.env.MNEMONIC || "aisle intact level enter fury shine void access toddler unaware rely erode"
+const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "KG1VJQJZVNR4AJU7QIWAKXGC78PCN9UGIK"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
 
 

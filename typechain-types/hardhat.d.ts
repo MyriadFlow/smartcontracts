@@ -141,6 +141,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EternumPass__factory>;
     getContractFactory(
+      name: "MyriadFlowOfferStation",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MyriadFlowOfferStation__factory>;
+    getContractFactory(
+      name: "FlowSubscription",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlowSubscription__factory>;
+    getContractFactory(
+      name: "FlowSubscription",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.FlowSubscription__factory>;
+    getContractFactory(
       name: "FusionSeries",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.FusionSeries__factory>;
@@ -148,10 +160,6 @@ declare module "hardhat/types/runtime" {
       name: "InstaGen",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.InstaGen__factory>;
-    getContractFactory(
-      name: "MyriadFlowOfferStation",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MyriadFlowOfferStation__factory>;
     getContractFactory(
       name: "SignatureSeries",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -322,6 +330,21 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.EternumPass>;
     getContractAt(
+      name: "MyriadFlowOfferStation",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MyriadFlowOfferStation>;
+    getContractAt(
+      name: "FlowSubscription",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlowSubscription>;
+    getContractAt(
+      name: "FlowSubscription",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.FlowSubscription>;
+    getContractAt(
       name: "FusionSeries",
       address: string,
       signer?: ethers.Signer
@@ -331,11 +354,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.InstaGen>;
-    getContractAt(
-      name: "MyriadFlowOfferStation",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.MyriadFlowOfferStation>;
     getContractAt(
       name: "SignatureSeries",
       address: string,
