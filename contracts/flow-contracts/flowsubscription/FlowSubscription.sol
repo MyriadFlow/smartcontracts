@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
+
 import "../../common/interface/IERC5643.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 
 /// @title Users can only utilise token services after renewing their subscriptions and renting them to others.
 /**
@@ -22,7 +24,15 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
+contract FlowSubscription is
+    Context,
+    IERC5643,
+    ERC2981,
+    AccessControlEnumerable,
+    ERC721Enumerable
+{
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
@@ -31,9 +41,7 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
 
     using Strings for uint256;
 
-    bool public mintPaused = true;
-    ///@notice for giving users free subscriptions or not
-    bool private isOperatorSubscription;
+    bool public mintPaused = false;
     uint256 public publicSalePrice;
     uint256 public subscriptionPricePerMonth;
     uint256 private _tokenIdCounter;
@@ -51,92 +59,72 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
         require(mintPaused == false, "FlowSubscription: NFT Minting Paused");
         _;
     }
-
     modifier onlyWhenTokenExist(uint256 tokenId) {
         require(_exists(tokenId), "FlowSubscription: Not a valid tokenId");
         _;
     }
-
-    modifier onlyOwner() {
-        require(_msgSender() == owner, "FlowSubscription: Not a owner");
-        _;
-    }
-
     event NFTMinted(uint256 tokenId, address indexed owner);
+
     event NFTBurnt(uint256 tokenId, address indexed ownerOrApproved);
 
-    event RentalInfo(
-        uint256 tokenId,
-        bool isRentable,
-        uint256 price,
-        address indexed renter
-    );
     event RequestedCancelSubscription(
         uint256 indexed tokenId,
         uint256 indexed Time
     );
 
     constructor(
-        string memory _name,//1
-        string memory _symbol,//2
-        string memory _initialURI,//3
-        uint256 _publicSalePrice,//4
-        uint256 _subscriptionPricePerMonth,//5
-        uint96 royaltyBasisPoint,//6
-        bool _isOperatorSubscription//7
+        string memory _name,
+        string memory _symbol,
+        string memory _initialURI,
+        uint256 _publicSalePrice,
+        uint256 _subscriptionPricePerMonth,
+        uint96 royaltyBasisPoint
     ) ERC721(_name, _symbol) {
         baseURI = _initialURI;
         publicSalePrice = _publicSalePrice;
         subscriptionPricePerMonth = _subscriptionPricePerMonth;
         // Setting default royalty
         _setDefaultRoyalty(_msgSender(), royaltyBasisPoint);
-        isOperatorSubscription = _isOperatorSubscription;
-        owner = _msgSender();
+        /// Setting up roles
+        _setupRole(ADMIN_ROLE, _msgSender());
+
+        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
+        _setRoleAdmin(OPERATOR_ROLE, ADMIN_ROLE);
+        // add Admin to operator and Creator
+        grantRole(OPERATOR_ROLE, _msgSender());
     }
 
     /// @notice Admin Role can set the mint price
-    function setPrice(uint256 _publicSalePrice) external onlyOwner {
+    function setPrice(
+        uint256 _publicSalePrice
+    ) external onlyRole(OPERATOR_ROLE) {
         publicSalePrice = _publicSalePrice;
     }
 
     /// @notice pause or stop the contract from working by ADMIN
-    function pause() public onlyOwner {
+    function pause() external onlyRole(OPERATOR_ROLE) {
         mintPaused = true;
     }
 
     /// @notice Unpause the contract by ADMIN
-    function unpause() public onlyOwner {
+    function unpause() public onlyRole(OPERATOR_ROLE) {
         mintPaused = false;
     }
 
-    /// @notice change the subscription amount only by Admin
-    function setSubscriptionCharges(
-        uint256 _subscriptionCharges
-    ) public onlyOwner {
-        subscriptionPricePerMonth = _subscriptionCharges;
-    }
-
-    ///@notice change the free subscription status
-    function setFreeSubscriptionStatus(bool _isOperatorSubscription) external {
-        isOperatorSubscription = _isOperatorSubscription;
-    }
-
     /// @notice only operator can set base token URI for the contract
-    function setBaseURI(string memory _tokenBaseURI) external onlyOwner {
+    function setBaseURI(
+        string memory _tokenBaseURI
+    ) external onlyRole(OPERATOR_ROLE) {
         baseURI = _tokenBaseURI;
     }
 
     /// @notice to set token URI of a indivual token
-    function setTokenURI(
-        uint tokenId,
-        string memory _tokenUri
-    ) external onlyOwner {
+    function setTokenURI(uint tokenId, string memory _tokenUri) external {
+        require(
+            ownerOf(tokenId) == _msgSender() ||
+                hasRole(OPERATOR_ROLE, _msgSender())
+        );
         _tokenURI[tokenId] = _tokenUri;
-    }
-
-    /// @notice for addition of subscription period to an token
-    function _addSubScription(uint currentTokenId) private {
-        _expirations[currentTokenId] = uint64(block.timestamp + MONTH);
     }
 
     /// @notice Call to mint NFTs
@@ -149,25 +137,17 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
             "FlowSubscription: Insuffiecient amount!"
         );
         _safeMint(_msgSender(), tokenId);
-        if (isOperatorSubscription) {
-            _addSubScription(tokenId);
-        }
-
         emit NFTMinted(tokenId, _msgSender());
         return tokenId;
     }
 
-    //// @notice
+    //// @notice to mint NFT's By Operator
     function delegateSubscribe(
-        address creator,
-        bool freeSubscribe
-    ) public onlyOwner returns (uint256 tokenId) {
+        address creator
+    ) public onlyRole(OPERATOR_ROLE) returns (uint256 tokenId) {
         _tokenIdCounter++;
         tokenId = _tokenIdCounter;
         _safeMint(creator, tokenId);
-        if (freeSubscribe) {
-            _addSubScription(tokenId);
-        }
         emit NFTMinted(tokenId, _msgSender());
     }
 
@@ -178,7 +158,9 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
      *
      * - The caller must own `tokenId` or be an approved operator.
      */
-    function revokeSubscription(uint256 _tokenId) public {
+    function revokeSubscription(
+        uint256 _tokenId
+    ) public onlyWhenTokenExist(_tokenId) {
         require(
             _isApprovedOrOwner(_msgSender(), _tokenId),
             "FlowSubscription: Not Owner Or Approved"
@@ -189,7 +171,7 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
     }
 
     /// @notice only Admin can withdraw the funds collected
-    function withdraw() external onlyOwner {
+    function withdraw() external onlyRole(ADMIN_ROLE) {
         // get the balance of the contract
         (bool callSuccess, ) = payable(_msgSender()).call{
             value: address(this).balance
@@ -209,24 +191,21 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
         uint256 tokenId,
         uint64 duration
     ) external payable onlyWhenTokenExist(tokenId) {
-        bool isOwner;
-        if (owner == msg.sender) {
-            isOwner = true;
-        }
+        bool isOperator = hasRole(OPERATOR_ROLE, _msgSender());
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId) || isOwner,
-            "FlowSubscription: Caller is owner nor approved or the Operator"
+            _isApprovedOrOwner(_msgSender(), tokenId) || isOperator,
+            "FlowSubscription: Caller is not owner nor approved nor the Operator"
         );
         require(
             cancellationRequested[tokenId] == false,
-            "FlowSubscription: Renewal cannot be proceeded, token in cancellation process!"
+            "FlowSubscription: Renewal cannot be proceeded, token  is in cancellation process!"
         );
         require(
             duration > 0 && duration <= 12,
             "FlowSubscription: Duration must be between 1 to 12 months!"
         );
         uint256 _duration = (duration * MONTH);
-        if (!isOwner) {
+        if (!isOperator) {
             require(
                 msg.value >= duration * subscriptionPricePerMonth,
                 "FlowSubscription: Insufficient Payment"
@@ -251,15 +230,12 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
     function cancelSubscription(
         uint256 tokenId
     ) external payable onlyWhenTokenExist(tokenId) {
-        bool isOwner;
-        if (owner == msg.sender) {
-            isOwner = true;
-        }
+        bool isOperator = hasRole(OPERATOR_ROLE, _msgSender());
         require(
             isRenewable(tokenId) == false,
             "FlowSubscription: Cancellation cannot be proceeded!"
         );
-        if (!isOwner) {
+        if (!isOperator) {
             require(
                 cancellationRequested[tokenId] == false,
                 "FlowSubscription: Cancellation cannot be proceeded!"
@@ -319,7 +295,13 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
+    )
+        public
+        view
+        virtual
+        override(ERC721Enumerable, ERC2981, AccessControlEnumerable)
+        returns (bool)
+    {
         if (interfaceId == _INTERFACE_ID_ERC2981) return true;
         if (interfaceId == type(IERC5643).interfaceId) return true;
         return super.supportsInterface(interfaceId);
