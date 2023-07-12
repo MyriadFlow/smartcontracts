@@ -20,7 +20,7 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
  * This contract uses {AccessControl} to lock permissioned functions using the
  * different roles - head to its documentation for details.
  *
- * The account that deploys the contract will be granted the creator and pauser
+ * The account that deploys the contract will be granted the Operator and pauser
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
@@ -63,11 +63,11 @@ contract FlowSubscription is
         require(_exists(tokenId), "FlowSubscription: Not a valid tokenId");
         _;
     }
-    event NFTMinted(uint256 tokenId, address indexed owner);
+    event SubscriptionIssued(uint256 tokenId, address indexed owner);
 
-    event NFTBurnt(uint256 tokenId, address indexed ownerOrApproved);
+    event SubscriptionRevoked(uint256 tokenId, address indexed ownerOrApproved);
 
-    event RequestedCancelSubscription(
+    event SubscriptionCancelRequested(
         uint256 indexed tokenId,
         uint256 indexed Time
     );
@@ -137,7 +137,7 @@ contract FlowSubscription is
             "FlowSubscription: Insuffiecient amount!"
         );
         _safeMint(_msgSender(), tokenId);
-        emit NFTMinted(tokenId, _msgSender());
+        emit SubscriptionIssued(tokenId, _msgSender());
         return tokenId;
     }
 
@@ -148,7 +148,7 @@ contract FlowSubscription is
         _tokenIdCounter++;
         tokenId = _tokenIdCounter;
         _safeMint(creator, tokenId);
-        emit NFTMinted(tokenId, _msgSender());
+        emit SubscriptionIssued(tokenId, _msgSender());
     }
 
     /**
@@ -166,7 +166,7 @@ contract FlowSubscription is
             "FlowSubscription: Not Owner Or Approved"
         );
         _burn(_tokenId);
-        emit NFTBurnt(_tokenId, _msgSender());
+        emit SubscriptionRevoked(_tokenId, _msgSender());
         _resetTokenRoyalty(_tokenId);
     }
 
@@ -246,7 +246,7 @@ contract FlowSubscription is
             );
             cancellationRequested[tokenId] = true;
             _expirations[tokenId] = uint64(block.timestamp);
-            emit RequestedCancelSubscription(tokenId, block.timestamp);
+            emit SubscriptionCancelRequested(tokenId, block.timestamp);
         } else {
             payable(ownerOf(tokenId)).transfer(msg.value);
             cancellationRequested[tokenId] = false;
