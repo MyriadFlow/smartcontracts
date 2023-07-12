@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../accessmaster/interfaces/IAccessMaster.sol";
+import "../../accessmaster/interfaces/IAccessMaster.sol";
 
 contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
     bool public paused;

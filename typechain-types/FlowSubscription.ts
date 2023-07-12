@@ -18,58 +18,70 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface FlowGenEditionInterface extends utils.Interface {
-  contractName: "FlowGenEdition";
+export interface FlowSubscriptionInterface extends utils.Interface {
+  contractName: "FlowSubscription";
   functions: {
-    "amountRequired(uint256,uint256)": FunctionFragment;
+    "MONTH()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "burn(uint256)": FunctionFragment;
-    "burnNFT(uint256)": FunctionFragment;
-    "countDownTime()": FunctionFragment;
+    "baseURI()": FunctionFragment;
+    "cancelSubscription(uint256)": FunctionFragment;
+    "cancellationRequested(uint256)": FunctionFragment;
+    "delegateSubscribe(address,bool)": FunctionFragment;
+    "expiresAt(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "marketplace()": FunctionFragment;
-    "maxSupply()": FunctionFragment;
-    "mint(uint256)": FunctionFragment;
+    "isRenewable(uint256)": FunctionFragment;
+    "mintPaused()": FunctionFragment;
     "name()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "preSalePrice()": FunctionFragment;
-    "rent(uint256,uint256)": FunctionFragment;
-    "rentables(uint256)": FunctionFragment;
+    "pause()": FunctionFragment;
+    "publicSalePrice()": FunctionFragment;
+    "renewSubscription(uint256,uint64)": FunctionFragment;
+    "revokeSubscription(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
-    "salePrice()": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setRentInfo(uint256,bool,uint256)": FunctionFragment;
-    "setUser(uint256,address,uint64)": FunctionFragment;
+    "setBaseURI(string)": FunctionFragment;
+    "setFreeSubscriptionStatus(bool)": FunctionFragment;
+    "setPrice(uint256)": FunctionFragment;
+    "setSubscriptionCharges(uint256)": FunctionFragment;
+    "setTokenURI(uint256,string)": FunctionFragment;
+    "subscribe()": FunctionFragment;
+    "subscriptionPricePerMonth()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
+    "tokenByIndex(uint256)": FunctionFragment;
+    "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "userExpires(uint256)": FunctionFragment;
-    "userOf(uint256)": FunctionFragment;
+    "unpause()": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "amountRequired",
-    values: [BigNumberish, BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "MONTH", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "baseURI", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "burnNFT",
+    functionFragment: "cancelSubscription",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "countDownTime",
-    values?: undefined
+    functionFragment: "cancellationRequested",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "delegateSubscribe",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "expiresAt",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -80,26 +92,29 @@ export interface FlowGenEditionInterface extends utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "marketplace",
+    functionFragment: "isRenewable",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "mintPaused",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
-  encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "preSalePrice",
+    functionFragment: "publicSalePrice",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "rent",
+    functionFragment: "renewSubscription",
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "rentables",
+    functionFragment: "revokeSubscription",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -110,24 +125,45 @@ export interface FlowGenEditionInterface extends utils.Interface {
     functionFragment: "safeTransferFrom",
     values: [string, string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "salePrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
+  encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "setRentInfo",
-    values: [BigNumberish, boolean, BigNumberish]
+    functionFragment: "setFreeSubscriptionStatus",
+    values: [boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "setUser",
-    values: [BigNumberish, string, BigNumberish]
+    functionFragment: "setPrice",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setSubscriptionCharges",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setTokenURI",
+    values: [BigNumberish, string]
+  ): string;
+  encodeFunctionData(functionFragment: "subscribe", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "subscriptionPricePerMonth",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "tokenByIndex",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenOfOwnerByIndex",
+    values: [string, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
     values: [BigNumberish]
@@ -140,28 +176,26 @@ export interface FlowGenEditionInterface extends utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "userExpires",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "userOf",
-    values: [BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "amountRequired",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "MONTH", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burnNFT", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "countDownTime",
+    functionFragment: "cancelSubscription",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "cancellationRequested",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "delegateSubscribe",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "expiresAt", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -171,19 +205,25 @@ export interface FlowGenEditionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "marketplace",
+    functionFragment: "isRenewable",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mintPaused", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "preSalePrice",
+    functionFragment: "publicSalePrice",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "renewSubscription",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "revokeSubscription",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
     data: BytesLike
@@ -192,21 +232,42 @@ export interface FlowGenEditionInterface extends utils.Interface {
     functionFragment: "safeTransferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "salePrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setRentInfo",
+    functionFragment: "setFreeSubscriptionStatus",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setUser", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setSubscriptionCharges",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setTokenURI",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "subscribe", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "subscriptionPricePerMonth",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenOfOwnerByIndex",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -216,32 +277,30 @@ export interface FlowGenEditionInterface extends utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "userExpires",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,uint256,address)": EventFragment;
-    "AssetDestroyed(uint256,address)": EventFragment;
-    "ConsecutiveTransfer(uint256,uint256,address,address)": EventFragment;
+    "NFTBurnt(uint256,address)": EventFragment;
+    "NFTMinted(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
+    "RequestedCancelSubscription(uint256,uint256)": EventFragment;
+    "SubscriptionUpdate(uint256,uint64)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
-    "UpdateUser(uint256,address,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "ConsecutiveTransfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NFTBurnt"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "NFTMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "RequestedCancelSubscription"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SubscriptionUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -258,27 +317,19 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type AssetCreatedEvent = TypedEvent<
-  [BigNumber, BigNumber, string],
-  { currentIndex: BigNumber; quantity: BigNumber; creator: string }
->;
-
-export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
-
-export type AssetDestroyedEvent = TypedEvent<
+export type NFTBurntEvent = TypedEvent<
   [BigNumber, string],
   { tokenId: BigNumber; ownerOrApproved: string }
 >;
 
-export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
+export type NFTBurntEventFilter = TypedEventFilter<NFTBurntEvent>;
 
-export type ConsecutiveTransferEvent = TypedEvent<
-  [BigNumber, BigNumber, string, string],
-  { fromTokenId: BigNumber; toTokenId: BigNumber; from: string; to: string }
+export type NFTMintedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; owner: string }
 >;
 
-export type ConsecutiveTransferEventFilter =
-  TypedEventFilter<ConsecutiveTransferEvent>;
+export type NFTMintedEventFilter = TypedEventFilter<NFTMintedEvent>;
 
 export type RentalInfoEvent = TypedEvent<
   [BigNumber, boolean, BigNumber, string],
@@ -287,6 +338,22 @@ export type RentalInfoEvent = TypedEvent<
 
 export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
 
+export type RequestedCancelSubscriptionEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  { tokenId: BigNumber; Time: BigNumber }
+>;
+
+export type RequestedCancelSubscriptionEventFilter =
+  TypedEventFilter<RequestedCancelSubscriptionEvent>;
+
+export type SubscriptionUpdateEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  { tokenId: BigNumber; expiration: BigNumber }
+>;
+
+export type SubscriptionUpdateEventFilter =
+  TypedEventFilter<SubscriptionUpdateEvent>;
+
 export type TransferEvent = TypedEvent<
   [string, string, BigNumber],
   { from: string; to: string; tokenId: BigNumber }
@@ -294,20 +361,13 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export type UpdateUserEvent = TypedEvent<
-  [BigNumber, string, BigNumber],
-  { tokenId: BigNumber; user: string; expires: BigNumber }
->;
-
-export type UpdateUserEventFilter = TypedEventFilter<UpdateUserEvent>;
-
-export interface FlowGenEdition extends BaseContract {
-  contractName: "FlowGenEdition";
+export interface FlowSubscription extends BaseContract {
+  contractName: "FlowSubscription";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: FlowGenEditionInterface;
+  interface: FlowSubscriptionInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -329,31 +389,38 @@ export interface FlowGenEdition extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amount: BigNumber }>;
+    MONTH(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    burn(
+    baseURI(overrides?: CallOverrides): Promise<[string]>;
+
+    cancelSubscription(
       tokenId: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    cancellationRequested(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
+
+    delegateSubscribe(
+      creator: string,
+      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    burnNFT(
+    expiresAt(
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    countDownTime(overrides?: CallOverrides): Promise<[BigNumber]>;
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -366,14 +433,12 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    marketplace(overrides?: CallOverrides): Promise<[string]>;
+    isRenewable(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
-    maxSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    mint(
-      quantity: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    mintPaused(overrides?: CallOverrides): Promise<[boolean]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -382,25 +447,22 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    preSalePrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
+    publicSalePrice(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    renewSubscription(
+      tokenId: BigNumberish,
+      duration: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<
-      [boolean, string, BigNumber, BigNumber] & {
-        isRentable: boolean;
-        user: string;
-        expires: BigNumber;
-        hourlyRate: BigNumber;
-      }
-    >;
+    revokeSubscription(
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     royaltyInfo(
       _tokenId: BigNumberish,
@@ -412,18 +474,16 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      _data: BytesLike,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    salePrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     setApprovalForAll(
       operator: string,
@@ -431,19 +491,37 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
+    setBaseURI(
+      _tokenBaseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
+    setFreeSubscriptionStatus(
+      _isOperatorSubscription: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    setPrice(
+      _publicSalePrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setSubscriptionCharges(
+      _subscriptionCharges: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setTokenURI(
+      tokenId: BigNumberish,
+      _tokenUri: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    subscribe(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    subscriptionPricePerMonth(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -451,6 +529,17 @@ export interface FlowGenEdition extends BaseContract {
     ): Promise<[boolean]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
+
+    tokenByIndex(
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -463,46 +552,50 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
-  amountRequired(
-    tokenId: BigNumberish,
-    time: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  MONTH(overrides?: CallOverrides): Promise<BigNumber>;
 
   approve(
     to: string,
     tokenId: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  burn(
+  baseURI(overrides?: CallOverrides): Promise<string>;
+
+  cancelSubscription(
     tokenId: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  cancellationRequested(
+    arg0: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
+
+  delegateSubscribe(
+    creator: string,
+    freeSubscribe: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  burnNFT(
+  expiresAt(
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  countDownTime(overrides?: CallOverrides): Promise<BigNumber>;
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   getApproved(
     tokenId: BigNumberish,
@@ -515,38 +608,33 @@ export interface FlowGenEdition extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  marketplace(overrides?: CallOverrides): Promise<string>;
+  isRenewable(
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
-  maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-  mint(
-    quantity: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  mintPaused(overrides?: CallOverrides): Promise<boolean>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  preSalePrice(overrides?: CallOverrides): Promise<BigNumber>;
+  pause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  rent(
-    _tokenId: BigNumberish,
-    _timeInHours: BigNumberish,
+  publicSalePrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+  renewSubscription(
+    tokenId: BigNumberish,
+    duration: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  rentables(
-    arg0: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<
-    [boolean, string, BigNumber, BigNumber] & {
-      isRentable: boolean;
-      user: string;
-      expires: BigNumber;
-      hourlyRate: BigNumber;
-    }
-  >;
+  revokeSubscription(
+    _tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   royaltyInfo(
     _tokenId: BigNumberish,
@@ -558,18 +646,16 @@ export interface FlowGenEdition extends BaseContract {
     from: string,
     to: string,
     tokenId: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256,bytes)"(
     from: string,
     to: string,
     tokenId: BigNumberish,
-    _data: BytesLike,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+    data: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  salePrice(overrides?: CallOverrides): Promise<BigNumber>;
 
   setApprovalForAll(
     operator: string,
@@ -577,19 +663,37 @@ export interface FlowGenEdition extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setRentInfo(
-    tokenId: BigNumberish,
-    isRentable: boolean,
-    pricePerHour: BigNumberish,
+  setBaseURI(
+    _tokenBaseURI: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setUser(
-    tokenId: BigNumberish,
-    user: string,
-    expires: BigNumberish,
+  setFreeSubscriptionStatus(
+    _isOperatorSubscription: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  setPrice(
+    _publicSalePrice: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setSubscriptionCharges(
+    _subscriptionCharges: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setTokenURI(
+    tokenId: BigNumberish,
+    _tokenUri: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  subscribe(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  subscriptionPricePerMonth(overrides?: CallOverrides): Promise<BigNumber>;
 
   supportsInterface(
     interfaceId: BytesLike,
@@ -597,6 +701,17 @@ export interface FlowGenEdition extends BaseContract {
   ): Promise<boolean>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
+
+  tokenByIndex(
+    index: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  tokenOfOwnerByIndex(
+    owner: string,
+    index: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -606,26 +721,19 @@ export interface FlowGenEdition extends BaseContract {
     from: string,
     to: string,
     tokenId: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  userExpires(
-    tokenId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+  unpause(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   withdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    MONTH(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -635,11 +743,28 @@ export interface FlowGenEdition extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    baseURI(overrides?: CallOverrides): Promise<string>;
 
-    burnNFT(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    cancelSubscription(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    countDownTime(overrides?: CallOverrides): Promise<BigNumber>;
+    cancellationRequested(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
+
+    delegateSubscribe(
+      creator: string,
+      freeSubscribe: boolean,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    expiresAt(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -652,38 +777,31 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    marketplace(overrides?: CallOverrides): Promise<string>;
-
-    maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    mint(
-      quantity: BigNumberish,
+    isRenewable(
+      tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber]>;
+    ): Promise<boolean>;
+
+    mintPaused(overrides?: CallOverrides): Promise<boolean>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    preSalePrice(overrides?: CallOverrides): Promise<BigNumber>;
+    pause(overrides?: CallOverrides): Promise<void>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
+    publicSalePrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    renewSubscription(
+      tokenId: BigNumberish,
+      duration: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    rentables(
-      arg0: BigNumberish,
+    revokeSubscription(
+      _tokenId: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [boolean, string, BigNumber, BigNumber] & {
-        isRentable: boolean;
-        user: string;
-        expires: BigNumber;
-        hourlyRate: BigNumber;
-      }
-    >;
+    ): Promise<void>;
 
     royaltyInfo(
       _tokenId: BigNumberish,
@@ -702,11 +820,9 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      _data: BytesLike,
+      data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    salePrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     setApprovalForAll(
       operator: string,
@@ -714,19 +830,32 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
+    setBaseURI(_tokenBaseURI: string, overrides?: CallOverrides): Promise<void>;
+
+    setFreeSubscriptionStatus(
+      _isOperatorSubscription: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
+    setPrice(
+      _publicSalePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    setSubscriptionCharges(
+      _subscriptionCharges: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setTokenURI(
+      tokenId: BigNumberish,
+      _tokenUri: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    subscribe(overrides?: CallOverrides): Promise<BigNumber>;
+
+    subscriptionPricePerMonth(overrides?: CallOverrides): Promise<BigNumber>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -734,6 +863,17 @@ export interface FlowGenEdition extends BaseContract {
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
+
+    tokenByIndex(
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -746,12 +886,7 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+    unpause(overrides?: CallOverrides): Promise<void>;
 
     withdraw(overrides?: CallOverrides): Promise<void>;
   };
@@ -779,38 +914,20 @@ export interface FlowGenEdition extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,uint256,address)"(
-      currentIndex?: null,
-      quantity?: null,
-      creator?: string | null
-    ): AssetCreatedEventFilter;
-    AssetCreated(
-      currentIndex?: null,
-      quantity?: null,
-      creator?: string | null
-    ): AssetCreatedEventFilter;
+    "NFTBurnt(uint256,address)"(
+      tokenId?: null,
+      ownerOrApproved?: string | null
+    ): NFTBurntEventFilter;
+    NFTBurnt(
+      tokenId?: null,
+      ownerOrApproved?: string | null
+    ): NFTBurntEventFilter;
 
-    "AssetDestroyed(uint256,address)"(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-    AssetDestroyed(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-
-    "ConsecutiveTransfer(uint256,uint256,address,address)"(
-      fromTokenId?: BigNumberish | null,
-      toTokenId?: null,
-      from?: string | null,
-      to?: string | null
-    ): ConsecutiveTransferEventFilter;
-    ConsecutiveTransfer(
-      fromTokenId?: BigNumberish | null,
-      toTokenId?: null,
-      from?: string | null,
-      to?: string | null
-    ): ConsecutiveTransferEventFilter;
+    "NFTMinted(uint256,address)"(
+      tokenId?: null,
+      owner?: string | null
+    ): NFTMintedEventFilter;
+    NFTMinted(tokenId?: null, owner?: string | null): NFTMintedEventFilter;
 
     "RentalInfo(uint256,bool,uint256,address)"(
       tokenId?: null,
@@ -825,6 +942,24 @@ export interface FlowGenEdition extends BaseContract {
       renter?: string | null
     ): RentalInfoEventFilter;
 
+    "RequestedCancelSubscription(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      Time?: BigNumberish | null
+    ): RequestedCancelSubscriptionEventFilter;
+    RequestedCancelSubscription(
+      tokenId?: BigNumberish | null,
+      Time?: BigNumberish | null
+    ): RequestedCancelSubscriptionEventFilter;
+
+    "SubscriptionUpdate(uint256,uint64)"(
+      tokenId?: BigNumberish | null,
+      expiration?: null
+    ): SubscriptionUpdateEventFilter;
+    SubscriptionUpdate(
+      tokenId?: BigNumberish | null,
+      expiration?: null
+    ): SubscriptionUpdateEventFilter;
+
     "Transfer(address,address,uint256)"(
       from?: string | null,
       to?: string | null,
@@ -835,45 +970,41 @@ export interface FlowGenEdition extends BaseContract {
       to?: string | null,
       tokenId?: BigNumberish | null
     ): TransferEventFilter;
-
-    "UpdateUser(uint256,address,uint64)"(
-      tokenId?: BigNumberish | null,
-      user?: string | null,
-      expires?: null
-    ): UpdateUserEventFilter;
-    UpdateUser(
-      tokenId?: BigNumberish | null,
-      user?: string | null,
-      expires?: null
-    ): UpdateUserEventFilter;
   };
 
   estimateGas: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    MONTH(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    burn(
+    baseURI(overrides?: CallOverrides): Promise<BigNumber>;
+
+    cancelSubscription(
       tokenId: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    cancellationRequested(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    delegateSubscribe(
+      creator: string,
+      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    burnNFT(
+    expiresAt(
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    countDownTime(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -886,14 +1017,12 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    marketplace(overrides?: CallOverrides): Promise<BigNumber>;
-
-    maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
-
-    mint(
-      quantity: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    isRenewable(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    mintPaused(overrides?: CallOverrides): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -902,17 +1031,21 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    preSalePrice(overrides?: CallOverrides): Promise<BigNumber>;
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
+    publicSalePrice(overrides?: CallOverrides): Promise<BigNumber>;
+
+    renewSubscription(
+      tokenId: BigNumberish,
+      duration: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
+    revokeSubscription(
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     royaltyInfo(
@@ -925,18 +1058,16 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      _data: BytesLike,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    salePrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     setApprovalForAll(
       operator: string,
@@ -944,19 +1075,37 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
+    setBaseURI(
+      _tokenBaseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
+    setFreeSubscriptionStatus(
+      _isOperatorSubscription: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    setPrice(
+      _publicSalePrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setSubscriptionCharges(
+      _subscriptionCharges: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setTokenURI(
+      tokenId: BigNumberish,
+      _tokenUri: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    subscribe(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    subscriptionPricePerMonth(overrides?: CallOverrides): Promise<BigNumber>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -964,6 +1113,17 @@ export interface FlowGenEdition extends BaseContract {
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
+
+    tokenByIndex(
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -976,17 +1136,11 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    userOf(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     withdraw(
@@ -995,16 +1149,12 @@ export interface FlowGenEdition extends BaseContract {
   };
 
   populateTransaction: {
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    MONTH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     balanceOf(
@@ -1012,17 +1162,28 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    burn(
+    baseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    cancelSubscription(
       tokenId: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    cancellationRequested(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    delegateSubscribe(
+      creator: string,
+      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    burnNFT(
+    expiresAt(
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    countDownTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -1035,14 +1196,12 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    marketplace(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    maxSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    mint(
-      quantity: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    isRenewable(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    mintPaused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1051,17 +1210,21 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    preSalePrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    pause(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
+    publicSalePrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    renewSubscription(
+      tokenId: BigNumberish,
+      duration: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    rentables(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
+    revokeSubscription(
+      _tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
@@ -1074,18 +1237,16 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      _data: BytesLike,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      data: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    salePrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setApprovalForAll(
       operator: string,
@@ -1093,18 +1254,38 @@ export interface FlowGenEdition extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
+    setBaseURI(
+      _tokenBaseURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
+    setFreeSubscriptionStatus(
+      _isOperatorSubscription: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPrice(
+      _publicSalePrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setSubscriptionCharges(
+      _subscriptionCharges: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setTokenURI(
+      tokenId: BigNumberish,
+      _tokenUri: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    subscribe(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    subscriptionPricePerMonth(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     supportsInterface(
@@ -1113,6 +1294,17 @@ export interface FlowGenEdition extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    tokenByIndex(
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    tokenOfOwnerByIndex(
+      owner: string,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     tokenURI(
       tokenId: BigNumberish,
@@ -1125,17 +1317,11 @@ export interface FlowGenEdition extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    userOf(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
+    unpause(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     withdraw(
