@@ -32,6 +32,7 @@ export interface MyriadFlowOfferStationInterface extends utils.Interface {
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "setPause()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
+    "updatePlatformFee(uint96)": FunctionFragment;
     "version()": FunctionFragment;
     "withdrawOffer(uint256)": FunctionFragment;
   };
@@ -73,6 +74,10 @@ export interface MyriadFlowOfferStationInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "updatePlatformFee",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(
@@ -116,6 +121,10 @@ export interface MyriadFlowOfferStationInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "setPause", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "updatePlatformFee",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
@@ -264,6 +273,11 @@ export interface MyriadFlowOfferStation extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    updatePlatformFee(
+      _platformFee: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     version(overrides?: CallOverrides): Promise<[string]>;
 
     withdrawOffer(
@@ -326,6 +340,11 @@ export interface MyriadFlowOfferStation extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  updatePlatformFee(
+    _platformFee: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   version(overrides?: CallOverrides): Promise<string>;
 
   withdrawOffer(
@@ -385,6 +404,11 @@ export interface MyriadFlowOfferStation extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    updatePlatformFee(
+      _platformFee: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     version(overrides?: CallOverrides): Promise<string>;
 
@@ -495,6 +519,11 @@ export interface MyriadFlowOfferStation extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    updatePlatformFee(
+      _platformFee: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     version(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdrawOffer(
@@ -550,6 +579,11 @@ export interface MyriadFlowOfferStation extends BaseContract {
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    updatePlatformFee(
+      _platformFee: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;

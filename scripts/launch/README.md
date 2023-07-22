@@ -101,6 +101,95 @@ The JSON file should have the following format:
 }
 ```
 
+`EternalSoul Contract`
+
+```shell
+{
+    "contractName" : "EternalSoul",
+    "constructorParams":{
+        "param1" : "Soul Wizard",
+        "param2" : "SW",
+        "param3" : "www.xyz.com",
+        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
+    }
+}
+```
+
+`FlowSubscription Contract`
+
+```shell
+{
+    "contractName" : "FlowSubscription",
+    "constructorParams":{
+        "param1" : "MYRIADFLOW",
+        "param2" : "MFW",
+        "param3" : "www.xyz.com",
+        "param4" : "1000000000000000000",
+        "param5" : "1000000000000000",
+        "param6" : 300
+        "param7" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
+    }
+}
+```
+`FlowOfferStation Contract`
+
+```shell
+{
+    "contractName" : "FlowSubscription",
+    "constructorParams":{
+        "param1" : "MYRIADFLOW",
+        "param2" : "MFW",
+        "param3" : "www.xyz.com",
+        "param4" : "1000000000000000000",
+        "param5" : "1000000000000000",
+        "param6" : 300
+    }
+}
+```
+
+`FlowOfferStation Contract`
+
+```shell
+{
+    "contractName" : "FlowOfferStation",
+    "constructorParams":{
+        "param1" : 300,
+        "param2" : "1.0.0",
+        "param3" : false,
+        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
+    }
+}
+```
+
+`CyberMaven Contract`
+
+```shell
+{
+    "contractName" : "CyberMaven",
+    "constructorParams":{
+
+    }
+}
+```
+
+
+`Account Registry`
+
+```shell
+{
+    "contractName" : "CyberMaven",
+    "constructorParams":{
+
+    }
+}
+```
+
+
+
+
+
+
+
 The `contracts` array contains objects representing each contract. Each contract object has two properties:
 
 -   `contractName`: The name of the contract.

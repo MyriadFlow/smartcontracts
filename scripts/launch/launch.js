@@ -184,24 +184,50 @@ async function eternumPassDeploy() {
     return Addr
 }
 
+async function eternalSoulDeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const EternalSoul = await hre.ethers.getContractFactory("EternalSoul")
+    const eternalsoul = await EternalSoul.deploy(
+        constructorParam.param1,
+        constructorParam.param2,
+        constructorParam.param3,
+        constructorParam.param4
+    )
+    await eternalsoul.deployed()
+    console.log("EternalSoul Deployed to:", eternalsoul.address)
+    const Addr = eternalsoul.address
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await eternalsoul.deployTransaction.wait(6)
+        await verify(Addr, [
+            constructorParam.param1,
+            constructorParam.param2,
+            constructorParam.param3,
+            constructorParam.param4,
+        ])
+    }
+    return Addr
+}
+
 async function flowSubscriptionDeploy() {
     const constructorParam = jsonContent.constructorParams
-    const EternumPass = await hre.ethers.getContractFactory("FlowSubscription")
-    const eternumpass = await EternumPass.deploy(
+    const FlowSubscription = await hre.ethers.getContractFactory(
+        "FlowSubscription"
+    )
+    const flowsubscription = await FlowSubscription.deploy(
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3,
         constructorParam.param4,
         constructorParam.param5,
-        constructorParam.param6,
-        constructorParam.param7
+        constructorParam.param6
     )
-    await eternumpass.deployed()
-    console.log("FlowSubscription Deployed to:", eternumpass.address)
-    const Addr = eternumpass.address
+    await flowsubscription.deployed()
+    console.log("FlowSubscription Deployed to:", flowsubscription.address)
+    const Addr = flowsubscription.address
     /// VERIFY
     if (hre.network.name != "hardhat") {
-        await eternumpass.deployTransaction.wait(6)
+        await flowsubscription.deployTransaction.wait(6)
         await verify(Addr, [
             constructorParam.param1,
             constructorParam.param2,
@@ -209,7 +235,68 @@ async function flowSubscriptionDeploy() {
             constructorParam.param4,
             constructorParam.param5,
             constructorParam.param6,
-            constructorParam.param7,
+        ])
+    }
+    return Addr
+}
+
+async function flowOfferStationDeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const OfferStation = await hre.ethers.getContractFactory(
+        "MyriadFlowOfferStation"
+    )
+    const offerstation = await OfferStation.deploy(
+        constructorParam.param1,
+        constructorParam.param2,
+        constructorParam.param3,
+        constructorParam.param4
+    )
+    await offerstation.deployed()
+    console.log("Offerstation Deployed to:", offerstation.address)
+    const Addr = offerstation.address
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await offerstation.deployTransaction.wait(6)
+        await verify(Addr, [
+            constructorParam.param1,
+            constructorParam.param2,
+            constructorParam.param3,
+            constructorParam.param4,
+        ])
+    }
+    return Addr
+}
+
+async function cyberMavenDeploy() {
+    const CyberMavenFactory = await hre.ethers.getContractFactory("CyberMavenV1")
+    const cybermaven = await CyberMavenFactory.deploy()
+    await cybermaven.deployed()
+    console.log(`CyberMaven Deployed  to : ${cybermaven.address}`)
+    let Addr = cybermaven.address
+    ///VERIFY
+    if (hre.network.name != "hardhat") {
+        await cybermaven.deployTransaction.wait(6)
+        await verify(cybermaven.address, [])
+    }
+    return Addr
+}
+
+async function accountRegistryDeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const AccountRegistry = await hre.ethers.getContractFactory(
+        "AccountRegistry"
+    )
+    const accountregistry = await AccountRegistry.deploy(
+        constructorParam.param1
+    )
+    await accountregistry.deployed()
+    console.log("Account Registry Deployed to:", accountregistry.address)
+    const Addr = accountregistry.address
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await accountregistry.deployTransaction.wait(6)
+        await verify(Addr, [
+            constructorParam.param1,
         ])
     }
     return Addr
@@ -240,10 +327,28 @@ async function main() {
     if (jsonContent.contractName == "EternumPass") {
         contractAddress = await eternumPassDeploy()
     }
+    // ETERNALSOUL CONTRACT
+    if (jsonContent.contractName == "EternalSoul") {
+        contractAddress = await eternalSoulDeploy()
+    }
+
     // FLOWSUBSCRIPTION
     if (jsonContent.contractName == "FlowSubscription") {
         contractAddress = await flowSubscriptionDeploy()
     }
+    // FLOWOFFERSTATION
+    if (jsonContent.contractName == "FlowOfferStation") {
+        contractAddress = await flowOfferStationDeploy()
+    }
+    // CYBERMAVEN
+    if (jsonContent.contractName == "CyberMaven") {
+        contractAddress = await cyberMavenDeploy()
+    }
+    // ACCOUNT REGISTRY
+    if (jsonContent.contractName == "AccountRegistry") {
+        contractAddress = await accountRegistryDeploy()
+    }
+
     let chainId
 
     if (network.config.chainId != undefined) {

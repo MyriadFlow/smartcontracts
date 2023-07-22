@@ -81,14 +81,14 @@ contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
         _;
     }
 
-    modifier onlyAdmin() {
+    modifier onlyOperator() {
         require(
-            flowRoles.isAdmin(_msgSender()),
-            "MyriadFlowOfferStation: User is not authorized"
+            flowRoles.isOperator(_msgSender()),
+            "EternalSoul: User is not authorized "
         );
         _;
     }
-
+    
     constructor(
         uint96 _platformFee,
         string memory _version,
@@ -101,6 +101,10 @@ contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
         MyriadFlowOfferStationPayoutAddress = _msgSender();
         version = _version;
         paused = _paused;
+    }
+
+    function updatePlatformFee(uint96 _platformFee) external onlyOperator {
+        platformFeeBasisPoint = _platformFee;
     }
 
     /// @notice create an Offer to any  nft contract in the blockchain
@@ -222,7 +226,7 @@ contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
         );
     }
 
-    function setPause() external onlyAdmin {
+    function setPause() external onlyOperator {
         paused ? paused = false : paused = true;
     }
 

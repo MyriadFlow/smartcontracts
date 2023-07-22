@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import "../../accessmaster/interfaces/IAccessMaster.sol";
 
 /// @title Users can only utilise token services after renewing their subscriptions and renting them to others.
 /**
@@ -24,13 +24,7 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract FlowSubscription is
-    Context,
-    IERC5643,
-    ERC2981,
-    AccessControlEnumerable,
-    ERC721Enumerable
-{
+contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant OPERATOR_ROLE = keccak256("OPERATOR_ROLE");
     // Set Constants for Interface ID and Roles
@@ -55,12 +49,30 @@ contract FlowSubscription is
     /// @notice storing token URI's
     mapping(uint256 => string) private _tokenURI;
 
+    IACCESSMASTER flowRoles;
+
     modifier whenNotpaused() {
         require(mintPaused == false, "FlowSubscription: NFT Minting Paused");
         _;
     }
     modifier onlyWhenTokenExist(uint256 tokenId) {
         require(_exists(tokenId), "FlowSubscription: Not a valid tokenId");
+        _;
+    }
+
+    modifier onlyOperator() {
+        require(
+            flowRoles.isOperator(_msgSender()),
+            "EternalSoul: User is not authorized "
+        );
+        _;
+    }
+
+    modifier onlyAdmin() {
+        require(
+            flowRoles.isAdmin(_msgSender()),
+            "InstaGen: User is not authorized"
+        );
         _;
     }
     event SubscriptionIssued(uint256 tokenId, address indexed owner);
@@ -78,43 +90,35 @@ contract FlowSubscription is
         string memory _initialURI,
         uint256 _publicSalePrice,
         uint256 _subscriptionPricePerMonth,
-        uint96 royaltyBasisPoint
+        uint96 royaltyBasisPoint,
+        address flowContract
     ) ERC721(_name, _symbol) {
         baseURI = _initialURI;
         publicSalePrice = _publicSalePrice;
         subscriptionPricePerMonth = _subscriptionPricePerMonth;
         // Setting default royalty
         _setDefaultRoyalty(_msgSender(), royaltyBasisPoint);
-        /// Setting up roles
-        _setupRole(ADMIN_ROLE, _msgSender());
 
-        _setRoleAdmin(ADMIN_ROLE, ADMIN_ROLE);
-        _setRoleAdmin(OPERATOR_ROLE, ADMIN_ROLE);
-        // add Admin to operator and Creator
-        grantRole(OPERATOR_ROLE, _msgSender());
+        flowRoles = IACCESSMASTER(flowContract);
     }
 
     /// @notice Admin Role can set the mint price
-    function setPrice(
-        uint256 _publicSalePrice
-    ) external onlyRole(OPERATOR_ROLE) {
+    function setPrice(uint256 _publicSalePrice) external onlyOperator {
         publicSalePrice = _publicSalePrice;
     }
 
     /// @notice pause or stop the contract from working by ADMIN
-    function pause() external onlyRole(OPERATOR_ROLE) {
+    function pause() external onlyOperator {
         mintPaused = true;
     }
 
     /// @notice Unpause the contract by ADMIN
-    function unpause() public onlyRole(OPERATOR_ROLE) {
+    function unpause() public onlyOperator {
         mintPaused = false;
     }
 
     /// @notice only operator can set base token URI for the contract
-    function setBaseURI(
-        string memory _tokenBaseURI
-    ) external onlyRole(OPERATOR_ROLE) {
+    function setBaseURI(string memory _tokenBaseURI) external onlyOperator {
         baseURI = _tokenBaseURI;
     }
 
@@ -122,7 +126,7 @@ contract FlowSubscription is
     function setTokenURI(uint tokenId, string memory _tokenUri) external {
         require(
             ownerOf(tokenId) == _msgSender() ||
-                hasRole(OPERATOR_ROLE, _msgSender())
+               flowRoles.isOperator(_msgSender())
         );
         _tokenURI[tokenId] = _tokenUri;
     }
@@ -144,7 +148,7 @@ contract FlowSubscription is
     //// @notice to mint NFT's By Operator
     function delegateSubscribe(
         address creator
-    ) public onlyRole(OPERATOR_ROLE) returns (uint256 tokenId) {
+    ) public onlyOperator returns (uint256 tokenId) {
         _tokenIdCounter++;
         tokenId = _tokenIdCounter;
         _safeMint(creator, tokenId);
@@ -171,7 +175,7 @@ contract FlowSubscription is
     }
 
     /// @notice only Admin can withdraw the funds collected
-    function withdraw() external onlyRole(ADMIN_ROLE) {
+    function withdraw() external onlyAdmin {
         // get the balance of the contract
         (bool callSuccess, ) = payable(_msgSender()).call{
             value: address(this).balance
@@ -191,7 +195,7 @@ contract FlowSubscription is
         uint256 tokenId,
         uint64 duration
     ) external payable onlyWhenTokenExist(tokenId) {
-        bool isOperator = hasRole(OPERATOR_ROLE, _msgSender());
+        bool isOperator = flowRoles.isOperator(_msgSender());
         require(
             _isApprovedOrOwner(_msgSender(), tokenId) || isOperator,
             "FlowSubscription: Caller is not owner nor approved nor the Operator"
@@ -230,7 +234,7 @@ contract FlowSubscription is
     function cancelSubscription(
         uint256 tokenId
     ) external payable onlyWhenTokenExist(tokenId) {
-        bool isOperator = hasRole(OPERATOR_ROLE, _msgSender());
+        bool isOperator = flowRoles.isOperator(_msgSender());
         require(
             isRenewable(tokenId) == false,
             "FlowSubscription: Cancellation cannot be proceeded!"
@@ -295,13 +299,7 @@ contract FlowSubscription is
 
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        virtual
-        override(ERC721Enumerable, ERC2981, AccessControlEnumerable)
-        returns (bool)
-    {
+    ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
         if (interfaceId == _INTERFACE_ID_ERC2981) return true;
         if (interfaceId == type(IERC5643).interfaceId) return true;
         return super.supportsInterface(interfaceId);

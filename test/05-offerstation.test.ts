@@ -2,8 +2,11 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect , assert } from "chai"
 import { ethers , network} from "hardhat"
 import { MyriadFlowOfferStation , SignatureSeries  ,AccessMaster} from "../typechain-types"
+import exp from "constants"
+import { off } from "process"
+import { equal } from "assert"
 
-describe("MyriadFlowOfferStation  contract", () => {
+describe("FlowOfferStation  contract", () => {
                                     
     let [owner, creator, creator2, buyer, operator ]: SignerWithAddress[] = new Array(5)
     before(async () => {
@@ -71,8 +74,7 @@ describe("MyriadFlowOfferStation  contract", () => {
 
     })
     it("Accept Offer by Owner",async()=>{
-
-        const contractAddress = signatureSeries.address
+      const contractAddress = signatureSeries.address
          //Accept Offer
         let val2 = ethers.utils.parseEther("1.0")
         await offerstation.createOffer(contractAddress,1 , {value : val2})
@@ -117,7 +119,9 @@ describe("MyriadFlowOfferStation  contract", () => {
         expect( offerstation.createOffer(contractAddress,1 , {value : val2})).to.be.revertedWith("MyriadOfferStation: You cannot offer , it is paused for sometime!")
         // only Admin can call
         expect(offerstation.connect(creator2).setPause()).to.be.revertedWith("MyriadFlowOfferStation: User is not authorized");
-
-        
+    })
+    it("To check updatePlatformFee",async()=>{
+        await offerstation.updatePlatformFee(30)
+        expect(await offerstation.platformFeeBasisPoint()).to.be.equal(30)       
     })
 })

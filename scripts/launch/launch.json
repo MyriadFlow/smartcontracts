@@ -1,12 +1,9 @@
-{
-    "contractName" : "FlowSubscription",
-    "constructorParams":{ 
-        "param1" : "NFT_MELA",
-        "param2" : "NFM",
+{   
+   "contractName" : "EternalSoul",
+    "constructorParams":{
+        "param1" : "Soul Wizard",
+        "param2" : "SW",
         "param3" : "www.xyz.com",
-        "param4" : "400000000000000000",
-        "param5" : "10000000000000000",
-        "param6" : "300",
-        "param7" : true
+        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
     }
 }

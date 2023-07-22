@@ -21,15 +21,23 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface FlowSubscriptionInterface extends utils.Interface {
   contractName: "FlowSubscription";
   functions: {
+    "ADMIN_ROLE()": FunctionFragment;
+    "DEFAULT_ADMIN_ROLE()": FunctionFragment;
     "MONTH()": FunctionFragment;
+    "OPERATOR_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
     "cancelSubscription(uint256)": FunctionFragment;
     "cancellationRequested(uint256)": FunctionFragment;
-    "delegateSubscribe(address,bool)": FunctionFragment;
+    "delegateSubscribe(address)": FunctionFragment;
     "expiresAt(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
+    "getRoleAdmin(bytes32)": FunctionFragment;
+    "getRoleMember(bytes32,uint256)": FunctionFragment;
+    "getRoleMemberCount(bytes32)": FunctionFragment;
+    "grantRole(bytes32,address)": FunctionFragment;
+    "hasRole(bytes32,address)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "isRenewable(uint256)": FunctionFragment;
     "mintPaused()": FunctionFragment;
@@ -38,14 +46,14 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     "pause()": FunctionFragment;
     "publicSalePrice()": FunctionFragment;
     "renewSubscription(uint256,uint64)": FunctionFragment;
+    "renounceRole(bytes32,address)": FunctionFragment;
+    "revokeRole(bytes32,address)": FunctionFragment;
     "revokeSubscription(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setBaseURI(string)": FunctionFragment;
-    "setFreeSubscriptionStatus(bool)": FunctionFragment;
     "setPrice(uint256)": FunctionFragment;
-    "setSubscriptionCharges(uint256)": FunctionFragment;
     "setTokenURI(uint256,string)": FunctionFragment;
     "subscribe()": FunctionFragment;
     "subscriptionPricePerMonth()": FunctionFragment;
@@ -60,7 +68,19 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     "withdraw()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "ADMIN_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "MONTH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "OPERATOR_ROLE",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
@@ -77,7 +97,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "delegateSubscribe",
-    values: [string, boolean]
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "expiresAt",
@@ -86,6 +106,26 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "getApproved",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoleAdmin",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoleMember",
+    values: [BytesLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getRoleMemberCount",
+    values: [BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "grantRole",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "hasRole",
+    values: [BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "isApprovedForAll",
@@ -114,6 +154,14 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "renounceRole",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "revokeRole",
+    values: [BytesLike, string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "revokeSubscription",
     values: [BigNumberish]
   ): string;
@@ -131,15 +179,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "setFreeSubscriptionStatus",
-    values: [boolean]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setPrice",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setSubscriptionCharges",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -179,7 +219,16 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "ADMIN_ROLE", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "DEFAULT_ADMIN_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "MONTH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "OPERATOR_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
@@ -201,6 +250,20 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getRoleAdmin",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoleMember",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getRoleMemberCount",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
@@ -221,6 +284,11 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "renounceRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(
     functionFragment: "revokeSubscription",
     data: BytesLike
   ): Result;
@@ -237,15 +305,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setFreeSubscriptionStatus",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setSubscriptionCharges",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setTokenURI",
     data: BytesLike
@@ -283,22 +343,26 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "NFTBurnt(uint256,address)": EventFragment;
-    "NFTMinted(uint256,address)": EventFragment;
-    "RentalInfo(uint256,bool,uint256,address)": EventFragment;
-    "RequestedCancelSubscription(uint256,uint256)": EventFragment;
+    "RoleAdminChanged(bytes32,bytes32,bytes32)": EventFragment;
+    "RoleGranted(bytes32,address,address)": EventFragment;
+    "RoleRevoked(bytes32,address,address)": EventFragment;
+    "SubscriptionCancelRequested(uint256,uint256)": EventFragment;
+    "SubscriptionIssued(uint256,address)": EventFragment;
+    "SubscriptionRevoked(uint256,address)": EventFragment;
     "SubscriptionUpdate(uint256,uint64)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTBurnt"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTMinted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleAdminChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleGranted"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RoleRevoked"): EventFragment;
   getEvent(
-    nameOrSignatureOrTopic: "RequestedCancelSubscription"
+    nameOrSignatureOrTopic: "SubscriptionCancelRequested"
   ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SubscriptionIssued"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SubscriptionRevoked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SubscriptionUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -317,34 +381,51 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type NFTBurntEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; ownerOrApproved: string }
+export type RoleAdminChangedEvent = TypedEvent<
+  [string, string, string],
+  { role: string; previousAdminRole: string; newAdminRole: string }
 >;
 
-export type NFTBurntEventFilter = TypedEventFilter<NFTBurntEvent>;
+export type RoleAdminChangedEventFilter =
+  TypedEventFilter<RoleAdminChangedEvent>;
 
-export type NFTMintedEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; owner: string }
+export type RoleGrantedEvent = TypedEvent<
+  [string, string, string],
+  { role: string; account: string; sender: string }
 >;
 
-export type NFTMintedEventFilter = TypedEventFilter<NFTMintedEvent>;
+export type RoleGrantedEventFilter = TypedEventFilter<RoleGrantedEvent>;
 
-export type RentalInfoEvent = TypedEvent<
-  [BigNumber, boolean, BigNumber, string],
-  { tokenId: BigNumber; isRentable: boolean; price: BigNumber; renter: string }
+export type RoleRevokedEvent = TypedEvent<
+  [string, string, string],
+  { role: string; account: string; sender: string }
 >;
 
-export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
+export type RoleRevokedEventFilter = TypedEventFilter<RoleRevokedEvent>;
 
-export type RequestedCancelSubscriptionEvent = TypedEvent<
+export type SubscriptionCancelRequestedEvent = TypedEvent<
   [BigNumber, BigNumber],
   { tokenId: BigNumber; Time: BigNumber }
 >;
 
-export type RequestedCancelSubscriptionEventFilter =
-  TypedEventFilter<RequestedCancelSubscriptionEvent>;
+export type SubscriptionCancelRequestedEventFilter =
+  TypedEventFilter<SubscriptionCancelRequestedEvent>;
+
+export type SubscriptionIssuedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; owner: string }
+>;
+
+export type SubscriptionIssuedEventFilter =
+  TypedEventFilter<SubscriptionIssuedEvent>;
+
+export type SubscriptionRevokedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; ownerOrApproved: string }
+>;
+
+export type SubscriptionRevokedEventFilter =
+  TypedEventFilter<SubscriptionRevokedEvent>;
 
 export type SubscriptionUpdateEvent = TypedEvent<
   [BigNumber, BigNumber],
@@ -389,7 +470,13 @@ export interface FlowSubscription extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     MONTH(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     approve(
       to: string,
@@ -413,7 +500,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -426,6 +512,31 @@ export interface FlowSubscription extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
+
+    getRoleMember(
+      role: BytesLike,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    getRoleMemberCount(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     isApprovedForAll(
       owner: string,
@@ -457,6 +568,18 @@ export interface FlowSubscription extends BaseContract {
       tokenId: BigNumberish,
       duration: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     revokeSubscription(
@@ -496,18 +619,8 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -564,7 +677,13 @@ export interface FlowSubscription extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
   MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+  OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
   approve(
     to: string,
@@ -588,7 +707,6 @@ export interface FlowSubscription extends BaseContract {
 
   delegateSubscribe(
     creator: string,
-    freeSubscribe: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -601,6 +719,31 @@ export interface FlowSubscription extends BaseContract {
     tokenId: BigNumberish,
     overrides?: CallOverrides
   ): Promise<string>;
+
+  getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+  getRoleMember(
+    role: BytesLike,
+    index: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  getRoleMemberCount(
+    role: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  grantRole(
+    role: BytesLike,
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  hasRole(
+    role: BytesLike,
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   isApprovedForAll(
     owner: string,
@@ -629,6 +772,18 @@ export interface FlowSubscription extends BaseContract {
     tokenId: BigNumberish,
     duration: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  renounceRole(
+    role: BytesLike,
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  revokeRole(
+    role: BytesLike,
+    account: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   revokeSubscription(
@@ -668,18 +823,8 @@ export interface FlowSubscription extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setFreeSubscriptionStatus(
-    _isOperatorSubscription: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setPrice(
     _publicSalePrice: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setSubscriptionCharges(
-    _subscriptionCharges: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -733,7 +878,13 @@ export interface FlowSubscription extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
     approve(
       to: string,
@@ -757,7 +908,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -770,6 +920,31 @@ export interface FlowSubscription extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<string>;
+
+    getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
+
+    getRoleMember(
+      role: BytesLike,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    getRoleMemberCount(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<boolean>;
 
     isApprovedForAll(
       owner: string,
@@ -795,6 +970,18 @@ export interface FlowSubscription extends BaseContract {
     renewSubscription(
       tokenId: BigNumberish,
       duration: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -832,18 +1019,8 @@ export interface FlowSubscription extends BaseContract {
 
     setBaseURI(_tokenBaseURI: string, overrides?: CallOverrides): Promise<void>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -914,42 +1091,65 @@ export interface FlowSubscription extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "NFTBurnt(uint256,address)"(
-      tokenId?: null,
-      ownerOrApproved?: string | null
-    ): NFTBurntEventFilter;
-    NFTBurnt(
-      tokenId?: null,
-      ownerOrApproved?: string | null
-    ): NFTBurntEventFilter;
+    "RoleAdminChanged(bytes32,bytes32,bytes32)"(
+      role?: BytesLike | null,
+      previousAdminRole?: BytesLike | null,
+      newAdminRole?: BytesLike | null
+    ): RoleAdminChangedEventFilter;
+    RoleAdminChanged(
+      role?: BytesLike | null,
+      previousAdminRole?: BytesLike | null,
+      newAdminRole?: BytesLike | null
+    ): RoleAdminChangedEventFilter;
 
-    "NFTMinted(uint256,address)"(
+    "RoleGranted(bytes32,address,address)"(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): RoleGrantedEventFilter;
+    RoleGranted(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): RoleGrantedEventFilter;
+
+    "RoleRevoked(bytes32,address,address)"(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): RoleRevokedEventFilter;
+    RoleRevoked(
+      role?: BytesLike | null,
+      account?: string | null,
+      sender?: string | null
+    ): RoleRevokedEventFilter;
+
+    "SubscriptionCancelRequested(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      Time?: BigNumberish | null
+    ): SubscriptionCancelRequestedEventFilter;
+    SubscriptionCancelRequested(
+      tokenId?: BigNumberish | null,
+      Time?: BigNumberish | null
+    ): SubscriptionCancelRequestedEventFilter;
+
+    "SubscriptionIssued(uint256,address)"(
       tokenId?: null,
       owner?: string | null
-    ): NFTMintedEventFilter;
-    NFTMinted(tokenId?: null, owner?: string | null): NFTMintedEventFilter;
-
-    "RentalInfo(uint256,bool,uint256,address)"(
+    ): SubscriptionIssuedEventFilter;
+    SubscriptionIssued(
       tokenId?: null,
-      isRentable?: null,
-      price?: null,
-      renter?: string | null
-    ): RentalInfoEventFilter;
-    RentalInfo(
-      tokenId?: null,
-      isRentable?: null,
-      price?: null,
-      renter?: string | null
-    ): RentalInfoEventFilter;
+      owner?: string | null
+    ): SubscriptionIssuedEventFilter;
 
-    "RequestedCancelSubscription(uint256,uint256)"(
-      tokenId?: BigNumberish | null,
-      Time?: BigNumberish | null
-    ): RequestedCancelSubscriptionEventFilter;
-    RequestedCancelSubscription(
-      tokenId?: BigNumberish | null,
-      Time?: BigNumberish | null
-    ): RequestedCancelSubscriptionEventFilter;
+    "SubscriptionRevoked(uint256,address)"(
+      tokenId?: null,
+      ownerOrApproved?: string | null
+    ): SubscriptionRevokedEventFilter;
+    SubscriptionRevoked(
+      tokenId?: null,
+      ownerOrApproved?: string | null
+    ): SubscriptionRevokedEventFilter;
 
     "SubscriptionUpdate(uint256,uint64)"(
       tokenId?: BigNumberish | null,
@@ -973,7 +1173,13 @@ export interface FlowSubscription extends BaseContract {
   };
 
   estimateGas: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    DEFAULT_ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -997,7 +1203,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1008,6 +1213,34 @@ export interface FlowSubscription extends BaseContract {
 
     getApproved(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRoleAdmin(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRoleMember(
+      role: BytesLike,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getRoleMemberCount(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1041,6 +1274,18 @@ export interface FlowSubscription extends BaseContract {
       tokenId: BigNumberish,
       duration: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     revokeSubscription(
@@ -1080,18 +1325,8 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1149,7 +1384,15 @@ export interface FlowSubscription extends BaseContract {
   };
 
   populateTransaction: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    DEFAULT_ADMIN_ROLE(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     MONTH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(
       to: string,
@@ -1176,7 +1419,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1187,6 +1429,34 @@ export interface FlowSubscription extends BaseContract {
 
     getApproved(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRoleAdmin(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRoleMember(
+      role: BytesLike,
+      index: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getRoleMemberCount(
+      role: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    grantRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    hasRole(
+      role: BytesLike,
+      account: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1220,6 +1490,18 @@ export interface FlowSubscription extends BaseContract {
       tokenId: BigNumberish,
       duration: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    renounceRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    revokeRole(
+      role: BytesLike,
+      account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     revokeSubscription(
@@ -1259,18 +1541,8 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
