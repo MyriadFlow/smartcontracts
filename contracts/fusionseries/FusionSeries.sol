@@ -28,10 +28,11 @@ contract FusionSeries is Context, ERC1155Supply {
 
     Counters.Counter private _tokenIdTracker;
 
+    address public tradeHub;
+    uint8 public version = 1;
+
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
-
-    address public tradeHub;
 
     IACCESSMASTER flowRoles;
 

@@ -21,13 +21,15 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface FlowSubscriptionInterface extends utils.Interface {
   contractName: "FlowSubscription";
   functions: {
+    "ADMIN_ROLE()": FunctionFragment;
     "MONTH()": FunctionFragment;
+    "OPERATOR_ROLE()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
     "cancelSubscription(uint256)": FunctionFragment;
     "cancellationRequested(uint256)": FunctionFragment;
-    "delegateSubscribe(address,bool)": FunctionFragment;
+    "delegateSubscribe(address)": FunctionFragment;
     "expiresAt(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
@@ -43,9 +45,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setBaseURI(string)": FunctionFragment;
-    "setFreeSubscriptionStatus(bool)": FunctionFragment;
     "setPrice(uint256)": FunctionFragment;
-    "setSubscriptionCharges(uint256)": FunctionFragment;
     "setTokenURI(uint256,string)": FunctionFragment;
     "subscribe()": FunctionFragment;
     "subscriptionPricePerMonth()": FunctionFragment;
@@ -57,10 +57,19 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     "totalSupply()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "unpause()": FunctionFragment;
+    "version()": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "ADMIN_ROLE",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "MONTH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "OPERATOR_ROLE",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
@@ -77,7 +86,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "delegateSubscribe",
-    values: [string, boolean]
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "expiresAt",
@@ -131,15 +140,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "setFreeSubscriptionStatus",
-    values: [boolean]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setPrice",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setSubscriptionCharges",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -177,9 +178,15 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "ADMIN_ROLE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "MONTH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "OPERATOR_ROLE",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
@@ -237,15 +244,7 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setFreeSubscriptionStatus",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setSubscriptionCharges",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "setTokenURI",
     data: BytesLike
@@ -278,27 +277,26 @@ export interface FlowSubscriptionInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "NFTBurnt(uint256,address)": EventFragment;
-    "NFTMinted(uint256,address)": EventFragment;
-    "RentalInfo(uint256,bool,uint256,address)": EventFragment;
-    "RequestedCancelSubscription(uint256,uint256)": EventFragment;
+    "SubscriptionCancelRequested(uint256,uint256)": EventFragment;
+    "SubscriptionIssued(uint256,address)": EventFragment;
+    "SubscriptionRevoked(uint256,address)": EventFragment;
     "SubscriptionUpdate(uint256,uint64)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTBurnt"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NFTMinted"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(
-    nameOrSignatureOrTopic: "RequestedCancelSubscription"
+    nameOrSignatureOrTopic: "SubscriptionCancelRequested"
   ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SubscriptionIssued"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "SubscriptionRevoked"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "SubscriptionUpdate"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -317,34 +315,29 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type NFTBurntEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; ownerOrApproved: string }
->;
-
-export type NFTBurntEventFilter = TypedEventFilter<NFTBurntEvent>;
-
-export type NFTMintedEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; owner: string }
->;
-
-export type NFTMintedEventFilter = TypedEventFilter<NFTMintedEvent>;
-
-export type RentalInfoEvent = TypedEvent<
-  [BigNumber, boolean, BigNumber, string],
-  { tokenId: BigNumber; isRentable: boolean; price: BigNumber; renter: string }
->;
-
-export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
-
-export type RequestedCancelSubscriptionEvent = TypedEvent<
+export type SubscriptionCancelRequestedEvent = TypedEvent<
   [BigNumber, BigNumber],
   { tokenId: BigNumber; Time: BigNumber }
 >;
 
-export type RequestedCancelSubscriptionEventFilter =
-  TypedEventFilter<RequestedCancelSubscriptionEvent>;
+export type SubscriptionCancelRequestedEventFilter =
+  TypedEventFilter<SubscriptionCancelRequestedEvent>;
+
+export type SubscriptionIssuedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; owner: string }
+>;
+
+export type SubscriptionIssuedEventFilter =
+  TypedEventFilter<SubscriptionIssuedEvent>;
+
+export type SubscriptionRevokedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; ownerOrApproved: string }
+>;
+
+export type SubscriptionRevokedEventFilter =
+  TypedEventFilter<SubscriptionRevokedEvent>;
 
 export type SubscriptionUpdateEvent = TypedEvent<
   [BigNumber, BigNumber],
@@ -389,7 +382,11 @@ export interface FlowSubscription extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<[string]>;
+
     MONTH(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
     approve(
       to: string,
@@ -413,7 +410,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -496,18 +492,8 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -559,12 +545,18 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    version(overrides?: CallOverrides): Promise<[number]>;
+
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
 
+  ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
   MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+  OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
   approve(
     to: string,
@@ -588,7 +580,6 @@ export interface FlowSubscription extends BaseContract {
 
   delegateSubscribe(
     creator: string,
-    freeSubscribe: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -668,18 +659,8 @@ export interface FlowSubscription extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setFreeSubscriptionStatus(
-    _isOperatorSubscription: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   setPrice(
     _publicSalePrice: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setSubscriptionCharges(
-    _subscriptionCharges: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -728,12 +709,18 @@ export interface FlowSubscription extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  version(overrides?: CallOverrides): Promise<number>;
+
   withdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<string>;
+
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
     approve(
       to: string,
@@ -757,7 +744,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -832,18 +818,8 @@ export interface FlowSubscription extends BaseContract {
 
     setBaseURI(_tokenBaseURI: string, overrides?: CallOverrides): Promise<void>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -888,6 +864,8 @@ export interface FlowSubscription extends BaseContract {
 
     unpause(overrides?: CallOverrides): Promise<void>;
 
+    version(overrides?: CallOverrides): Promise<number>;
+
     withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
@@ -914,42 +892,32 @@ export interface FlowSubscription extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "NFTBurnt(uint256,address)"(
-      tokenId?: null,
-      ownerOrApproved?: string | null
-    ): NFTBurntEventFilter;
-    NFTBurnt(
-      tokenId?: null,
-      ownerOrApproved?: string | null
-    ): NFTBurntEventFilter;
+    "SubscriptionCancelRequested(uint256,uint256)"(
+      tokenId?: BigNumberish | null,
+      Time?: BigNumberish | null
+    ): SubscriptionCancelRequestedEventFilter;
+    SubscriptionCancelRequested(
+      tokenId?: BigNumberish | null,
+      Time?: BigNumberish | null
+    ): SubscriptionCancelRequestedEventFilter;
 
-    "NFTMinted(uint256,address)"(
+    "SubscriptionIssued(uint256,address)"(
       tokenId?: null,
       owner?: string | null
-    ): NFTMintedEventFilter;
-    NFTMinted(tokenId?: null, owner?: string | null): NFTMintedEventFilter;
-
-    "RentalInfo(uint256,bool,uint256,address)"(
+    ): SubscriptionIssuedEventFilter;
+    SubscriptionIssued(
       tokenId?: null,
-      isRentable?: null,
-      price?: null,
-      renter?: string | null
-    ): RentalInfoEventFilter;
-    RentalInfo(
-      tokenId?: null,
-      isRentable?: null,
-      price?: null,
-      renter?: string | null
-    ): RentalInfoEventFilter;
+      owner?: string | null
+    ): SubscriptionIssuedEventFilter;
 
-    "RequestedCancelSubscription(uint256,uint256)"(
-      tokenId?: BigNumberish | null,
-      Time?: BigNumberish | null
-    ): RequestedCancelSubscriptionEventFilter;
-    RequestedCancelSubscription(
-      tokenId?: BigNumberish | null,
-      Time?: BigNumberish | null
-    ): RequestedCancelSubscriptionEventFilter;
+    "SubscriptionRevoked(uint256,address)"(
+      tokenId?: null,
+      ownerOrApproved?: string | null
+    ): SubscriptionRevokedEventFilter;
+    SubscriptionRevoked(
+      tokenId?: null,
+      ownerOrApproved?: string | null
+    ): SubscriptionRevokedEventFilter;
 
     "SubscriptionUpdate(uint256,uint64)"(
       tokenId?: BigNumberish | null,
@@ -973,7 +941,11 @@ export interface FlowSubscription extends BaseContract {
   };
 
   estimateGas: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
+
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -997,7 +969,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1080,18 +1051,8 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1143,13 +1104,19 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    version(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    ADMIN_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     MONTH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    OPERATOR_ROLE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     approve(
       to: string,
@@ -1176,7 +1143,6 @@ export interface FlowSubscription extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1259,18 +1225,8 @@ export interface FlowSubscription extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     setPrice(
       _publicSalePrice: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setSubscriptionCharges(
-      _subscriptionCharges: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1323,6 +1279,8 @@ export interface FlowSubscription extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -31,6 +31,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
 
     /// @notice UNIX TIME FOR ONE MONTH(30 days)
     uint256 public constant MONTH = 2592000;
+    uint8 public version = 1;
 
     using Strings for uint256;
 

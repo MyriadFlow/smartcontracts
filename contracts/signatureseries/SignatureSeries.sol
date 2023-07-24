@@ -30,6 +30,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     Counters.Counter private _tokenIdTracker;
 
     address public tradeHub;
+    uint8 public version = 1;
 
     struct RentableItems {
         bool isRentable; //to check is renting is available

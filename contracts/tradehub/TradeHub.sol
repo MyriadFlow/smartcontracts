@@ -32,6 +32,7 @@ contract TradeHub is
 
     address public marketplacePayoutAddress;
     uint96 public platformFeeBasisPoint;
+    uint8 public version = 1;
 
     string public name;
 

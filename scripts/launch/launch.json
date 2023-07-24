@@ -1,12 +1,6 @@
 {
-    "contractName" : "FlowSubscription",
-    "constructorParams":{ 
-        "param1" : "NFT_MELA",
-        "param2" : "NFM",
-        "param3" : "www.xyz.com",
-        "param4" : "400000000000000000",
-        "param5" : "10000000000000000",
-        "param6" : "300",
-        "param7" : true
+    "contractName" : "CyberMavenRegistry",
+    "constructorParams":{
+        "param1" : "0x5FbDB2315678afecb367f032d93F642f64180aa3"
     }
 }
