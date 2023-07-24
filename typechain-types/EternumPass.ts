@@ -65,6 +65,7 @@ export interface EternumPassInterface extends utils.Interface {
     "updateFee(uint256)": FunctionFragment;
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
+    "version()": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
 
@@ -217,6 +218,7 @@ export interface EternumPassInterface extends utils.Interface {
     functionFragment: "userOf",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "MONTH", data: BytesLike): Result;
@@ -338,6 +340,7 @@ export interface EternumPassInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -668,6 +671,8 @@ export interface EternumPass extends BaseContract {
 
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
+    version(overrides?: CallOverrides): Promise<[number]>;
+
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -877,6 +882,8 @@ export interface EternumPass extends BaseContract {
 
   userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  version(overrides?: CallOverrides): Promise<number>;
+
   withdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1076,6 +1083,8 @@ export interface EternumPass extends BaseContract {
     ): Promise<BigNumber>;
 
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    version(overrides?: CallOverrides): Promise<number>;
 
     withdraw(overrides?: CallOverrides): Promise<void>;
   };
@@ -1386,6 +1395,8 @@ export interface EternumPass extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    version(overrides?: CallOverrides): Promise<BigNumber>;
+
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1611,6 +1622,8 @@ export interface EternumPass extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }

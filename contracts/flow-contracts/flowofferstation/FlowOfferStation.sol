@@ -9,10 +9,10 @@ import "../../accessmaster/interfaces/IAccessMaster.sol";
 
 contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
     bool public paused;
-    string public version;
+    uint8 public version = 1;
 
     uint256 public proposalCounter = 0;
-    address public MyriadFlowOfferStationPayoutAddress;
+    address private flowOfferStationPayoutAddress;
     uint96 public platformFeeBasisPoint;
 
     enum ProposalStatus {
@@ -88,18 +88,16 @@ contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
         );
         _;
     }
-    
+
     constructor(
         uint96 _platformFee,
-        string memory _version,
         bool _paused,
         address flowContract
     ) {
         flowRoles = IACCESSMASTER(flowContract);
 
         platformFeeBasisPoint = _platformFee;
-        MyriadFlowOfferStationPayoutAddress = _msgSender();
-        version = _version;
+        flowOfferStationPayoutAddress = _msgSender();
         paused = _paused;
     }
 
@@ -185,7 +183,7 @@ contract MyriadFlowOfferStation is Context, ReentrancyGuard, ERC2981 {
         uint256 payoutForSeller = amountToOwner - royaltyAmount;
 
         //transfering amounts to MyriadFlowOfferStation, creator and seller
-        payable(MyriadFlowOfferStationPayoutAddress).transfer(
+        payable(flowOfferStationPayoutAddress).transfer(
             payoutForMyriadFlowOfferStation
         );
         //payout for creator

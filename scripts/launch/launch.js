@@ -248,8 +248,7 @@ async function flowOfferStationDeploy() {
     const offerstation = await OfferStation.deploy(
         constructorParam.param1,
         constructorParam.param2,
-        constructorParam.param3,
-        constructorParam.param4
+        constructorParam.param3
     )
     await offerstation.deployed()
     console.log("Offerstation Deployed to:", offerstation.address)
@@ -261,14 +260,13 @@ async function flowOfferStationDeploy() {
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
-            constructorParam.param4,
         ])
     }
     return Addr
 }
 
 async function cyberMavenDeploy() {
-    const CyberMavenFactory = await hre.ethers.getContractFactory("CyberMavenV1")
+    const CyberMavenFactory = await hre.ethers.getContractFactory("CyberMaven")
     const cybermaven = await CyberMavenFactory.deploy()
     await cybermaven.deployed()
     console.log(`CyberMaven Deployed  to : ${cybermaven.address}`)
@@ -281,23 +279,21 @@ async function cyberMavenDeploy() {
     return Addr
 }
 
-async function accountRegistryDeploy() {
+async function cybermavenRegistryDeploy() {
     const constructorParam = jsonContent.constructorParams
     const AccountRegistry = await hre.ethers.getContractFactory(
-        "AccountRegistry"
+        "CyberMavenRegistry"
     )
     const accountregistry = await AccountRegistry.deploy(
         constructorParam.param1
     )
     await accountregistry.deployed()
-    console.log("Account Registry Deployed to:", accountregistry.address)
+    console.log("CyberMaven Registry Deployed to:", accountregistry.address)
     const Addr = accountregistry.address
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await accountregistry.deployTransaction.wait(6)
-        await verify(Addr, [
-            constructorParam.param1,
-        ])
+        await verify(Addr, [constructorParam.param1])
     }
     return Addr
 }
@@ -345,8 +341,8 @@ async function main() {
         contractAddress = await cyberMavenDeploy()
     }
     // ACCOUNT REGISTRY
-    if (jsonContent.contractName == "AccountRegistry") {
-        contractAddress = await accountRegistryDeploy()
+    if (jsonContent.contractName == "CyberMavenRegistry") {
+        contractAddress = await cybermavenRegistryDeploy()
     }
 
     let chainId

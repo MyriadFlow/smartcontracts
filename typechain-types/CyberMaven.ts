@@ -18,8 +18,8 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface CyberMavenV1Interface extends utils.Interface {
-  contractName: "CyberMavenV1";
+export interface CyberMavenInterface extends utils.Interface {
+  contractName: "CyberMaven";
   functions: {
     "callSetter(address,bytes)": FunctionFragment;
     "erc1155SafeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
@@ -32,6 +32,7 @@ export interface CyberMavenV1Interface extends utils.Interface {
     "erc721setApprovalForAll(address,address,bool)": FunctionFragment;
     "executeCall(address,uint256,bytes)": FunctionFragment;
     "getBalance()": FunctionFragment;
+    "getValueFromMyContract(address,bytes)": FunctionFragment;
     "isValidSignature(bytes32,bytes)": FunctionFragment;
     "name()": FunctionFragment;
     "nonce()": FunctionFragment;
@@ -44,6 +45,7 @@ export interface CyberMavenV1Interface extends utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "token()": FunctionFragment;
+    "version()": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
 
@@ -92,6 +94,10 @@ export interface CyberMavenV1Interface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "getValueFromMyContract",
+    values: [string, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "isValidSignature",
     values: [BytesLike, BytesLike]
   ): string;
@@ -124,6 +130,7 @@ export interface CyberMavenV1Interface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "callSetter", data: BytesLike): Result;
@@ -165,6 +172,10 @@ export interface CyberMavenV1Interface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "getBalance", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "getValueFromMyContract",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "isValidSignature",
     data: BytesLike
   ): Result;
@@ -197,6 +208,7 @@ export interface CyberMavenV1Interface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
@@ -290,13 +302,13 @@ export type ERC6551ERC721SetApprovalForAllEvent = TypedEvent<
 export type ERC6551ERC721SetApprovalForAllEventFilter =
   TypedEventFilter<ERC6551ERC721SetApprovalForAllEvent>;
 
-export interface CyberMavenV1 extends BaseContract {
-  contractName: "CyberMavenV1";
+export interface CyberMaven extends BaseContract {
+  contractName: "CyberMaven";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: CyberMavenV1Interface;
+  interface: CyberMavenInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -391,6 +403,12 @@ export interface CyberMavenV1 extends BaseContract {
 
     getBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    getValueFromMyContract(
+      contractAddr: string,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
     isValidSignature(
       hash: BytesLike,
       signature: BytesLike,
@@ -455,6 +473,8 @@ export interface CyberMavenV1 extends BaseContract {
         tokenId: BigNumber;
       }
     >;
+
+    version(overrides?: CallOverrides): Promise<[number]>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -534,6 +554,12 @@ export interface CyberMavenV1 extends BaseContract {
 
   getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
+  getValueFromMyContract(
+    contractAddr: string,
+    data: BytesLike,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
   isValidSignature(
     hash: BytesLike,
     signature: BytesLike,
@@ -598,6 +624,8 @@ export interface CyberMavenV1 extends BaseContract {
       tokenId: BigNumber;
     }
   >;
+
+  version(overrides?: CallOverrides): Promise<number>;
 
   withdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -677,6 +705,12 @@ export interface CyberMavenV1 extends BaseContract {
 
     getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getValueFromMyContract(
+      contractAddr: string,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
     isValidSignature(
       hash: BytesLike,
       signature: BytesLike,
@@ -735,6 +769,8 @@ export interface CyberMavenV1 extends BaseContract {
         tokenId: BigNumber;
       }
     >;
+
+    version(overrides?: CallOverrides): Promise<number>;
 
     withdraw(overrides?: CallOverrides): Promise<void>;
   };
@@ -905,6 +941,12 @@ export interface CyberMavenV1 extends BaseContract {
 
     getBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getValueFromMyContract(
+      contractAddr: string,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     isValidSignature(
       hash: BytesLike,
       signature: BytesLike,
@@ -961,6 +1003,8 @@ export interface CyberMavenV1 extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     token(overrides?: CallOverrides): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1041,6 +1085,12 @@ export interface CyberMavenV1 extends BaseContract {
 
     getBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    getValueFromMyContract(
+      contractAddr: string,
+      data: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     isValidSignature(
       hash: BytesLike,
       signature: BytesLike,
@@ -1097,6 +1147,8 @@ export interface CyberMavenV1 extends BaseContract {
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "./Bytecode.sol";
 import "./interface/IERC6551Account.sol";
 
-contract CyberMavenV1 is
+contract CyberMaven is
     IERC165,
     IERC1271,
     IERC6551Account,
@@ -23,6 +23,7 @@ contract CyberMavenV1 is
 {
     string public name = "CyberMaven Wallet";
     string public symbol = "CMW";
+    uint8 public version = 1;
     uint256 private _nounce;
 
     event ECR6551ERC20Transfer(
@@ -127,6 +128,19 @@ contract CyberMavenV1 is
         address reciever = owner();
         (bool success, ) = reciever.call{value: address(this).balance}("");
         require(success);
+    }
+
+    // Put Getter
+
+    function getValueFromMyContract(
+        address contractAddr,
+        bytes calldata data
+    ) external view returns (bytes memory) {
+        // Call the getter function on the contract.
+        (bool success, bytes memory output) = contractAddr.staticcall(data);
+        require(success, "CyberMaven : Contract call failed");
+
+        return output;
     }
 
     function callSetter(

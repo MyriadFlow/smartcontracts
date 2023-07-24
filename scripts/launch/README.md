@@ -154,9 +154,8 @@ The JSON file should have the following format:
     "contractName" : "FlowOfferStation",
     "constructorParams":{
         "param1" : 300,
-        "param2" : "1.0.0",
-        "param3" : false,
-        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
+        "param2" : false,
+        "param3" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
     }
 }
 ```
@@ -173,13 +172,13 @@ The JSON file should have the following format:
 ```
 
 
-`Account Registry`
+`CyberMaven Registry`
 
 ```shell
 {
-    "contractName" : "CyberMaven",
+    "contractName" : "CyberMavenRegistry",
     "constructorParams":{
-
+        "param1" : "0x5FbDB2315678afecb367f032d93F642f64180aa3"
     }
 }
 ```

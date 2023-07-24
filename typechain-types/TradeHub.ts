@@ -40,6 +40,7 @@ export interface TradeHubInterface extends utils.Interface {
     "supportsInterface(bytes4)": FunctionFragment;
     "updateAuctionTime(uint256,uint256)": FunctionFragment;
     "updatePrice(uint256,uint256)": FunctionFragment;
+    "version()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -122,6 +123,7 @@ export interface TradeHubInterface extends utils.Interface {
     functionFragment: "updatePrice",
     values: [BigNumberish, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "acceptBidAndEndAuction",
@@ -184,6 +186,7 @@ export interface TradeHubInterface extends utils.Interface {
     functionFragment: "updatePrice",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
     "AuctionEnded(uint256,address,uint256,string,address,address,uint256)": EventFragment;
@@ -458,6 +461,8 @@ export interface TradeHub extends BaseContract {
       pricePerUnit: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    version(overrides?: CallOverrides): Promise<[number]>;
   };
 
   acceptBidAndEndAuction(
@@ -592,6 +597,8 @@ export interface TradeHub extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  version(overrides?: CallOverrides): Promise<number>;
+
   callStatic: {
     acceptBidAndEndAuction(
       itemId: BigNumberish,
@@ -718,6 +725,8 @@ export interface TradeHub extends BaseContract {
       pricePerUnit: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<number>;
   };
 
   filters: {
@@ -942,6 +951,8 @@ export interface TradeHub extends BaseContract {
       pricePerUnit: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1056,5 +1067,7 @@ export interface TradeHub extends BaseContract {
       pricePerUnit: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

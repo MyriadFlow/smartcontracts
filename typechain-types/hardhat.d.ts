@@ -161,17 +161,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EternumPass__factory>;
     getContractFactory(
-      name: "AccountRegistry",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.AccountRegistry__factory>;
-    getContractFactory(
       name: "Bytecode",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Bytecode__factory>;
     getContractFactory(
-      name: "CyberMavenV1",
+      name: "CyberMaven",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CyberMavenV1__factory>;
+    ): Promise<Contracts.CyberMaven__factory>;
+    getContractFactory(
+      name: "CyberMavenRegistry",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CyberMavenRegistry__factory>;
     getContractFactory(
       name: "IERC6551Account",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -403,20 +403,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.EternumPass>;
     getContractAt(
-      name: "AccountRegistry",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.AccountRegistry>;
-    getContractAt(
       name: "Bytecode",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Bytecode>;
     getContractAt(
-      name: "CyberMavenV1",
+      name: "CyberMaven",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.CyberMavenV1>;
+    ): Promise<Contracts.CyberMaven>;
+    getContractAt(
+      name: "CyberMavenRegistry",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CyberMavenRegistry>;
     getContractAt(
       name: "IERC6551Account",
       address: string,

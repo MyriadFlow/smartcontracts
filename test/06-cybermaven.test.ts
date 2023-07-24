@@ -1,17 +1,17 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import {expect } from "chai"
 import { artifacts, ethers} from "hardhat"
-import { CyberMavenV1 , AccountRegistry , NFT , Token , SFT} from "../typechain-types"
+import { CyberMaven, CyberMavenRegistry , NFT , Token , SFT} from "../typechain-types"
 
-describe("CyberMavenV1 contract", () => {
+describe("CyberMaven contract", () => {
                                     
     let [owner, creator, creator2, buyer, operator ]: SignerWithAddress[] = new Array(5)
     before(async () => {
         [owner,creator, creator2, buyer,operator] = await ethers.getSigners()
         
     })
-    let accountRegistry : AccountRegistry
-    let cybermaven: CyberMavenV1
+    let accountRegistry : CyberMavenRegistry
+    let cybermaven: CyberMaven
     let nft : NFT
     let token : Token
     let sft : SFT
@@ -21,14 +21,14 @@ describe("CyberMavenV1 contract", () => {
     before(async () => {
 
         //deploying Cybermaven
-        let CyberMavenV1Factory = await ethers.getContractFactory("CyberMavenV1")
+        let CyberMavenV1Factory = await ethers.getContractFactory("CyberMaven")
         cybermaven =  await CyberMavenV1Factory.deploy()
         await cybermaven.deployed()
         
         // deploying AccountRegistry
-        let AccountRegistryFactory = await ethers.getContractFactory("AccountRegistry")
+        let AccountRegistryFactory = await ethers.getContractFactory("CyberMavenRegistry")
         accountRegistry = await AccountRegistryFactory.deploy(cybermaven.address);
-        await cybermaven.deployed()
+        await accountRegistry.deployed()
 
         /// deploying mocks
         ///ERC721
@@ -53,7 +53,7 @@ describe("CyberMavenV1 contract", () => {
         let userAccount = await accountRegistry.accounts(1)
         Addr = userAccount[2]
         /// fetching the abi
-        contractArtifact = await artifacts.readArtifact("CyberMavenV1");
+        contractArtifact = await artifacts.readArtifact("CyberMaven");
 
         contract = new ethers.Contract(userAccount[2],contractArtifact.abi,creator)
         await contract.deployed()

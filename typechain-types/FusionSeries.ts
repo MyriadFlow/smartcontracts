@@ -35,6 +35,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     "totalSupply(uint256)": FunctionFragment;
     "tradeHub()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
+    "version()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -88,6 +89,7 @@ export interface FusionSeriesInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "tradeHub", values?: undefined): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
@@ -134,6 +136,7 @@ export interface FusionSeriesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "tradeHub", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "uri", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
@@ -317,6 +320,8 @@ export interface FusionSeries extends BaseContract {
     tradeHub(overrides?: CallOverrides): Promise<[string]>;
 
     uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+
+    version(overrides?: CallOverrides): Promise<[number]>;
   };
 
   balanceOf(
@@ -400,6 +405,8 @@ export interface FusionSeries extends BaseContract {
 
   uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
+  version(overrides?: CallOverrides): Promise<number>;
+
   callStatic: {
     balanceOf(
       account: string,
@@ -481,6 +488,8 @@ export interface FusionSeries extends BaseContract {
     tradeHub(overrides?: CallOverrides): Promise<string>;
 
     uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    version(overrides?: CallOverrides): Promise<number>;
   };
 
   filters: {
@@ -636,6 +645,8 @@ export interface FusionSeries extends BaseContract {
     tradeHub(overrides?: CallOverrides): Promise<BigNumber>;
 
     uri(tokenId: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -728,5 +739,7 @@ export interface FusionSeries extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

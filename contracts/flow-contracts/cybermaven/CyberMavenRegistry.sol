@@ -5,8 +5,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 import "./interface/IERC6551Registry.sol";
 
-
-/// @title Users can create there own smart contract Wallet or Token Bound Account 
+/// @title Users can create there own smart contract Wallet or Token Bound Account
 /**
  * @dev {ERC1167} token, including:
  *
@@ -15,12 +14,16 @@ import "./interface/IERC6551Registry.sol";
  *
  */
 
+/// CYBERMAVEN REGISTRY
+
 error InitializationFailed();
 
-contract AccountRegistry is IERC6551Registry, Context {
+contract CyberMavenRegistry is IERC6551Registry, Context {
+    string public name = "CyberMavenRegistry";
     uint256 public counter = 0;
     address private implementationContract;
     address private owner;
+    uint8 public version = 1;
 
     struct AccountInfo {
         address tokenAddress;
@@ -39,15 +42,15 @@ contract AccountRegistry is IERC6551Registry, Context {
         implementationContract = contractAddr;
         owner = _msgSender();
     }
-    
+
     /// @notice to change the implementation contract only by owner
     /// @param contractAddr is address
     function setImplementation(address contractAddr) external {
-        require(owner == _msgSender(),"AccountRegistry : Not owner!");
+        require(owner == _msgSender(), "AccountRegistry : Not owner!");
         implementationContract = contractAddr;
     }
 
-    ///@notice create a token bound account 
+    ///@notice create a token bound account
     function intiateWallet(
         address tokenContract,
         uint256 tokenId,
@@ -70,7 +73,7 @@ contract AccountRegistry is IERC6551Registry, Context {
     }
 
     /**
-     * 
+     *
      * @param implementation is the address of the contract which would be replicated
      * @param chainId  is the chainId of the current network
      * @param tokenContract is the nft contract Address

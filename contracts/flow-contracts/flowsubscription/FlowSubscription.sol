@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
-
 import "../../common/interface/IERC5643.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -36,6 +35,7 @@ contract FlowSubscription is Context, IERC5643, ERC2981, ERC721Enumerable {
     using Strings for uint256;
 
     bool public mintPaused = false;
+    uint8 public version = 1;
     uint256 public publicSalePrice;
     uint256 public subscriptionPricePerMonth;
     uint256 private _tokenIdCounter;

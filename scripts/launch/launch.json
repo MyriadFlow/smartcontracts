@@ -1,9 +1,6 @@
-{   
-   "contractName" : "EternalSoul",
+{
+    "contractName" : "CyberMavenRegistry",
     "constructorParams":{
-        "param1" : "Soul Wizard",
-        "param2" : "SW",
-        "param3" : "www.xyz.com",
-        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
+        "param1" : "0x5FbDB2315678afecb367f032d93F642f64180aa3"
     }
 }

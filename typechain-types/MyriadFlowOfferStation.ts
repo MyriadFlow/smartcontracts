@@ -21,7 +21,6 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface MyriadFlowOfferStationInterface extends utils.Interface {
   contractName: "MyriadFlowOfferStation";
   functions: {
-    "MyriadFlowOfferStationPayoutAddress()": FunctionFragment;
     "acceptOffer(uint256)": FunctionFragment;
     "createOffer(address,uint256)": FunctionFragment;
     "idToproposal(uint256)": FunctionFragment;
@@ -37,10 +36,6 @@ export interface MyriadFlowOfferStationInterface extends utils.Interface {
     "withdrawOffer(uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "MyriadFlowOfferStationPayoutAddress",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "acceptOffer",
     values: [BigNumberish]
@@ -85,10 +80,6 @@ export interface MyriadFlowOfferStationInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "MyriadFlowOfferStationPayoutAddress",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "acceptOffer",
     data: BytesLike
@@ -219,10 +210,6 @@ export interface MyriadFlowOfferStation extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    MyriadFlowOfferStationPayoutAddress(
-      overrides?: CallOverrides
-    ): Promise<[string]>;
-
     acceptOffer(
       _offerId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -278,17 +265,13 @@ export interface MyriadFlowOfferStation extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    version(overrides?: CallOverrides): Promise<[string]>;
+    version(overrides?: CallOverrides): Promise<[number]>;
 
     withdrawOffer(
       offerId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  MyriadFlowOfferStationPayoutAddress(
-    overrides?: CallOverrides
-  ): Promise<string>;
 
   acceptOffer(
     _offerId: BigNumberish,
@@ -345,7 +328,7 @@ export interface MyriadFlowOfferStation extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  version(overrides?: CallOverrides): Promise<string>;
+  version(overrides?: CallOverrides): Promise<number>;
 
   withdrawOffer(
     offerId: BigNumberish,
@@ -353,10 +336,6 @@ export interface MyriadFlowOfferStation extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    MyriadFlowOfferStationPayoutAddress(
-      overrides?: CallOverrides
-    ): Promise<string>;
-
     acceptOffer(
       _offerId: BigNumberish,
       overrides?: CallOverrides
@@ -410,7 +389,7 @@ export interface MyriadFlowOfferStation extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    version(overrides?: CallOverrides): Promise<string>;
+    version(overrides?: CallOverrides): Promise<number>;
 
     withdrawOffer(
       offerId: BigNumberish,
@@ -473,10 +452,6 @@ export interface MyriadFlowOfferStation extends BaseContract {
   };
 
   estimateGas: {
-    MyriadFlowOfferStationPayoutAddress(
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     acceptOffer(
       _offerId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -533,10 +508,6 @@ export interface MyriadFlowOfferStation extends BaseContract {
   };
 
   populateTransaction: {
-    MyriadFlowOfferStationPayoutAddress(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     acceptOffer(
       _offerId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }

@@ -17,17 +17,19 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface AccountRegistryInterface extends utils.Interface {
-  contractName: "AccountRegistry";
+export interface CyberMavenRegistryInterface extends utils.Interface {
+  contractName: "CyberMavenRegistry";
   functions: {
     "account(address,uint256,address,uint256,uint256)": FunctionFragment;
     "accounts(uint256)": FunctionFragment;
     "counter()": FunctionFragment;
     "createAccount(address,uint256,address,uint256,uint256,bytes)": FunctionFragment;
     "intiateWallet(address,uint256,bytes)": FunctionFragment;
+    "name()": FunctionFragment;
     "setImplementation(address)": FunctionFragment;
     "userAccount(address,uint256)": FunctionFragment;
     "userBalance(address)": FunctionFragment;
+    "version()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -54,6 +56,7 @@ export interface AccountRegistryInterface extends utils.Interface {
     functionFragment: "intiateWallet",
     values: [string, BigNumberish, BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setImplementation",
     values: [string]
@@ -63,6 +66,7 @@ export interface AccountRegistryInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "userBalance", values: [string]): string;
+  encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "account", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "accounts", data: BytesLike): Result;
@@ -75,6 +79,7 @@ export interface AccountRegistryInterface extends utils.Interface {
     functionFragment: "intiateWallet",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setImplementation",
     data: BytesLike
@@ -87,6 +92,7 @@ export interface AccountRegistryInterface extends utils.Interface {
     functionFragment: "userBalance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
     "AccountCreated(address,address,uint256,address,uint256,uint256)": EventFragment;
@@ -109,13 +115,13 @@ export type AccountCreatedEvent = TypedEvent<
 
 export type AccountCreatedEventFilter = TypedEventFilter<AccountCreatedEvent>;
 
-export interface AccountRegistry extends BaseContract {
-  contractName: "AccountRegistry";
+export interface CyberMavenRegistry extends BaseContract {
+  contractName: "CyberMavenRegistry";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: AccountRegistryInterface;
+  interface: CyberMavenRegistryInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -176,6 +182,8 @@ export interface AccountRegistry extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    name(overrides?: CallOverrides): Promise<[string]>;
+
     setImplementation(
       contractAddr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -194,6 +202,8 @@ export interface AccountRegistry extends BaseContract {
     >;
 
     userBalance(arg0: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    version(overrides?: CallOverrides): Promise<[number]>;
   };
 
   account(
@@ -235,6 +245,8 @@ export interface AccountRegistry extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  name(overrides?: CallOverrides): Promise<string>;
+
   setImplementation(
     contractAddr: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -253,6 +265,8 @@ export interface AccountRegistry extends BaseContract {
   >;
 
   userBalance(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
     account(
@@ -294,6 +308,8 @@ export interface AccountRegistry extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    name(overrides?: CallOverrides): Promise<string>;
+
     setImplementation(
       contractAddr: string,
       overrides?: CallOverrides
@@ -312,6 +328,8 @@ export interface AccountRegistry extends BaseContract {
     >;
 
     userBalance(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<number>;
   };
 
   filters: {
@@ -364,6 +382,8 @@ export interface AccountRegistry extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
     setImplementation(
       contractAddr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -376,6 +396,8 @@ export interface AccountRegistry extends BaseContract {
     ): Promise<BigNumber>;
 
     userBalance(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    version(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -412,6 +434,8 @@ export interface AccountRegistry extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     setImplementation(
       contractAddr: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -427,5 +451,7 @@ export interface AccountRegistry extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

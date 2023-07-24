@@ -27,11 +27,12 @@ contract EternalSoul is Context, ERC721Enumerable {
     Counters.Counter private _tokenIdTracker;
 
     string public baseURI;
+    uint8 public version = 1;
+
+    IACCESSMASTER flowRoles;
 
     /// @dev mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
-
-    IACCESSMASTER flowRoles;
 
     modifier onlyOperator() {
         require(
@@ -152,8 +153,7 @@ contract EternalSoul is Context, ERC721Enumerable {
         return baseURI;
     }
 
-
-    /// @dev only minting and burning can happen 
+    /// @dev only minting and burning can happen
     /// token transfer are restricted
     function _beforeTokenTransfer(
         address from,
@@ -161,7 +161,10 @@ contract EternalSoul is Context, ERC721Enumerable {
         uint256 tokenId,
         uint256 batchSize
     ) internal virtual override(ERC721Enumerable) {
-        require(from == address(0) || to == address(0), "EternalSoul : Asset cannot be transferred");
+        require(
+            from == address(0) || to == address(0),
+            "EternalSoul : Asset cannot be transferred"
+        );
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
