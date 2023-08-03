@@ -31,6 +31,7 @@ const MNEMONIC = process.env.MNEMONIC || "aisle intact level enter fury shine vo
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "KG1VJQJZVNR4AJU7QIWAKXGC78PCN9UGIK"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
 
+const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -53,18 +54,6 @@ module.exports = {
     hardhat: {
       initialBaseFeePerGas: 0, // workaround from https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136 . Remove when that issue is closed.
     },
-    ropsten: {
-      url: ROPSTEN_RPC_URL,
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
-    },
-    rinkeby: {
-      url: RINKEBY_RPC_URL,
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
-    },
     maticmum: {
       networkId: 80001,
       url: MATICMUM_RPC_URL,
@@ -73,12 +62,13 @@ module.exports = {
         mnemonic: MNEMONIC,
       },
     },
-    ethereum: {
-      networkId: 1,
+    sepholia: {
+      networkId: 11155111,
       url: ETHEREUM_RPC_URL,
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
+      accounts : [PRIVATE_KEY],
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
     }
   },
   gasReporter: {
@@ -86,7 +76,10 @@ module.exports = {
     currency: "USD",
   },
   etherscan: {
-    apiKey: POLYGONSCAN_API_KEY || ETHERSCAN_API_KEY,
+    apiKey: {
+      polygonMumbai : POLYGONSCAN_API_KEY,
+      sepolia : ETHERSCAN_API_KEY,
+    }
   },
   paths: {
     sources: "./contracts",

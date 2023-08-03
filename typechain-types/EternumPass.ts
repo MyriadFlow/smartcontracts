@@ -28,7 +28,7 @@ export interface EternumPassInterface extends utils.Interface {
     "baseURI()": FunctionFragment;
     "cancelSubscription(uint256)": FunctionFragment;
     "cancellationRequested(uint256)": FunctionFragment;
-    "delegateSubscribe(address,bool)": FunctionFragment;
+    "delegateSubscribe(address)": FunctionFragment;
     "expiresAt(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
@@ -46,7 +46,6 @@ export interface EternumPassInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setBaseURI(string)": FunctionFragment;
-    "setFreeSubscriptionStatus(bool)": FunctionFragment;
     "setPrice(uint256)": FunctionFragment;
     "setRentInfo(uint256,bool,uint256)": FunctionFragment;
     "setSubscriptionCharges(uint256)": FunctionFragment;
@@ -90,7 +89,7 @@ export interface EternumPassInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "delegateSubscribe",
-    values: [string, boolean]
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "expiresAt",
@@ -151,10 +150,6 @@ export interface EternumPassInterface extends utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "setFreeSubscriptionStatus",
-    values: [boolean]
-  ): string;
   encodeFunctionData(
     functionFragment: "setPrice",
     values: [BigNumberish]
@@ -288,10 +283,6 @@ export interface EternumPassInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "setFreeSubscriptionStatus",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "setPrice", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setRentInfo",
@@ -491,7 +482,6 @@ export interface EternumPass extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -579,11 +569,6 @@ export interface EternumPass extends BaseContract {
 
     setBaseURI(
       _tokenBaseURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -708,7 +693,6 @@ export interface EternumPass extends BaseContract {
 
   delegateSubscribe(
     creator: string,
-    freeSubscribe: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -793,11 +777,6 @@ export interface EternumPass extends BaseContract {
 
   setBaseURI(
     _tokenBaseURI: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setFreeSubscriptionStatus(
-    _isOperatorSubscription: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -919,7 +898,6 @@ export interface EternumPass extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1001,11 +979,6 @@ export interface EternumPass extends BaseContract {
     ): Promise<void>;
 
     setBaseURI(_tokenBaseURI: string, overrides?: CallOverrides): Promise<void>;
-
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     setPrice(
       _publicSalePrice: BigNumberish,
@@ -1212,7 +1185,6 @@ export interface EternumPass extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1300,11 +1272,6 @@ export interface EternumPass extends BaseContract {
 
     setBaseURI(
       _tokenBaseURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1436,7 +1403,6 @@ export interface EternumPass extends BaseContract {
 
     delegateSubscribe(
       creator: string,
-      freeSubscribe: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1526,11 +1492,6 @@ export interface EternumPass extends BaseContract {
 
     setBaseURI(
       _tokenBaseURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setFreeSubscriptionStatus(
-      _isOperatorSubscription: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

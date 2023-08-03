@@ -10,7 +10,9 @@
     "coverage": "hardhat coverage",
     "deploy": "hardhat run scripts/deploy.ts --network $NETWORK",
     "compile": "hardhat compile",
-    "launch":"hardhat run scripts/launch/launch.js"
+    "launch":"hardhat run scripts/launch/launch.js",
+    "launchMumbai" : "hardhat run scripts/launch/launch.js --network maticmum",
+    "launchSepholia" : "hardhat run scripts/launch/launch.js --network sepholia"
 
   },
   "devDependencies": {

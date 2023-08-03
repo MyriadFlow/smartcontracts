@@ -94,9 +94,8 @@ The JSON file should have the following format:
         "param5" : "30",
         "param6" : "10000000000000",
         "param7" : "500",
-        "param8" : true,
-        "param9" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
-        "param10" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
+        "param8" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC",
+        "param9" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298"
     }
 }
 ```
@@ -182,12 +181,6 @@ The JSON file should have the following format:
     }
 }
 ```
-
-
-
-
-
-
 
 The `contracts` array contains objects representing each contract. Each contract object has two properties:
 
