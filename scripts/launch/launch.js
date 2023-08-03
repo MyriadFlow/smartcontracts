@@ -63,7 +63,9 @@ async function fusionSeriesDeploy() {
     const fusionseries = await FusionSeries.deploy(
         constructorParam.param1,
         constructorParam.param2,
-        constructorParam.param3
+        constructorParam.param3,
+        constructorParam.param4,
+        constructorParam.param5
     )
     await fusionseries.deployed()
     console.log("FusionSeries Deployed to:", fusionseries.address)
@@ -75,6 +77,8 @@ async function fusionSeriesDeploy() {
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
+            constructorParam.param4,
+            constructorParam.param5,
         ])
     }
 
@@ -159,8 +163,7 @@ async function eternumPassDeploy() {
         constructorParam.param6,
         constructorParam.param7,
         constructorParam.param8,
-        constructorParam.param9,
-        constructorParam.param10
+        constructorParam.param9
     )
     await eternumpass.deployed()
     console.log("EternumPass Deployed to:", eternumpass.address)
@@ -178,7 +181,6 @@ async function eternumPassDeploy() {
             constructorParam.param7,
             constructorParam.param8,
             constructorParam.param9,
-            constructorParam.param10,
         ])
     }
     return Addr

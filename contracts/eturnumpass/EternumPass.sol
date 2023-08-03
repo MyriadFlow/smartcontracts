@@ -36,8 +36,6 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     using Strings for uint256;
 
     bool public mintPaused = true;
-    ///@notice for giving users free subscriptions or not
-    bool private isOperatorSubscription;
     uint256 public publicSalePrice;
     uint256 public platFormFeeBasisPoint;
     uint256 public subscriptionPricePerMonth;
@@ -110,7 +108,6 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         uint256 _platFormFeeBasisPoint,
         uint256 _subscriptionPricePerMonth,
         uint96 royaltyBasisPoint,
-        bool _isOperatorSubscription,
         address flowContract,
         address _tradeHubAddrr
     ) ERC721(_name, _symbol) {
@@ -121,8 +118,8 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         subscriptionPricePerMonth = _subscriptionPricePerMonth;
         // Setting default royalty
         _setDefaultRoyalty(_msgSender(), royaltyBasisPoint);
-        isOperatorSubscription = _isOperatorSubscription;
         tradeHubAddress = _tradeHubAddrr;
+        flowRoles = IACCESSMASTER(flowContract);
     }
 
     ///@notice Function to update the plateformFeeBasisPoint
@@ -151,12 +148,6 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     ) public onlyOperator {
         subscriptionPricePerMonth = _subscriptionCharges;
     }
-
-    ///@notice change the free subscription status
-    function setFreeSubscriptionStatus(bool _isOperatorSubscription) external {
-        isOperatorSubscription = _isOperatorSubscription;
-    }
-
     /// @notice only operator can set base token URI for the contract
     function setBaseURI(string memory _tokenBaseURI) external onlyOperator {
         baseURI = _tokenBaseURI;
@@ -170,11 +161,6 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         _tokenURI[tokenId] = _tokenUri;
     }
 
-    /// @notice for addition of subscription period to an token
-    function _addSubScription(uint currentTokenId) private {
-        _expirations[currentTokenId] = uint64(block.timestamp + MONTH);
-    }
-
     /// @notice Call to mint NFTs
     /// @return tokenId
     function subscribe() external payable whenNotpaused returns (uint256) {
@@ -185,9 +171,6 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
             "EternumPass: Insuffiecient amount!"
         );
         _safeMint(_msgSender(), tokenId);
-        if (isOperatorSubscription) {
-            _addSubScription(tokenId);
-        }
         // Approve marketplace to transfer NFTs
         setApprovalForAll(tradeHubAddress, true);
 
@@ -198,15 +181,11 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
 
     //// @notice
     function delegateSubscribe(
-        address creator,
-        bool freeSubscribe
+        address creator
     ) public onlyOperator returns (uint256 tokenId) {
         _tokenIdCounter++;
         tokenId = _tokenIdCounter;
         _safeMint(creator, tokenId);
-        if (freeSubscribe) {
-            _addSubScription(tokenId);
-        }
         emit NFTMinted(tokenId, _msgSender());
     }
 

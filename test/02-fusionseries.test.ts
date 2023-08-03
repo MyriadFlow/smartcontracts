@@ -31,7 +31,7 @@ describe("TradeHub && FusionSeries contract", () => {
        tradehub = await TradeHubFactory.deploy(300,"MyMarketplace", accessmaster.address)
 
         let FusionSeriesFactory = await ethers.getContractFactory("FusionSeries")
-        fusionseries = await FusionSeriesFactory.deploy("www.xyz.com",tradehub.address, accessmaster.address)
+        fusionseries = await FusionSeriesFactory.deploy("www.xyz.com","PIGGY STACK","PG",tradehub.address,accessmaster.address)
     })
     it("Should get the right owner", async () => {
         const STOREFRONT_ADMIN_ROLE = await accessmaster.FLOW_ADMIN_ROLE()

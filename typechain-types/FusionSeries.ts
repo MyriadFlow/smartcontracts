@@ -27,11 +27,13 @@ export interface FusionSeriesInterface extends utils.Interface {
     "destroyAsset(uint256,uint256)": FunctionFragment;
     "exists(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "name()": FunctionFragment;
     "safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setURI(string)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
+    "symbol()": FunctionFragment;
     "totalSupply(uint256)": FunctionFragment;
     "tradeHub()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
@@ -66,6 +68,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
+  encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "safeBatchTransferFrom",
     values: [string, string, BigNumberish[], BigNumberish[], BytesLike]
@@ -83,6 +86,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
+  encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
     values: [BigNumberish]
@@ -113,6 +117,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "safeBatchTransferFrom",
     data: BytesLike
@@ -130,6 +135,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     functionFragment: "supportsInterface",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
     data: BytesLike
@@ -278,6 +284,8 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    name(overrides?: CallOverrides): Promise<[string]>;
+
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -311,6 +319,8 @@ export interface FusionSeries extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    symbol(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(
       id: BigNumberish,
@@ -365,6 +375,8 @@ export interface FusionSeries extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  name(overrides?: CallOverrides): Promise<string>;
+
   safeBatchTransferFrom(
     from: string,
     to: string,
@@ -398,6 +410,8 @@ export interface FusionSeries extends BaseContract {
     interfaceId: BytesLike,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  symbol(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -449,6 +463,8 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    name(overrides?: CallOverrides): Promise<string>;
+
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -479,6 +495,8 @@ export interface FusionSeries extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    symbol(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(
       id: BigNumberish,
@@ -603,6 +621,8 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    name(overrides?: CallOverrides): Promise<BigNumber>;
+
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -636,6 +656,8 @@ export interface FusionSeries extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(
       id: BigNumberish,
@@ -694,6 +716,8 @@ export interface FusionSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     safeBatchTransferFrom(
       from: string,
       to: string,
@@ -727,6 +751,8 @@ export interface FusionSeries extends BaseContract {
       interfaceId: BytesLike,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(
       id: BigNumberish,

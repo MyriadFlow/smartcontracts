@@ -28,6 +28,9 @@ contract FusionSeries is Context, ERC1155Supply {
 
     Counters.Counter private _tokenIdTracker;
 
+    string public name;
+    string public symbol;
+
     address public tradeHub;
     uint8 public version = 1;
 
@@ -67,9 +70,13 @@ contract FusionSeries is Context, ERC1155Supply {
      */
     constructor(
         string memory baseURI,
+        string memory _name,
+        string memory _symbol,
         address tradeHubAddress,
         address flowContract
     ) ERC1155(baseURI) {
+        name = _name;
+        symbol = _symbol;
         tradeHub = tradeHubAddress;
         flowRoles = IACCESSMASTER(flowContract);
     }

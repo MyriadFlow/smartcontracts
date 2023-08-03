@@ -28,7 +28,7 @@ describe("Eternumpass Contract", () => {
         const AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
         accessmaster = await AccessMasterFactory.deploy()
         const  EternumPassFactory = await ethers.getContractFactory("EternumPass")        
-        eternumpass = await EternumPassFactory.deploy(metadata.name, metadata.symbol,baseURI,publicSalePrice,30,subscriptionPerMonth,500,true,accessmaster.address,"0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298");
+        eternumpass = await EternumPassFactory.deploy(metadata.name, metadata.symbol,baseURI,publicSalePrice,30,subscriptionPerMonth,500,accessmaster.address,"0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298");
     })
     it("Should return the right name and symbol of the token once EternumPass is deployed", async () => {
         expect(await eternumpass.name()).to.equal(metadata.name)
@@ -43,7 +43,7 @@ describe("Eternumpass Contract", () => {
     const metaDataHash = "ipfs://QmbXvKra8Re7sxCMAEpquWJEq5qmSqis5VPCvo9uTA7AcF"
     it("Should delegate artifact creation and SetTokenUri", async () => {
         expect(
-            await eternumpass.delegateSubscribe(creator2.address,true)
+            await eternumpass.delegateSubscribe(creator2.address)
         )
             .to.emit(eternumpass, "NFTMinted")
             .withArgs(1, creator2.address)
@@ -121,7 +121,6 @@ describe("Eternumpass Contract", () => {
          expect(eternumpass.connect(creator).setUser(1,creator2.address,3000)).to.be.reverted
     })
      it("should cancel Subscription", async () => {
-            await eternumpass.setFreeSubscriptionStatus(false)
             await eternumpass.connect(operator).subscribe({value : publicSalePrice})
             // When other than owner of the token tries to cancel subscription
             expect(eternumpass.cancelSubscription(2)).to.be.reverted    
@@ -141,6 +140,8 @@ describe("Eternumpass Contract", () => {
              
         })
         it("to check if the renewal can be done by both Owner or Operator", async () => {
+            ///renewing token 2  subscription
+            await eternumpass.renewSubscription(2,1)
             const Month = await eternumpass.MONTH()
             // ##Failing Test 1 - > When 0 Months
             expect(eternumpass.connect(creator2).renewSubscription(2, 0)).to.be.reverted
@@ -151,7 +152,7 @@ describe("Eternumpass Contract", () => {
             /// Subscription renewal by operator
             let previousSubscriptionPeriod = await eternumpass.expiresAt(2)
             expect(await eternumpass.renewSubscription(2, 1)).to.emit(eternumpass,"SubscriptionUpdate")
-            let newSubscriptionPeriod = await eternumpass.expiresAt(2)
+            let newSubscriptionPeriod = await eternumpass.expiresAt(2)            
             expect(
                 newSubscriptionPeriod.sub(previousSubscriptionPeriod)
             ).to.be.equal(Month)

@@ -1,6 +1,14 @@
 {
-    "contractName" : "CyberMavenRegistry",
+     "contractName" : "EternumPass",
     "constructorParams":{
-        "param1" : "0x5FbDB2315678afecb367f032d93F642f64180aa3"
+        "param1" : "NFT_MELA",
+        "param2" : "NFM",
+        "param3" : "www.xyz.com",
+        "param4" : "100000000000000000",
+        "param5" : "30",
+        "param6" : "10000000000000",
+        "param7" : "500",
+        "param8" : "0x16c3A26f93ccaa96b2F7aA4C01504ED7F2E3aeC0",
+        "param9" : "0xF0e22301D7894D4706B83ca4C2Ac4D27ff7E1F52"
     }
 }
