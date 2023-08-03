@@ -65,10 +65,10 @@ module.exports = {
     sepholia: {
       networkId: 11155111,
       url: ETHEREUM_RPC_URL,
-      accounts : [PRIVATE_KEY],
-      // accounts: {
-      //   mnemonic: MNEMONIC,
-      // },
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
     }
   },
   gasReporter: {
