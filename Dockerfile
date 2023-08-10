@@ -16,5 +16,6 @@ RUN yarn install
 COPY . ./
 RUN yarn add hardhat
 RUN yarn compile
+RUN yarn global add @graphprotocol/graph-cli
 EXPOSE 8080
 CMD [ "./smartcontracts" ]

@@ -29,6 +29,7 @@ func main() {
 	router.Use(cors.New(config))
 
 	router.POST("/Contract", DeployContract)
+	router.POST("/Subgraph", DeploySubgraph)
 	router.Use(cors.New(config))
 	router.Run(":8080")
 }
@@ -88,4 +89,73 @@ func genResponse(jsonByte []byte, network string) ([]byte, error) {
 	err = cmd.Wait()
 	log.Printf("Command finished with error: %v", err)
 	return outb.Bytes(), nil
+}
+
+type subgraphPayload struct {
+	Name            string `json:"name"`
+	Folder          string `json:"folder"`
+	NodeUrl         string `json:"nodeUrl"`
+	IpfsUrl         string `json:"ipfsUrl"`
+	ContractName    string `json:"contractName"`
+	ContractAddress string `json:"contractAddress"`
+	Network         string `json:"network"`
+	Protocol        string `json:"protocol"`
+	Tag             string `json:"tag"`
+}
+
+func DeploySubgraph(c *gin.Context) {
+	var req subgraphPayload
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--contract-name", req.ContractName, "--from-contract", req.ContractAddress, "--network", req.Network)
+	err := cmd.Start()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = cmd.Wait()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	os.Chdir(req.Folder)
+
+	newcmd := exec.Command("graph", "create", "--node", req.NodeUrl, req.Name)
+	err = newcmd.Start()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = newcmd.Wait()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	cmd = exec.Command("yarn", "deploy", "-l", "v1", "-i", req.IpfsUrl)
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err = cmd.Start()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	err = cmd.Wait()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	// //output of yarn deploy
+	// output := strings.Split(outb.String(), "\n")[5]
+
+	// //string contains the graph endpoint which is deployed_addr[2]
+	// deployed_addr := strings.Split(output, " ")
+
+	c.JSON(http.StatusOK, outb.Bytes())
 }
