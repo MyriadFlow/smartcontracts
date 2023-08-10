@@ -151,5 +151,11 @@ func DeploySubgraph(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	fmt.Println(outb.String())
+	// //output of yarn deploy
+	// output := strings.Split(outb.String(), "\n")[5]
+
+	// //string contains the graph endpoint which is deployed_addr[2]
+	// deployed_addr := strings.Split(output, " ")
+
+	c.JSON(http.StatusOK, outb.Bytes())
 }
