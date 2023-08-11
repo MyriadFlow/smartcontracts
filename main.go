@@ -36,7 +36,6 @@ func main() {
 }
 
 func DeployContract(c *gin.Context) {
-	os.Chdir("/usr/src/app")
 	var req Contract
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -106,6 +105,13 @@ type subgraphPayload struct {
 }
 
 func DeploySubgraph(c *gin.Context) {
+	ws, err := os.Getwd()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		logrus.Error("Error in graph create")
+		return
+	}
+
 	var req subgraphPayload
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -115,8 +121,7 @@ func DeploySubgraph(c *gin.Context) {
 	}
 
 	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--contract-name", req.ContractName, "--from-contract", req.ContractAddress, "--network", req.Network)
-	fmt.Println(cmd.Args)
-	err := cmd.Start()
+	err = cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		logrus.Error("Failed to start graph init")
@@ -166,7 +171,7 @@ func DeploySubgraph(c *gin.Context) {
 
 	// //string contains the graph endpoint which is deployed_addr[2]
 	// deployed_addr := strings.Split(output, " ")
-	os.Chdir("/usr/src/app")
+	os.Chdir(ws)
 	os.Remove(req.Folder)
 
 	c.JSON(http.StatusOK, outb.Bytes())
