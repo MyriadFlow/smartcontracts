@@ -11,6 +11,7 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type Contract struct {
@@ -108,19 +109,19 @@ func DeploySubgraph(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Invalid request body")
 	}
 
 	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--contract-name", req.ContractName, "--from-contract", req.ContractAddress, "--network", req.Network)
 	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Failed to start graph init")
 	}
 	err = cmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Error in graph init")
 	}
 
 	os.Chdir(req.Folder)
@@ -129,12 +130,12 @@ func DeploySubgraph(c *gin.Context) {
 	err = newcmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Error in graph create")
 	}
 	err = newcmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Failed to run graph create")
 	}
 
 	cmd = exec.Command("yarn", "deploy", "-l", "v1", "-i", req.IpfsUrl)
@@ -144,12 +145,12 @@ func DeploySubgraph(c *gin.Context) {
 	err = cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Failed to deploy graph")
 	}
 	err = cmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		logrus.Fatal("Failed run deploy graph")
 	}
 	// //output of yarn deploy
 	// output := strings.Split(outb.String(), "\n")[5]
