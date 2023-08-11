@@ -17,5 +17,7 @@ COPY . ./
 RUN yarn add hardhat
 RUN yarn compile
 RUN yarn global add @graphprotocol/graph-cli
+RUN git config --global user.email "connect@myriadflow.com"
+RUN git config --global user.name "myriadflow"
 EXPOSE 8080
 CMD [ "./smartcontracts" ]

@@ -109,19 +109,23 @@ func DeploySubgraph(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Invalid request body")
+		logrus.Error("Invalid request body")
+		return
 	}
 
 	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--contract-name", req.ContractName, "--from-contract", req.ContractAddress, "--network", req.Network)
+	fmt.Println(cmd.Args)
 	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Failed to start graph init")
+		logrus.Error("Failed to start graph init")
+		return
 	}
 	err = cmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Error in graph init")
+		logrus.Error("Error in graph init")
+		return
 	}
 
 	os.Chdir(req.Folder)
@@ -130,12 +134,14 @@ func DeploySubgraph(c *gin.Context) {
 	err = newcmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Error in graph create")
+		logrus.Error("Error in graph create")
+		return
 	}
 	err = newcmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Failed to run graph create")
+		logrus.Error("Failed to run graph create")
+		return
 	}
 
 	cmd = exec.Command("yarn", "deploy", "-l", "v1", "-i", req.IpfsUrl)
@@ -145,12 +151,14 @@ func DeploySubgraph(c *gin.Context) {
 	err = cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Failed to deploy graph")
+		logrus.Error("Failed to deploy graph")
+		return
 	}
 	err = cmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Fatal("Failed run deploy graph")
+		logrus.Error("Failed run deploy graph")
+		return
 	}
 	// //output of yarn deploy
 	// output := strings.Split(outb.String(), "\n")[5]
