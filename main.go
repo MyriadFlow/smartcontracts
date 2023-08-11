@@ -36,6 +36,7 @@ func main() {
 }
 
 func DeployContract(c *gin.Context) {
+	os.Chdir("/usr/src/app")
 	var req Contract
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -165,6 +166,8 @@ func DeploySubgraph(c *gin.Context) {
 
 	// //string contains the graph endpoint which is deployed_addr[2]
 	// deployed_addr := strings.Split(output, " ")
+	os.Chdir("/usr/src/app")
+	os.Remove(req.Folder)
 
 	c.JSON(http.StatusOK, outb.Bytes())
 }
