@@ -123,13 +123,6 @@ contract CyberMaven is
         }
         _nounce++;
     }
-
-    function withdraw() external {
-        address reciever = owner();
-        (bool success, ) = reciever.call{value: address(this).balance}("");
-        require(success);
-    }
-
     // Put Getter
 
     function getValueFromMyContract(

@@ -29,11 +29,11 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     uint256 public immutable preSalePrice;
     /// @dev The time until presalePrice will be valid
     uint256 public immutable countDownTime;
-    
+
     uint256 public immutable maxSupply;
 
     uint8 public version = 1;
-    
+
     // PUBLIC && PRIVATE VARIABLES
     string private baseURI;
     address public tradeHub;
@@ -95,6 +95,10 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         baseURI = _baseUri;
         // SET DEFAULT ROYALTY
         _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS));
+    }
+
+    function setSalePrice(uint256 _salePrice) external onlyAdmin {
+        salePrice = _salePrice;
     }
 
     function mint(
