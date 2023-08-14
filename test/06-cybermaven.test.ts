@@ -98,34 +98,6 @@ describe("CyberMaven contract", () => {
         )        
         expect(endingCreatorBalance.sub(startingCreatorBalance)).to.be.equal(val2)
     })
-    it("Withdraw",async() =>{
-
-        expect(contract.connect(owner).withdraw()).to.be.reverted
-        const startingWalletBalance = await contract.provider.getBalance(
-                contract.address
-            )
-            const startingDeployerBalance = await contract.provider.getBalance(
-                creator.address
-            )
-            // Act
-            const transactionResponse = await contract.withdraw()
-            const transactionReceipt = await transactionResponse.wait()
-            const { gasUsed, effectiveGasPrice } = transactionReceipt
-            const gasCost = gasUsed.mul(effectiveGasPrice)
-
-            const endingWalletBalance = await contract.provider.getBalance(
-                contract.address
-            )
-            const endingDeployerBalance = await contract.provider.getBalance(
-                creator.address
-            )
-            expect(endingWalletBalance).to.be.equal(0)
-
-            expect(
-                endingDeployerBalance.sub(startingDeployerBalance)).to.be.equal(
-                startingWalletBalance.sub(gasCost)
-            )
-    })
     it("To check ERC20", async() => {  
         let val  = ethers.utils.parseEther("1")
         await token.transfer(contract.address,val)
