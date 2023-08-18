@@ -22,6 +22,8 @@ type Contract struct {
 	Network string `json:"network"`
 }
 
+var dir, _ = os.Getwd()
+
 func main() {
 	router := gin.Default()
 	config := cors.DefaultConfig()
@@ -58,6 +60,7 @@ func DeployContract(c *gin.Context) {
 }
 
 func genResponse(jsonByte []byte, network string) ([]byte, error) {
+	os.Chdir(dir)
 	filePath := "scripts/launch/launch.json"
 
 	_, err := os.ReadFile(filePath)
@@ -105,13 +108,7 @@ type subgraphPayload struct {
 }
 
 func DeploySubgraph(c *gin.Context) {
-	ws, err := os.Getwd()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		logrus.Error("Error in graph create")
-		return
-	}
-
+	os.Chdir(dir)
 	var req subgraphPayload
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -121,7 +118,7 @@ func DeploySubgraph(c *gin.Context) {
 	}
 
 	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--contract-name", req.ContractName, "--from-contract", req.ContractAddress, "--network", req.Network)
-	err = cmd.Start()
+	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		logrus.Error("Failed to start graph init")
@@ -166,13 +163,9 @@ func DeploySubgraph(c *gin.Context) {
 		logrus.Error("Failed run deploy graph")
 		return
 	}
-	// //output of yarn deploy
-	// output := strings.Split(outb.String(), "\n")[5]
 
-	// //string contains the graph endpoint which is deployed_addr[2]
-	// deployed_addr := strings.Split(output, " ")
-	os.Chdir(ws)
-	os.Remove(req.Folder)
+	os.Chdir(dir)
+	os.RemoveAll(req.Folder)
 
 	c.JSON(http.StatusOK, outb.Bytes())
 }
