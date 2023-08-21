@@ -100,7 +100,6 @@ type subgraphPayload struct {
 	Folder          string `json:"folder"`
 	NodeUrl         string `json:"nodeUrl"`
 	IpfsUrl         string `json:"ipfsUrl"`
-	ContractName    string `json:"contractName"`
 	ContractAddress string `json:"contractAddress"`
 	Network         string `json:"network"`
 	Protocol        string `json:"protocol"`
@@ -117,7 +116,7 @@ func DeploySubgraph(c *gin.Context) {
 		return
 	}
 
-	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--contract-name", req.ContractName, "--from-contract", req.ContractAddress, "--network", req.Network)
+	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.ContractAddress, "--index-events", "--network", req.Network)
 	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
