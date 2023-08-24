@@ -105,10 +105,24 @@ type subgraphPayload struct {
 	Protocol        string `json:"protocol"`
 	Tag             string `json:"tag"`
 }
+type DeploySubgraphPayload struct {
+	Name      string     `json:"name"`
+	Folder    string     `json:"folder"`
+	NodeUrl   string     `json:"nodeUrl"`
+	IpfsUrl   string     `json:"ipfsUrl"`
+	Contracts []contract `json:"contracts"`
+	Network   string     `json:"network"`
+	Protocol  string     `json:"protocol"`
+	Tag       string     `json:"tag"`
+}
+type contract struct {
+	Name    string `json:"name"`
+	Address string `json:"address"`
+}
 
 func DeploySubgraph(c *gin.Context) {
 	os.Chdir(dir)
-	var req subgraphPayload
+	var req DeploySubgraphPayload
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -116,7 +130,7 @@ func DeploySubgraph(c *gin.Context) {
 		return
 	}
 
-	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.ContractAddress, "--index-events", "--network", req.Network)
+	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.Contracts[0].Address, "--contract-name", req.Contracts[0].Name, "--index-events", "--network", req.Network)
 	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -129,7 +143,21 @@ func DeploySubgraph(c *gin.Context) {
 		logrus.Error("Error in graph init")
 		return
 	}
-
+	for i := 1; i < len(req.Contracts); i++ {
+		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name)
+		err := cmd.Start()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			logrus.Error("Failed to start graph init")
+			return
+		}
+		err = cmd.Wait()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			logrus.Error("Error in graph init")
+			return
+		}
+	}
 	os.Chdir(req.Folder)
 
 	newcmd := exec.Command("graph", "create", "--node", req.NodeUrl, req.Name)
