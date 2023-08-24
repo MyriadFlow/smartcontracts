@@ -95,16 +95,6 @@ func genResponse(jsonByte []byte, network string) ([]byte, error) {
 	return outb.Bytes(), nil
 }
 
-type subgraphPayload struct {
-	Name            string `json:"name"`
-	Folder          string `json:"folder"`
-	NodeUrl         string `json:"nodeUrl"`
-	IpfsUrl         string `json:"ipfsUrl"`
-	ContractAddress string `json:"contractAddress"`
-	Network         string `json:"network"`
-	Protocol        string `json:"protocol"`
-	Tag             string `json:"tag"`
-}
 type DeploySubgraphPayload struct {
 	Name      string     `json:"name"`
 	Folder    string     `json:"folder"`
@@ -143,22 +133,22 @@ func DeploySubgraph(c *gin.Context) {
 		logrus.Error("Error in graph init")
 		return
 	}
+	os.Chdir(req.Folder)
 	for i := 1; i < len(req.Contracts); i++ {
 		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name)
 		err := cmd.Start()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			logrus.Error("Failed to start graph init")
+			logrus.Error("Failed to start graph add")
 			return
 		}
 		err = cmd.Wait()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			logrus.Error("Error in graph init")
+			logrus.Error("Error in graph add")
 			return
 		}
 	}
-	os.Chdir(req.Folder)
 
 	newcmd := exec.Command("graph", "create", "--node", req.NodeUrl, req.Name)
 	err = newcmd.Start()
