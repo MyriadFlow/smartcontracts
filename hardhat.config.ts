@@ -22,14 +22,30 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
+
+// Testnet: sepolia, mumbai, linea, fevm, binance
+// Mainnet: Ethereum, Polygon, Linea, FEVM, Binance 
+
+
+
 // API_KEY & PRIVATE_KEY
-const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://polygon-mumbai.g.alchemy.com/v2/tr0pG2ASpL0-Ucmm969f_1yFgDIiAc6y"
+const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://polygon-mumbai.g.alchemy.com/v2/api-key"
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || "https://ETH-RPC-URL"
+const LINEA_GOERLI_RPC_URL = process.env.LINEA_GOERLI_RPC_URL || "https://linea-goerli.infura.io/v3/api-key"
+const FILECOIN_CALIBARATION_RPC_URL = process.env.FILECOIN_CALIBARATION_RPC_URL || "https://rpc.ankr.com/filecoin_testnet"
+const BNB_TESTNET_RPC_URL = process.env.BNB_TESTNET_RPC_URL || "https://bsc-testnet.public.blastapi.io"
+const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL || "https://mainnet.infura.io/v3/api-key"
+const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL || "https://polygon-mainnet.g.alchemy.com/v2/api-key"
+const LINEA_RPC_URL = process.env.LINEA_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
+const FILECOIN_RPC_URL = process.env.FILECOIN_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
+const BNB_RPC_URL = process.env.BNB_RPC_URL || "https://bsc.blockpi.network/v1/rpc/public"
+
 const MNEMONIC = process.env.MNEMONIC || "ajkskjfjksjkf ssfaasff asklkfl klfkas dfklhao asfj sfk klsfjs fkjs"
+const PRIVATE_KEY = process.env.PRIVATE_KEY
+
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "KG1VJQJZVNR4AJU7QIWAKXGC78PCN9UGIK"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
 
-const PRIVATE_KEY = process.env.PRIVATE_KEY
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -67,6 +83,70 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC,
       },
+    },
+     lineaGoerli :{
+      networkId: 59140,
+      url: LINEA_GOERLI_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },      
+    },
+    filecoinCalibaration :{
+      networkId: 314159,
+      url: FILECOIN_CALIBARATION_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
+    },
+    bnbTest :{
+      networkId: 97,
+      url: BNB_TESTNET_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
+    },
+    ethereum: {
+      networkId: 1,
+      url: ETHEREUM_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
+    },
+    polygon: {
+      networkId: 137,
+      url: POLYGON_RPC_URL,
+      // accounts: [`0x${ETH_PRIVATE_KEY}`],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
+    },
+    linea :{
+      networkId: 59144,
+      url: LINEA_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },      
+    },
+    filecoin :{
+      networkId: 314,
+      url: FILECOIN_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
+    },
+    bnb:{
+      networkId: 56,
+      url: BNB_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
     }
   },
   gasReporter: {

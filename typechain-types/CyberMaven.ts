@@ -46,7 +46,6 @@ export interface CyberMavenInterface extends utils.Interface {
     "symbol()": FunctionFragment;
     "token()": FunctionFragment;
     "version()": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -131,7 +130,6 @@ export interface CyberMavenInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "callSetter", data: BytesLike): Result;
   decodeFunctionResult(
@@ -209,7 +207,6 @@ export interface CyberMavenInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "ECR6551ERC1155Transfer(address,address,uint256,uint256)": EventFragment;
@@ -475,10 +472,6 @@ export interface CyberMaven extends BaseContract {
     >;
 
     version(overrides?: CallOverrides): Promise<[number]>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
   callSetter(
@@ -627,10 +620,6 @@ export interface CyberMaven extends BaseContract {
 
   version(overrides?: CallOverrides): Promise<number>;
 
-  withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     callSetter(
       contractAddress: string,
@@ -771,8 +760,6 @@ export interface CyberMaven extends BaseContract {
     >;
 
     version(overrides?: CallOverrides): Promise<number>;
-
-    withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -1005,10 +992,6 @@ export interface CyberMaven extends BaseContract {
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
     version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1149,9 +1132,5 @@ export interface CyberMaven extends BaseContract {
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
   };
 }
