@@ -41,6 +41,7 @@ export interface InstaGenInterface extends utils.Interface {
     "salePrice()": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setRentInfo(uint256,bool,uint256)": FunctionFragment;
+    "setSalePrice(uint256)": FunctionFragment;
     "setUser(uint256,address,uint64)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
@@ -115,6 +116,10 @@ export interface InstaGenInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setRentInfo",
     values: [BigNumberish, boolean, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setSalePrice",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setUser",
@@ -194,6 +199,10 @@ export interface InstaGenInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setRentInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setSalePrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setUser", data: BytesLike): Result;
@@ -433,6 +442,11 @@ export interface InstaGen extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setSalePrice(
+      _salePrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     setUser(
       tokenId: BigNumberish,
       user: string,
@@ -581,6 +595,11 @@ export interface InstaGen extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setSalePrice(
+    _salePrice: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   setUser(
     tokenId: BigNumberish,
     user: string,
@@ -717,6 +736,11 @@ export interface InstaGen extends BaseContract {
       tokenId: BigNumberish,
       isRentable: boolean,
       pricePerHour: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setSalePrice(
+      _salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -952,6 +976,11 @@ export interface InstaGen extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setSalePrice(
+      _salePrice: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     setUser(
       tokenId: BigNumberish,
       user: string,
@@ -1100,6 +1129,11 @@ export interface InstaGen extends BaseContract {
       tokenId: BigNumberish,
       isRentable: boolean,
       pricePerHour: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setSalePrice(
+      _salePrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
