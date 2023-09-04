@@ -50,12 +50,13 @@ The JSON file should have the following format:
 
 ```shell
 {
-    "contractName" : "SignatureSeries",
+    "contractName" : "FusionSeries",
     "constructorParams":{
-        "param1" : "NFT_MELA",
-        "param2" : "NFM",
-        "param3" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
-        "param4" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"
+        "param1":  "www.xyz.com",
+        "param2" : "NFT Baazar",
+        "param3" : "NFB",
+        "param4" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
+        "param5" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"
     }
 }
 
@@ -125,40 +126,11 @@ The JSON file should have the following format:
         "param3" : "www.xyz.com",
         "param4" : "1000000000000000000",
         "param5" : "1000000000000000",
-        "param6" : 300
+        "param6" : 300,
         "param7" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
     }
 }
 ```
-`FlowOfferStation Contract`
-
-```shell
-{
-    "contractName" : "FlowSubscription",
-    "constructorParams":{
-        "param1" : "MYRIADFLOW",
-        "param2" : "MFW",
-        "param3" : "www.xyz.com",
-        "param4" : "1000000000000000000",
-        "param5" : "1000000000000000",
-        "param6" : 300
-    }
-}
-```
-
-`FlowOfferStation Contract`
-
-```shell
-{
-    "contractName" : "FlowOfferStation",
-    "constructorParams":{
-        "param1" : 300,
-        "param2" : false,
-        "param3" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
-    }
-}
-```
-
 `CyberMaven Contract`
 
 ```shell

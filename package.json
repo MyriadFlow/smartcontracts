@@ -12,7 +12,10 @@
     "compile": "hardhat compile",
     "launch":"hardhat run scripts/launch/launch.js",
     "launchMumbai" : "hardhat run scripts/launch/launch.js --network maticmum",
-    "launchSepolia" : "hardhat run scripts/launch/launch.js --network sepolia"
+    "launchSepolia" : "hardhat run scripts/launch/launch.js --network sepolia",
+    "launchBNBTest" : "hardhat run scripts/launch/launch.js --network bnbTest",
+    "launchFilCalibration" : "hardhat run scripts/launch/launch.js --network filecoinCalibaration",
+    "launchLineaGoerli" : "hardhat run scripts/launch/launch.js --network lineaGoerli"
 
   },
   "devDependencies": {
