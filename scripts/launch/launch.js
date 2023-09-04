@@ -6,6 +6,7 @@ const data = fs.readFileSync(scripts, "utf8")
 const jsonContent = JSON.parse(data)
 
 let contractAddress
+let blockNumber
 let Verified = false
 
 async function AccessMasterDeploy() {
@@ -15,14 +16,15 @@ async function AccessMasterDeploy() {
     const AccessMaster = await AccessMasterFactory.deploy()
     await AccessMaster.deployed()
     console.log(`AccessMaster Deployed  to : ${AccessMaster.address}`)
-    let Addr = AccessMaster.address
+    //console.log(AccessMaster)
+    contractAddress = AccessMaster.address
+    blockNumber = AccessMaster.provider._maxInternalBlockNumber
 
     ///VERIFY
     if (hre.network.name != "hardhat") {
         await AccessMaster.deployTransaction.wait(6)
         await verify(AccessMaster.address, [])
     }
-    return Addr
 }
 
 async function TradeHubDeploy() {
@@ -38,7 +40,8 @@ async function TradeHubDeploy() {
     await tradehub.deployed()
     console.log("TradeHub Deployed to: ", tradehub.address)
 
-    const Addr = tradehub.address
+    contractAddress = tradehub.address
+    blockNumber = tradehub.provider._maxInternalBlockNumber
 
     const txHash = tradehub.deployTransaction.hash
     console.log(`Tx hash: ${txHash}\nWaiting for transaction to be mined...`)
@@ -48,13 +51,12 @@ async function TradeHubDeploy() {
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await tradehub.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(tradehub.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
         ])
     }
-    return Addr
 }
 
 async function fusionSeriesDeploy() {
@@ -69,11 +71,12 @@ async function fusionSeriesDeploy() {
     )
     await fusionseries.deployed()
     console.log("FusionSeries Deployed to:", fusionseries.address)
-    const Addr = fusionseries.address
+    contractAddress = fusionseries.address
+    blockNumber = fusionseries.provider._maxInternalBlockNumber
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await fusionseries.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(fusionseries.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
@@ -81,8 +84,6 @@ async function fusionSeriesDeploy() {
             constructorParam.param5,
         ])
     }
-
-    return Addr
 }
 
 async function signatureSeriesDeploy() {
@@ -96,21 +97,20 @@ async function signatureSeriesDeploy() {
         constructorParam.param3,
         constructorParam.param4
     )
-    await signatureSeries.deployed()
     console.log("SignatureSeries Deployed to:", signatureSeries.address)
-    const Addr = signatureSeries.address
+    contractAddress = signatureSeries.address
+    blockNumber = signatureSeries.provider._maxInternalBlockNumber
+
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await signatureSeries.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(signatureSeries.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
             constructorParam.param4,
         ])
     }
-
-    return Addr
 }
 
 async function instaGenDeploy() {
@@ -130,11 +130,12 @@ async function instaGenDeploy() {
     )
     await instaGen.deployed()
     console.log("InstaGen Deployed to:", instaGen.address)
-    const Addr = instaGen.address
+    contractAddress = instaGen.address
+    blockNumber = instaGen.provider._maxInternalBlockNumber - 1
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await instaGen.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(instaGen.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
@@ -147,8 +148,6 @@ async function instaGenDeploy() {
             constructorParam.param10,
         ])
     }
-
-    return Addr
 }
 
 async function eternumPassDeploy() {
@@ -167,11 +166,12 @@ async function eternumPassDeploy() {
     )
     await eternumpass.deployed()
     console.log("EternumPass Deployed to:", eternumpass.address)
-    const Addr = eternumpass.address
+    contractAddress = eternumpass.address
+    blockNumber = eternumpass.provider._maxInternalBlockNumber
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await eternumpass.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(eternumpass.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
@@ -183,7 +183,6 @@ async function eternumPassDeploy() {
             constructorParam.param9,
         ])
     }
-    return Addr
 }
 
 async function eternalSoulDeploy() {
@@ -197,18 +196,18 @@ async function eternalSoulDeploy() {
     )
     await eternalsoul.deployed()
     console.log("EternalSoul Deployed to:", eternalsoul.address)
-    const Addr = eternalsoul.address
+    contractAddress = eternalsoul.address
+    blockNumber = eternalsoul.provider._maxInternalBlockNumber
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await eternalsoul.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(eternalsoul.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
             constructorParam.param4,
         ])
     }
-    return Addr
 }
 
 async function flowSubscriptionDeploy() {
@@ -222,49 +221,26 @@ async function flowSubscriptionDeploy() {
         constructorParam.param3,
         constructorParam.param4,
         constructorParam.param5,
-        constructorParam.param6
+        constructorParam.param6,
+        constructorParam.param7
     )
     await flowsubscription.deployed()
     console.log("FlowSubscription Deployed to:", flowsubscription.address)
-    const Addr = flowsubscription.address
+    contractAddress = flowsubscription.address
+    blockNumber = flowsubscription.provider._maxInternalBlockNumber
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await flowsubscription.deployTransaction.wait(6)
-        await verify(Addr, [
+        await verify(flowsubscription.address, [
             constructorParam.param1,
             constructorParam.param2,
             constructorParam.param3,
             constructorParam.param4,
             constructorParam.param5,
             constructorParam.param6,
+            constructorParam.param7,
         ])
     }
-    return Addr
-}
-
-async function flowOfferStationDeploy() {
-    const constructorParam = jsonContent.constructorParams
-    const OfferStation = await hre.ethers.getContractFactory(
-        "MyriadFlowOfferStation"
-    )
-    const offerstation = await OfferStation.deploy(
-        constructorParam.param1,
-        constructorParam.param2,
-        constructorParam.param3
-    )
-    await offerstation.deployed()
-    console.log("Offerstation Deployed to:", offerstation.address)
-    const Addr = offerstation.address
-    /// VERIFY
-    if (hre.network.name != "hardhat") {
-        await offerstation.deployTransaction.wait(6)
-        await verify(Addr, [
-            constructorParam.param1,
-            constructorParam.param2,
-            constructorParam.param3,
-        ])
-    }
-    return Addr
 }
 
 async function cyberMavenDeploy() {
@@ -272,13 +248,13 @@ async function cyberMavenDeploy() {
     const cybermaven = await CyberMavenFactory.deploy()
     await cybermaven.deployed()
     console.log(`CyberMaven Deployed  to : ${cybermaven.address}`)
-    let Addr = cybermaven.address
+    contractAddress = cybermaven.address
+    blockNumber = cybermaven.provider._maxInternalBlockNumber
     ///VERIFY
     if (hre.network.name != "hardhat") {
         await cybermaven.deployTransaction.wait(6)
         await verify(cybermaven.address, [])
     }
-    return Addr
 }
 
 async function cybermavenRegistryDeploy() {
@@ -291,60 +267,60 @@ async function cybermavenRegistryDeploy() {
     )
     await accountregistry.deployed()
     console.log("CyberMaven Registry Deployed to:", accountregistry.address)
-    const Addr = accountregistry.address
+    contractAddress = accountregistry.address
+    blockNumber = accountregistry.provider._maxInternalBlockNumber
     /// VERIFY
     if (hre.network.name != "hardhat") {
         await accountregistry.deployTransaction.wait(6)
-        await verify(Addr, [constructorParam.param1])
+        await verify(accountregistry.address, [constructorParam.param1])
     }
-    return Addr
 }
 
 async function main() {
     //AccessMaster
     if (jsonContent.contractName == "AccessMaster") {
-        contractAddress = await AccessMasterDeploy()
+        await AccessMasterDeploy()
     }
     /// TRADEHUB CONTRACT
     if (jsonContent.contractName == "TradeHub") {
-        contractAddress = await TradeHubDeploy()
+        await TradeHubDeploy()
     }
     // FUSION-SERIES CONTRACT
     if (jsonContent.contractName == "FusionSeries") {
-        contractAddress = await fusionSeriesDeploy()
+        await fusionSeriesDeploy()
     }
     // SIGNATURE-SERIES CONTRACT
     if (jsonContent.contractName == "SignatureSeries") {
-        contractAddress = await signatureSeriesDeploy()
+        await signatureSeriesDeploy()
     }
     // INSTAGEN CONTRACT
     if (jsonContent.contractName == "InstaGen") {
-        contractAddress = await instaGenDeploy()
+        await instaGenDeploy()
     }
     //ETERNUMPASS CONTRACT
     if (jsonContent.contractName == "EternumPass") {
-        contractAddress = await eternumPassDeploy()
+        await eternumPassDeploy()
     }
     // ETERNALSOUL CONTRACT
     if (jsonContent.contractName == "EternalSoul") {
-        contractAddress = await eternalSoulDeploy()
+        await eternalSoulDeploy()
     }
 
     // FLOWSUBSCRIPTION
     if (jsonContent.contractName == "FlowSubscription") {
-        contractAddress = await flowSubscriptionDeploy()
+        await flowSubscriptionDeploy()
     }
     // FLOWOFFERSTATION
     if (jsonContent.contractName == "FlowOfferStation") {
-        contractAddress = await flowOfferStationDeploy()
+        await flowOfferStationDeploy()
     }
     // CYBERMAVEN
     if (jsonContent.contractName == "CyberMaven") {
-        contractAddress = await cyberMavenDeploy()
+        await cyberMavenDeploy()
     }
     // ACCOUNT REGISTRY
     if (jsonContent.contractName == "CyberMavenRegistry") {
-        contractAddress = await cybermavenRegistryDeploy()
+        await cybermavenRegistryDeploy()
     }
 
     let chainId
@@ -356,7 +332,7 @@ async function main() {
     }
 
     console.log(`The chainId is ${chainId}`)
-    const data = { chainId, contractAddress, Verified }
+    const data = { chainId, contractAddress, Verified, blockNumber }
     const jsonString = JSON.stringify(data)
     // Log the JSON string
     console.log(jsonString)
