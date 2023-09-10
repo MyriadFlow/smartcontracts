@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -91,7 +92,10 @@ func genResponse(jsonByte []byte, network string) ([]byte, error) {
 		return nil, err
 	}
 	err = cmd.Wait()
-	log.Printf("Command finished with error: %v", err)
+	if err != nil {
+		log.Printf("Command finished with error: %v", err.Error())
+		return nil, err
+	}
 	return outb.Bytes(), nil
 }
 
@@ -106,8 +110,9 @@ type DeploySubgraphPayload struct {
 	Tag       string     `json:"tag"`
 }
 type contract struct {
-	Name    string `json:"name"`
-	Address string `json:"address"`
+	Name        string `json:"name"`
+	Address     string `json:"address"`
+	BlockNumber int    `json:"blockNumber"`
 }
 
 func DeploySubgraph(c *gin.Context) {
@@ -120,8 +125,8 @@ func DeploySubgraph(c *gin.Context) {
 		return
 	}
 
-	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.Contracts[0].Address, "--contract-name", req.Contracts[0].Name, "--index-events", "--network", req.Network)
-	fmt.Println(cmd)
+	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.Contracts[0].Address, "--contract-name", req.Contracts[0].Name, "--start-block", strconv.Itoa(req.Contracts[0].BlockNumber), "--index-events", "--network", req.Network)
+
 	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -136,8 +141,7 @@ func DeploySubgraph(c *gin.Context) {
 	}
 	os.Chdir(req.Folder)
 	for i := 1; i < len(req.Contracts); i++ {
-		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name)
-		fmt.Println(cmd)
+		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name, "--start-block", strconv.Itoa(req.Contracts[i].BlockNumber))
 		err := cmd.Start()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
