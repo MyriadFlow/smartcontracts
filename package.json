@@ -15,7 +15,8 @@
     "launchSepolia" : "hardhat run scripts/launch/launch.js --network sepolia",
     "launchBNBTest" : "hardhat run scripts/launch/launch.js --network bnbTest",
     "launchFilCalibration" : "hardhat run scripts/launch/launch.js --network filecoinCalibaration",
-    "launchLineaGoerli" : "hardhat run scripts/launch/launch.js --network lineaGoerli"
+    "launchLineaGoerli" : "hardhat run scripts/launch/launch.js --network lineaGoerli",
+    "contractAddress" : "hardhat run scripts/contractAddress.js"
 
   },
   "devDependencies": {
