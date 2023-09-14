@@ -26,9 +26,9 @@ The JSON file should have the following format:
 {
     "contractName" : "TradeHub",
     "constructorParams":{
-        "param1":   30,
-        "param2" : "NFT BAZAAR",
-        "param3" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"
+        "param1":   30, // PlaformFee
+        "param2" : "NFT BAZAAR", // TradeHub Name
+        "param3" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC" // AccessMaster Address 
     }
 }
 ```
@@ -39,9 +39,11 @@ The JSON file should have the following format:
 {
     "contractName" : "FusionSeries",
     "constructorParams":{
-        "param1":  "www.xyz.com",
-        "param2" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
-        "param3" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"
+        "param1":  "www.xyz.com", //BaseURI
+        "param2" : "NFT MELA", // Name
+        "param3" : "NFM", // Symbol
+        "param2" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",//TradeHub Address
+        "param3" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"//AccessMaster Address
     }
 }
 ```
@@ -50,13 +52,12 @@ The JSON file should have the following format:
 
 ```shell
 {
-    "contractName" : "FusionSeries",
+    "contractName" : "SignatureSeries",
     "constructorParams":{
-        "param1":  "www.xyz.com",
-        "param2" : "NFT Baazar",
-        "param3" : "NFB",
-        "param4" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
-        "param5" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"
+        "param1" : "NFT Baazar", // Name 
+        "param2" : "NFB",// Symbol
+        "param3" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298", // TradeHub Address
+        "param4" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"// AccessMaster Address
     }
 }
 
@@ -68,16 +69,16 @@ The JSON file should have the following format:
 {
     "contractName" : "InstaGen",
     "constructorParams":{
-        "param1": "NFT MELA",
-        "param2" : "NM",
-        "param3" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298",
-        "param4" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC" ,
-        "param5" :"1000000000000000000",
-        "param6" : "100000000000000000",
-        "param7" : 0,
-        "param8" : 2000,
-        "param9" : 300,
-        "param10": "www.abc.com"
+        "param1": "NFT MELA",//Name
+        "param2" : "NM",//Symbol
+        "param3" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298", // TradeHub Address
+        "param4" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC" , // AccessMaster Address
+        "param5" :"1000000000000000000", // SalePrice
+        "param6" : "100000000000000000",// PreSalePrice
+        "param7" : 0,//CountDown
+        "param8" : 2000,// MaxSupply
+        "param9" : 300,//Royalty Percentage
+        "param10": "www.abc.com"// BaseUri
     }
 }
 ```
@@ -88,15 +89,15 @@ The JSON file should have the following format:
 {
     "contractName" : "EternumPass",
     "constructorParams":{
-        "param1" : "NFT_MELA",
-        "param2" : "NFM",
-        "param3" : "www.xyz.com",
-        "param4" : "100000000000000000",
-        "param5" : "30",
-        "param6" : "10000000000000",
-        "param7" : "500",
-        "param8" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC",
-        "param9" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298"
+        "param1" : "NFT_MELA",//Name
+        "param2" : "NFM",//Symbol
+        "param3" : "www.xyz.com",//BaseUri
+        "param4" : "100000000000000000",//PublicSalePrice
+        "param5" : "30",//PlatformFee
+        "param6" : "10000000000000",//Subscription Price
+        "param7" : "500",//Royalty
+        "param8" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC",//AccessMaster Address
+        "param9" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298" // TradeHub Address
     }
 }
 ```
@@ -107,10 +108,10 @@ The JSON file should have the following format:
 {
     "contractName" : "EternalSoul",
     "constructorParams":{
-        "param1" : "Soul Wizard",
-        "param2" : "SW",
-        "param3" : "www.xyz.com",
-        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"
+        "param1" : "Soul Wizard",//Name
+        "param2" : "SW",//Symbol
+        "param3" : "www.xyz.com", //BaseUri
+        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"// AccessMaster Address
     }
 }
 ```
@@ -131,6 +132,7 @@ The JSON file should have the following format:
     }
 }
 ```
+
 `CyberMaven Contract`
 
 ```shell
@@ -141,7 +143,6 @@ The JSON file should have the following format:
     }
 }
 ```
-
 
 `CyberMaven Registry`
 
