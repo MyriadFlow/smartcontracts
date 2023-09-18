@@ -232,18 +232,22 @@ export interface SignatureSeriesInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,address,string)": EventFragment;
-    "AssetDestroyed(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
+    "SignatureSeriesAssetCreated(uint256,address,string)": EventFragment;
+    "SignatureSeriesAssetDestroyed(uint256,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "UpdateUser(uint256,address,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "SignatureSeriesAssetCreated"
+  ): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "SignatureSeriesAssetDestroyed"
+  ): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
 }
@@ -262,26 +266,28 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type AssetCreatedEvent = TypedEvent<
-  [BigNumber, string, string],
-  { tokenID: BigNumber; creator: string; metaDataURI: string }
->;
-
-export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
-
-export type AssetDestroyedEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; ownerOrApproved: string }
->;
-
-export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
-
 export type RentalInfoEvent = TypedEvent<
   [BigNumber, boolean, BigNumber, string],
   { tokenId: BigNumber; isRentable: boolean; price: BigNumber; renter: string }
 >;
 
 export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
+
+export type SignatureSeriesAssetCreatedEvent = TypedEvent<
+  [BigNumber, string, string],
+  { tokenID: BigNumber; creator: string; metaDataURI: string }
+>;
+
+export type SignatureSeriesAssetCreatedEventFilter =
+  TypedEventFilter<SignatureSeriesAssetCreatedEvent>;
+
+export type SignatureSeriesAssetDestroyedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; ownerOrApproved: string }
+>;
+
+export type SignatureSeriesAssetDestroyedEventFilter =
+  TypedEventFilter<SignatureSeriesAssetDestroyedEvent>;
 
 export type TransferEvent = TypedEvent<
   [string, string, BigNumber],
@@ -805,26 +811,6 @@ export interface SignatureSeries extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,address,string)"(
-      tokenID?: null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): AssetCreatedEventFilter;
-    AssetCreated(
-      tokenID?: null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): AssetCreatedEventFilter;
-
-    "AssetDestroyed(uint256,address)"(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-    AssetDestroyed(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-
     "RentalInfo(uint256,bool,uint256,address)"(
       tokenId?: null,
       isRentable?: null,
@@ -837,6 +823,26 @@ export interface SignatureSeries extends BaseContract {
       price?: null,
       renter?: string | null
     ): RentalInfoEventFilter;
+
+    "SignatureSeriesAssetCreated(uint256,address,string)"(
+      tokenID?: null,
+      creator?: string | null,
+      metaDataURI?: null
+    ): SignatureSeriesAssetCreatedEventFilter;
+    SignatureSeriesAssetCreated(
+      tokenID?: null,
+      creator?: string | null,
+      metaDataURI?: null
+    ): SignatureSeriesAssetCreatedEventFilter;
+
+    "SignatureSeriesAssetDestroyed(uint256,address)"(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): SignatureSeriesAssetDestroyedEventFilter;
+    SignatureSeriesAssetDestroyed(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): SignatureSeriesAssetDestroyedEventFilter;
 
     "Transfer(address,address,uint256)"(
       from?: string | null,

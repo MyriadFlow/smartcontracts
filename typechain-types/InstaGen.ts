@@ -232,9 +232,9 @@ export interface InstaGenInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,uint256,address)": EventFragment;
-    "AssetDestroyed(uint256,address)": EventFragment;
     "ConsecutiveTransfer(uint256,uint256,address,address)": EventFragment;
+    "InstaGenAssetCreated(uint256,uint256,address)": EventFragment;
+    "InstaGenAssetDestroyed(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "UpdateUser(uint256,address,uint64)": EventFragment;
@@ -242,9 +242,9 @@ export interface InstaGenInterface extends utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ConsecutiveTransfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InstaGenAssetCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InstaGenAssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
@@ -264,20 +264,6 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type AssetCreatedEvent = TypedEvent<
-  [BigNumber, BigNumber, string],
-  { currentIndex: BigNumber; quantity: BigNumber; creator: string }
->;
-
-export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
-
-export type AssetDestroyedEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; ownerOrApproved: string }
->;
-
-export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
-
 export type ConsecutiveTransferEvent = TypedEvent<
   [BigNumber, BigNumber, string, string],
   { fromTokenId: BigNumber; toTokenId: BigNumber; from: string; to: string }
@@ -285,6 +271,22 @@ export type ConsecutiveTransferEvent = TypedEvent<
 
 export type ConsecutiveTransferEventFilter =
   TypedEventFilter<ConsecutiveTransferEvent>;
+
+export type InstaGenAssetCreatedEvent = TypedEvent<
+  [BigNumber, BigNumber, string],
+  { currentIndex: BigNumber; quantity: BigNumber; creator: string }
+>;
+
+export type InstaGenAssetCreatedEventFilter =
+  TypedEventFilter<InstaGenAssetCreatedEvent>;
+
+export type InstaGenAssetDestroyedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; ownerOrApproved: string }
+>;
+
+export type InstaGenAssetDestroyedEventFilter =
+  TypedEventFilter<InstaGenAssetDestroyedEvent>;
 
 export type RentalInfoEvent = TypedEvent<
   [BigNumber, boolean, BigNumber, string],
@@ -806,26 +808,6 @@ export interface InstaGen extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,uint256,address)"(
-      currentIndex?: null,
-      quantity?: null,
-      creator?: string | null
-    ): AssetCreatedEventFilter;
-    AssetCreated(
-      currentIndex?: null,
-      quantity?: null,
-      creator?: string | null
-    ): AssetCreatedEventFilter;
-
-    "AssetDestroyed(uint256,address)"(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-    AssetDestroyed(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-
     "ConsecutiveTransfer(uint256,uint256,address,address)"(
       fromTokenId?: BigNumberish | null,
       toTokenId?: null,
@@ -838,6 +820,26 @@ export interface InstaGen extends BaseContract {
       from?: string | null,
       to?: string | null
     ): ConsecutiveTransferEventFilter;
+
+    "InstaGenAssetCreated(uint256,uint256,address)"(
+      currentIndex?: null,
+      quantity?: null,
+      creator?: string | null
+    ): InstaGenAssetCreatedEventFilter;
+    InstaGenAssetCreated(
+      currentIndex?: null,
+      quantity?: null,
+      creator?: string | null
+    ): InstaGenAssetCreatedEventFilter;
+
+    "InstaGenAssetDestroyed(uint256,address)"(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): InstaGenAssetDestroyedEventFilter;
+    InstaGenAssetDestroyed(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): InstaGenAssetDestroyedEventFilter;
 
     "RentalInfo(uint256,bool,uint256,address)"(
       tokenId?: null,

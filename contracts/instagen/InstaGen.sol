@@ -60,12 +60,12 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         _;
     }
 
-    event AssetCreated(
+    event InstaGenAssetCreated(
         uint256 currentIndex,
         uint256 quantity,
         address indexed creator
     );
-    event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+    event InstaGenAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
     event RentalInfo(
         uint256 tokenId,
@@ -122,7 +122,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         }
         _safeMint(_msgSender(), quantity);
         setApprovalForAll(tradeHub, true);
-        emit AssetCreated(_totalMinted(), quantity, _msgSender());
+        emit InstaGenAssetCreated(_totalMinted(), quantity, _msgSender());
         return (prevQuantity, quantity);
     }
 
@@ -142,7 +142,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         );
         _burn(tokenId, true);
         _resetTokenRoyalty(tokenId);
-        emit AssetDestroyed(tokenId, _msgSender());
+        emit InstaGenAssetDestroyed(tokenId, _msgSender());
     }
 
     function withdraw() external onlyAdmin {

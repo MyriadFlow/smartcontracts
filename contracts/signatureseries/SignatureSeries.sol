@@ -71,12 +71,12 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         _;
     }
 
-    event AssetCreated(
+    event SignatureSeriesAssetCreated(
         uint256 tokenID,
         address indexed creator,
         string metaDataURI
     );
-    event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+    event SignatureSeriesAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
     event RentalInfo(
         uint256 tokenId,
         bool isRentable,
@@ -137,7 +137,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         // Approve tradeHub to transfer NFTs
         setApprovalForAll(tradeHub, true);
 
-        emit AssetCreated(currentTokenID, _msgSender(), metadataURI);
+        emit SignatureSeriesAssetCreated(currentTokenID, _msgSender(), metadataURI);
         return currentTokenID;
     }
 
@@ -174,7 +174,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         // Approve tradeHub to transfer NFTs
         setApprovalForAll(tradeHub, true);
 
-        emit AssetCreated(currentTokenID, creator, metadataURI);
+        emit SignatureSeriesAssetCreated(currentTokenID, creator, metadataURI);
         return currentTokenID;
     }
 
@@ -191,7 +191,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
             "SignatureSeries: Caller is not token owner or approved"
         );
         _burn(tokenId);
-        emit AssetDestroyed(tokenId, _msgSender());
+        emit SignatureSeriesAssetDestroyed(tokenId, _msgSender());
         _resetTokenRoyalty(tokenId);
     }
 

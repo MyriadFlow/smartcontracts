@@ -146,16 +146,16 @@ export interface FusionSeriesInterface extends utils.Interface {
 
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetCreated(uint256,address,uint256)": EventFragment;
-    "AssetDestroyed(uint256,address)": EventFragment;
+    "FusionSeriesAssetCreated(uint256,address,uint256)": EventFragment;
+    "FusionSeriesAssetDestroyed(uint256,address)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
     "URI(string,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FusionSeriesAssetCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FusionSeriesAssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferBatch"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TransferSingle"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "URI"): EventFragment;
@@ -168,19 +168,21 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type AssetCreatedEvent = TypedEvent<
+export type FusionSeriesAssetCreatedEvent = TypedEvent<
   [BigNumber, string, BigNumber],
   { tokenID: BigNumber; creator: string; amount: BigNumber }
 >;
 
-export type AssetCreatedEventFilter = TypedEventFilter<AssetCreatedEvent>;
+export type FusionSeriesAssetCreatedEventFilter =
+  TypedEventFilter<FusionSeriesAssetCreatedEvent>;
 
-export type AssetDestroyedEvent = TypedEvent<
+export type FusionSeriesAssetDestroyedEvent = TypedEvent<
   [BigNumber, string],
   { tokenId: BigNumber; ownerOrApproved: string }
 >;
 
-export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
+export type FusionSeriesAssetDestroyedEventFilter =
+  TypedEventFilter<FusionSeriesAssetDestroyedEvent>;
 
 export type TransferBatchEvent = TypedEvent<
   [string, string, string, BigNumber[], BigNumber[]],
@@ -522,25 +524,25 @@ export interface FusionSeries extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetCreated(uint256,address,uint256)"(
+    "FusionSeriesAssetCreated(uint256,address,uint256)"(
       tokenID?: BigNumberish | null,
       creator?: string | null,
       amount?: BigNumberish | null
-    ): AssetCreatedEventFilter;
-    AssetCreated(
+    ): FusionSeriesAssetCreatedEventFilter;
+    FusionSeriesAssetCreated(
       tokenID?: BigNumberish | null,
       creator?: string | null,
       amount?: BigNumberish | null
-    ): AssetCreatedEventFilter;
+    ): FusionSeriesAssetCreatedEventFilter;
 
-    "AssetDestroyed(uint256,address)"(
+    "FusionSeriesAssetDestroyed(uint256,address)"(
       tokenId?: BigNumberish | null,
       ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-    AssetDestroyed(
+    ): FusionSeriesAssetDestroyedEventFilter;
+    FusionSeriesAssetDestroyed(
       tokenId?: BigNumberish | null,
       ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
+    ): FusionSeriesAssetDestroyedEventFilter;
 
     "TransferBatch(address,address,address,uint256[],uint256[])"(
       operator?: string | null,
