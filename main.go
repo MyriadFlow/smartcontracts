@@ -188,6 +188,8 @@ func DeploySubgraph(c *gin.Context) {
 	err = cmd.Wait()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		fmt.Println("out: ", outb.String())
+		fmt.Println("err: ", errb.String())
 		logrus.Error("Failed run deploy graph")
 		return
 	}
