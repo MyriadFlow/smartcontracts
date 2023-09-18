@@ -79,7 +79,7 @@ module.exports = {
     maticmum: {
       networkId: 80001,
       url: MATICMUM_RPC_URL,
-      // accounts: [`0x${ETH_PRIVATE_KEY}`],
+      // accounts: [PRIVATE_KEY],
       accounts: {
         mnemonic: MNEMONIC,
       },

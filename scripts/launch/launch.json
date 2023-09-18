@@ -1,5 +1,8 @@
 {
-    "contractName" : "AccessMaster",
+    "contractName" : "TradeHub",
     "constructorParams":{
+        "param1":   30, 
+        "param2" : "NFT BAZAAR", 
+        "param3" : "0x7d03a6da1D3E6B63Cd08f51B64907Fa0161A53e8" 
     }
 }

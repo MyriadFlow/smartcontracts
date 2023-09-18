@@ -55,12 +55,12 @@ contract FusionSeries is Context, ERC1155Supply {
         _;
     }
 
-    event AssetCreated(
+    event FusionSeriesAssetCreated(
         uint256 indexed tokenID,
         address indexed creator,
         uint256 indexed amount
     );
-    event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+    event FusionSeriesAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
     // tradeHub should be there
     /**
@@ -103,7 +103,7 @@ contract FusionSeries is Context, ERC1155Supply {
         _mint(_msgSender(), currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit AssetCreated(currentTokenID, _msgSender(), amount);
+        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount);
         return currentTokenID;
     }
 
@@ -129,7 +129,7 @@ contract FusionSeries is Context, ERC1155Supply {
         _mint(creator, currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit AssetCreated(currentTokenID, _msgSender(), amount);
+        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount);
         return currentTokenID;
     }
 
@@ -146,7 +146,7 @@ contract FusionSeries is Context, ERC1155Supply {
             "FusionSeries: Caller is not token owner or approved"
         );
         _burn(_msgSender(), tokenId, amount);
-        emit AssetDestroyed(tokenId, _msgSender());
+        emit FusionSeriesAssetDestroyed(tokenId, _msgSender());
     }
 
     /// @dev  ONLY Operator can set the Base URI
