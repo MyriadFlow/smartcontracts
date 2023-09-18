@@ -126,7 +126,10 @@ func DeploySubgraph(c *gin.Context) {
 	}
 
 	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.Contracts[0].Address, "--contract-name", req.Contracts[0].Name, "--start-block", strconv.Itoa(req.Contracts[0].BlockNumber), "--index-events", "--network", req.Network)
-
+	fmt.Println("cmd: ", cmd)
+	var graphout, grapherr bytes.Buffer
+	cmd.Stdout = &graphout
+	cmd.Stderr = &grapherr
 	err := cmd.Start()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -137,6 +140,8 @@ func DeploySubgraph(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		logrus.Error("Error in graph init")
+		fmt.Println("out: ", graphout.String())
+		fmt.Println("err: ", grapherr.String())
 		return
 	}
 	os.Chdir(req.Folder)
