@@ -16,7 +16,8 @@
     "launchBNBTest" : "hardhat run scripts/launch/launch.js --network bnbTest",
     "launchFilCalibration" : "hardhat run scripts/launch/launch.js --network filecoinCalibaration",
     "launchLineaGoerli" : "hardhat run scripts/launch/launch.js --network lineaGoerli",
-    "contractAddress" : "hardhat run scripts/contractAddress.js"
+    "contractAddress" : "hardhat run scripts/contractAddress.js",
+    "grantRole" : "hardhat run  scripts/grantRole.js --network maticmum"
 
   },
   "devDependencies": {
