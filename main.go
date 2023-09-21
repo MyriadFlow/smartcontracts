@@ -23,6 +23,14 @@ type Contract struct {
 	Network string `json:"network"`
 }
 
+type grantRoleReq struct {
+	Data struct {
+		ContractAddr string `json:"contractAddr"`
+		WalletAddr   string `json:"walletAddr"`
+	}
+	Network string `json:"network"`
+}
+
 var dir, _ = os.Getwd()
 
 func main() {
@@ -34,6 +42,7 @@ func main() {
 
 	router.POST("/Contract", DeployContract)
 	router.POST("/Subgraph", DeploySubgraph)
+	router.POST("/GrantRole", GrantRole)
 	router.Use(cors.New(config))
 	router.Run(":8080")
 }
@@ -198,4 +207,57 @@ func DeploySubgraph(c *gin.Context) {
 	os.RemoveAll(req.Folder)
 
 	c.JSON(http.StatusOK, outb.Bytes())
+}
+
+func GrantRole(c *gin.Context) {
+	os.Chdir(dir)
+	var req grantRoleReq
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	jsonByte, err := json.Marshal(req.Data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	filePath := "scripts/grantRole.json"
+
+	_, err = os.ReadFile(filePath)
+	if err != nil {
+		fmt.Println("error reading")
+	}
+
+	err = os.WriteFile(filePath, []byte(jsonByte), 0644)
+	if err != nil {
+		fmt.Println("error writing")
+
+	}
+
+	err = os.Chdir(".")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+
+	}
+
+	// Execute the yarn launch command
+	cmd := exec.Command("yarn", "grantRole", "--network", req.Network)
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err = cmd.Start()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+
+	}
+	err = cmd.Wait()
+	if err != nil {
+		log.Printf("Command finished with error: %v", err.Error())
+		fmt.Println("out", outb.String())
+		fmt.Println("err", errb.String())
+		c.JSON(http.StatusInternalServerError, err)
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "role granted"})
 }
