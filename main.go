@@ -146,7 +146,7 @@ func DeploySubgraph(c *gin.Context) {
 	}
 	os.Chdir(req.Folder)
 	for i := 1; i < len(req.Contracts); i++ {
-		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name, "--start-block", strconv.Itoa(req.Contracts[i].BlockNumber))
+		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name, "--start-block", strconv.Itoa(req.Contracts[i].BlockNumber), "--merge-entities")
 		err := cmd.Start()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
