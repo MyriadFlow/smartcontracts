@@ -26,7 +26,7 @@ describe("Eternumpass Contract", () => {
     
     before(async () => {
         const AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
-        accessmaster = await AccessMasterFactory.deploy()
+        accessmaster = await AccessMasterFactory.deploy(owner.address)
         const  EternumPassFactory = await ethers.getContractFactory("EternumPass")        
         eternumpass = await EternumPassFactory.deploy(metadata.name, metadata.symbol,baseURI,publicSalePrice,30,subscriptionPerMonth,500,accessmaster.address,"0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298");
     })

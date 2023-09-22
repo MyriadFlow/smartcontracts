@@ -1,5 +1,6 @@
 {
     "contractName" : "AccessMaster",
     "constructorParams":{
+        "param1" : "0x59Ecbeb479C45de2AB9996129499A5afd437454d"
     }
 }
