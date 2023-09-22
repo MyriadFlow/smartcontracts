@@ -28,7 +28,7 @@ describe("TradeHub and InstaGen contracts", () => {
         Saleprice = ethers.utils.parseEther("0.01")
 
         const AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
-       accessmaster = await AccessMasterFactory.deploy()
+       accessmaster = await AccessMasterFactory.deploy(owner.address)
 
 
         let TradeHubFactory = await ethers.getContractFactory("TradeHub")

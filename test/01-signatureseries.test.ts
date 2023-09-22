@@ -24,7 +24,7 @@ describe("TradeHub && SignatureSeries Contract", () => {
     
     before(async () => {
         const AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
-        accessmaster = await AccessMasterFactory.deploy()
+        accessmaster = await AccessMasterFactory.deploy(owner.address)
 
 
         let  TradeHubFactory = await ethers.getContractFactory("TradeHub")

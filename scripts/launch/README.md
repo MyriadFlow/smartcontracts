@@ -16,6 +16,7 @@ The JSON file should have the following format:
 {
     "contractName" : "AccessMaster",
     "constructorParams":{
+        "param1" : "0x83AD8ddAdb013fbA80DE0d802FD4fB1a949AD79f" // storefrontAdmin wallet
     }
 }
 ```
@@ -28,7 +29,7 @@ The JSON file should have the following format:
     "constructorParams":{
         "param1":   30, // PlaformFee
         "param2" : "NFT BAZAAR", // TradeHub Name
-        "param3" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC" // AccessMaster Address 
+        "param3" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC" // AccessMaster Address
     }
 }
 ```
@@ -54,7 +55,7 @@ The JSON file should have the following format:
 {
     "contractName" : "SignatureSeries",
     "constructorParams":{
-        "param1" : "NFT Baazar", // Name 
+        "param1" : "NFT Baazar", // Name
         "param2" : "NFB",// Symbol
         "param3" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298", // TradeHub Address
         "param4" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"// AccessMaster Address

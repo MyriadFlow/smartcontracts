@@ -10,10 +10,14 @@ let blockNumber
 let Verified = false
 
 async function AccessMasterDeploy() {
+    const constructorParam = jsonContent.constructorParams
+
     const AccessMasterFactory = await hre.ethers.getContractFactory(
         "AccessMaster"
     )
-    const AccessMaster = await AccessMasterFactory.deploy()
+    const AccessMaster = await AccessMasterFactory.deploy(
+        constructorParam.param1
+    )
     await AccessMaster.deployed()
     console.log(`AccessMaster Deployed  to : ${AccessMaster.address}`)
     //console.log(AccessMaster)
@@ -23,7 +27,7 @@ async function AccessMasterDeploy() {
     ///VERIFY
     if (hre.network.name != "hardhat") {
         await AccessMaster.deployTransaction.wait(6)
-        await verify(AccessMaster.address, [])
+        await verify(AccessMaster.address, [constructorParam.param1])
     }
 }
 

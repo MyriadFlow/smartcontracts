@@ -25,7 +25,7 @@ describe("FlowOfferStation  contract", () => {
     }
     before(async () => {
         let AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
-        accessMaster = await AccessMasterFactory.deploy();
+        accessMaster = await AccessMasterFactory.deploy(owner.address);
 
         let offerStationFactory = await ethers.getContractFactory("MyriadFlowOfferStation")
         offerstation = await offerStationFactory.deploy(300 , false , accessMaster.address)

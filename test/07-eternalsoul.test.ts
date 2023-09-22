@@ -20,7 +20,7 @@ describe("Eternal Soul Contract", () => {
     
     before(async () => {
         const AccessMasterFactory = await ethers.getContractFactory("AccessMaster")
-        accessmaster = await AccessMasterFactory.deploy()
+        accessmaster = await AccessMasterFactory.deploy(owner.address)
 
         const EternalSoulFactory = await ethers.getContractFactory("EternalSoul")
         eternalsoul = await EternalSoulFactory.deploy(metadata.name, metadata.symbol,"www.xyz.com" ,accessmaster.address)   

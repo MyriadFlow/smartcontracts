@@ -19,7 +19,7 @@ contract AccessMaster is AccessControlEnumerable {
         keccak256("FLOW_OPERATOR_ROLE");
     bytes32 public constant FLOW_CREATOR_ROLE = keccak256("FLOW_CREATOR_ROLE");
 
-    constructor() {
+    constructor(address storefrontAdmin) {
         _setupRole(FLOW_ADMIN_ROLE, _msgSender());
 
         _setRoleAdmin(FLOW_ADMIN_ROLE, FLOW_ADMIN_ROLE);
@@ -28,7 +28,11 @@ contract AccessMaster is AccessControlEnumerable {
 
         // add Admin to operator and Creator
         grantRole(FLOW_OPERATOR_ROLE, _msgSender());
-        grantRole(FLOW_CREATOR_ROLE, _msgSender());
+
+        // assigning storefront publisher Wallet the Admin role
+        grantRole(FLOW_ADMIN_ROLE, storefrontAdmin);
+        grantRole(FLOW_OPERATOR_ROLE, storefrontAdmin);
+        grantRole(FLOW_CREATOR_ROLE, storefrontAdmin);
     }
 
     function updateName(
