@@ -154,7 +154,7 @@ func DeploySubgraph(c *gin.Context) {
 		fmt.Println("err: ", grapherr.String())
 		return
 	}
-	os.Chdir(req.Folder)
+	os.Chdir(nonce)
 	for i := 1; i < len(req.Contracts); i++ {
 		cmd := exec.Command("graph", "add", req.Contracts[i].Address, "--contract-name", req.Contracts[i].Name, "--start-block", strconv.Itoa(req.Contracts[i].BlockNumber), "--merge-entities")
 		err := cmd.Start()
@@ -205,7 +205,7 @@ func DeploySubgraph(c *gin.Context) {
 	}
 
 	os.Chdir(dir)
-	os.RemoveAll(req.Folder)
+	os.RemoveAll(nonce)
 
 	c.JSON(http.StatusOK, outb.Bytes())
 }
