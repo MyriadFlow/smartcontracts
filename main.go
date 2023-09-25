@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"os/exec"
@@ -133,8 +134,8 @@ func DeploySubgraph(c *gin.Context) {
 		logrus.Error("Invalid request body")
 		return
 	}
-
-	cmd := exec.Command("graph", "init", req.Name, req.Folder, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.Contracts[0].Address, "--contract-name", req.Contracts[0].Name, "--start-block", strconv.Itoa(req.Contracts[0].BlockNumber), "--index-events", "--network", req.Network)
+	nonce := fmt.Sprint(rand.Int())
+	cmd := exec.Command("graph", "init", req.Name, nonce, "--protocol", req.Protocol, "--studio", "-g", req.NodeUrl, "--from-contract", req.Contracts[0].Address, "--contract-name", req.Contracts[0].Name, "--start-block", strconv.Itoa(req.Contracts[0].BlockNumber), "--index-events", "--network", req.Network)
 	fmt.Println("cmd: ", cmd)
 	var graphout, grapherr bytes.Buffer
 	cmd.Stdout = &graphout
