@@ -375,6 +375,7 @@ contract TradeHub is
             uint256 endAt = block.timestamp + time;
             uint256 startingBid = price * quantity;
 
+
             idToMarketItem[itemId] = MarketItem(
                 itemId,
                 nftContract,
@@ -506,7 +507,7 @@ contract TradeHub is
             "TradeHub: Timer cannot be less than One Minute"
         );
 
-        uint256 price = idToMarketItem[itemId].highestBid;
+        uint256 price = idToMarketItem[itemId].price * idToMarketItem[itemId].supply;
 
         uint256 endTime = block.timestamp + time;
 

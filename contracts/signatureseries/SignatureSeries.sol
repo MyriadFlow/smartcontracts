@@ -66,7 +66,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     modifier onlyAdmin() {
         require(
             flowRoles.isAdmin(_msgSender()),
-            "MyriadFlowOfferStation: User is not authorized"
+            "SignatureSeries: User is not authorized"
         );
         _;
     }
