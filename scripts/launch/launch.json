@@ -1,6 +1,6 @@
 {
-    "contractName" : "AccessMaster",
+    "contractName" : "CyberMavenRegistry",
     "constructorParams":{
-        "param1" : "0x59Ecbeb479C45de2AB9996129499A5afd437454d"
+        "param1" : "0xB4A982E4d8359cb24587BBA17328fB2ff575bC05"
     }
 }

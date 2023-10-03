@@ -53,7 +53,7 @@ contract EternalSoul is Context, ERC721Enumerable {
     event AssetIssued(
         uint256 indexed tokenID,
         address indexed creator,
-        string indexed metaDataURI
+        string metaDataURI
     );
     event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 

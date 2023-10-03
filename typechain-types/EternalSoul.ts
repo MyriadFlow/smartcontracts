@@ -572,12 +572,12 @@ export interface EternalSoul extends BaseContract {
     "AssetIssued(uint256,address,string)"(
       tokenID?: BigNumberish | null,
       creator?: string | null,
-      metaDataURI?: string | null
+      metaDataURI?: null
     ): AssetIssuedEventFilter;
     AssetIssued(
       tokenID?: BigNumberish | null,
       creator?: string | null,
-      metaDataURI?: string | null
+      metaDataURI?: null
     ): AssetIssuedEventFilter;
 
     "Transfer(address,address,uint256)"(
