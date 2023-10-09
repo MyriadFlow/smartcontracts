@@ -21,7 +21,9 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface TradeHubInterface extends utils.Interface {
   contractName: "TradeHub";
   functions: {
+    "_getItemId(address,uint256)": FunctionFragment;
     "acceptBidAndEndAuction(uint256)": FunctionFragment;
+    "accessMasterAddress()": FunctionFragment;
     "buyItem(uint256,uint256)": FunctionFragment;
     "changeFeeAndPayoutAddress(uint96,address)": FunctionFragment;
     "concludeAuction(uint256)": FunctionFragment;
@@ -44,8 +46,16 @@ export interface TradeHubInterface extends utils.Interface {
   };
 
   encodeFunctionData(
+    functionFragment: "_getItemId",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "acceptBidAndEndAuction",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "accessMasterAddress",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "buyItem",
@@ -125,8 +135,13 @@ export interface TradeHubInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "_getItemId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "acceptBidAndEndAuction",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "accessMasterAddress",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "buyItem", data: BytesLike): Result;
@@ -193,7 +208,7 @@ export interface TradeHubInterface extends utils.Interface {
     "AuctionStarted(uint256,address,uint256,string,address,uint256,uint256)": EventFragment;
     "BidPlaced(uint256,uint256,address)": EventFragment;
     "ItemRemoved(uint256,address,uint256,string,address)": EventFragment;
-    "ItemSold(uint256,address,uint256,string,address,address,uint256)": EventFragment;
+    "ItemSold(uint256,address,uint256,string,address,address,uint256,uint256)": EventFragment;
     "PriceUpdated(uint256,uint256)": EventFragment;
     "SaleStarted(uint256,address,uint256,string,address,uint256)": EventFragment;
     "TimeUpdated(uint256,uint256)": EventFragment;
@@ -260,7 +275,7 @@ export type ItemRemovedEvent = TypedEvent<
 export type ItemRemovedEventFilter = TypedEventFilter<ItemRemovedEvent>;
 
 export type ItemSoldEvent = TypedEvent<
-  [BigNumber, string, BigNumber, string, string, string, BigNumber],
+  [BigNumber, string, BigNumber, string, string, string, BigNumber, BigNumber],
   {
     itemId: BigNumber;
     nftContract: string;
@@ -269,6 +284,7 @@ export type ItemSoldEvent = TypedEvent<
     seller: string;
     buyer: string;
     price: BigNumber;
+    quantity: BigNumber;
   }
 >;
 
@@ -330,10 +346,18 @@ export interface TradeHub extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    _getItemId(
+      nftContract: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
 
     buyItem(
       itemId: BigNumberish,
@@ -465,10 +489,18 @@ export interface TradeHub extends BaseContract {
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
+  _getItemId(
+    nftContract: string,
+    tokenId: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   acceptBidAndEndAuction(
     itemId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
   buyItem(
     itemId: BigNumberish,
@@ -600,10 +632,18 @@ export interface TradeHub extends BaseContract {
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
+    _getItemId(
+      nftContract: string,
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
     buyItem(
       itemId: BigNumberish,
@@ -794,14 +834,15 @@ export interface TradeHub extends BaseContract {
       seller?: null
     ): ItemRemovedEventFilter;
 
-    "ItemSold(uint256,address,uint256,string,address,address,uint256)"(
+    "ItemSold(uint256,address,uint256,string,address,address,uint256,uint256)"(
       itemId?: BigNumberish | null,
       nftContract?: string | null,
       tokenId?: BigNumberish | null,
       metadataURI?: null,
       seller?: null,
       buyer?: null,
-      price?: null
+      price?: null,
+      quantity?: null
     ): ItemSoldEventFilter;
     ItemSold(
       itemId?: BigNumberish | null,
@@ -810,7 +851,8 @@ export interface TradeHub extends BaseContract {
       metadataURI?: null,
       seller?: null,
       buyer?: null,
-      price?: null
+      price?: null,
+      quantity?: null
     ): ItemSoldEventFilter;
 
     "PriceUpdated(uint256,uint256)"(
@@ -844,10 +886,18 @@ export interface TradeHub extends BaseContract {
   };
 
   estimateGas: {
+    _getItemId(
+      nftContract: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     buyItem(
       itemId: BigNumberish,
@@ -956,9 +1006,19 @@ export interface TradeHub extends BaseContract {
   };
 
   populateTransaction: {
+    _getItemId(
+      nftContract: string,
+      tokenId: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    accessMasterAddress(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     buyItem(

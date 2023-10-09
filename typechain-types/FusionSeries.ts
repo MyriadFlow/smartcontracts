@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface FusionSeriesInterface extends utils.Interface {
   contractName: "FusionSeries";
   functions: {
+    "accessMasterAddress()": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
     "createAsset(uint256,bytes,string)": FunctionFragment;
@@ -40,6 +41,10 @@ export interface FusionSeriesInterface extends utils.Interface {
     "version()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "accessMasterAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [string, BigNumberish]
@@ -95,6 +100,10 @@ export interface FusionSeriesInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "accessMasterAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "balanceOfBatch",
@@ -146,7 +155,7 @@ export interface FusionSeriesInterface extends utils.Interface {
 
   events: {
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "FusionSeriesAssetCreated(uint256,address,uint256)": EventFragment;
+    "FusionSeriesAssetCreated(uint256,address,uint256,string)": EventFragment;
     "FusionSeriesAssetDestroyed(uint256,address)": EventFragment;
     "TransferBatch(address,address,address,uint256[],uint256[])": EventFragment;
     "TransferSingle(address,address,address,uint256,uint256)": EventFragment;
@@ -169,8 +178,13 @@ export type ApprovalForAllEvent = TypedEvent<
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
 export type FusionSeriesAssetCreatedEvent = TypedEvent<
-  [BigNumber, string, BigNumber],
-  { tokenID: BigNumber; creator: string; amount: BigNumber }
+  [BigNumber, string, BigNumber, string],
+  {
+    tokenID: BigNumber;
+    creator: string;
+    amount: BigNumber;
+    metadataUri: string;
+  }
 >;
 
 export type FusionSeriesAssetCreatedEventFilter =
@@ -245,6 +259,8 @@ export interface FusionSeries extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -336,6 +352,8 @@ export interface FusionSeries extends BaseContract {
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
+  accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
   balanceOf(
     account: string,
     id: BigNumberish,
@@ -424,6 +442,8 @@ export interface FusionSeries extends BaseContract {
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -524,15 +544,17 @@ export interface FusionSeries extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "FusionSeriesAssetCreated(uint256,address,uint256)"(
+    "FusionSeriesAssetCreated(uint256,address,uint256,string)"(
       tokenID?: BigNumberish | null,
       creator?: string | null,
-      amount?: BigNumberish | null
+      amount?: BigNumberish | null,
+      metadataUri?: null
     ): FusionSeriesAssetCreatedEventFilter;
     FusionSeriesAssetCreated(
       tokenID?: BigNumberish | null,
       creator?: string | null,
-      amount?: BigNumberish | null
+      amount?: BigNumberish | null,
+      metadataUri?: null
     ): FusionSeriesAssetCreatedEventFilter;
 
     "FusionSeriesAssetDestroyed(uint256,address)"(
@@ -582,6 +604,8 @@ export interface FusionSeries extends BaseContract {
   };
 
   estimateGas: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(
       account: string,
       id: BigNumberish,
@@ -674,6 +698,10 @@ export interface FusionSeries extends BaseContract {
   };
 
   populateTransaction: {
+    accessMasterAddress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       account: string,
       id: BigNumberish,

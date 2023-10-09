@@ -30,6 +30,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     Counters.Counter private _tokenIdTracker;
 
     address public tradeHub;
+    address public accessMasterAddress;
     uint8 public version = 1;
 
     struct RentableItems {
@@ -101,6 +102,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     ) ERC721(name, symbol) {
         flowRoles = IACCESSMASTER(flowContract);
         tradeHub = tradeHubAddress;
+        accessMasterAddress = flowContract;
     }
 
     /**

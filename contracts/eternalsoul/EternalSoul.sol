@@ -26,6 +26,7 @@ contract EternalSoul is Context, ERC721Enumerable {
 
     Counters.Counter private _tokenIdTracker;
 
+    address public accessMasterAddress;
     string public baseURI;
     uint8 public version = 1;
 
@@ -67,6 +68,7 @@ contract EternalSoul is Context, ERC721Enumerable {
     ) ERC721(name, symbol) {
         baseURI = _intialURI;
         flowRoles = IACCESSMASTER(flowContract);
+        accessMasterAddress = flowContract;
     }
 
     /// @dev update BaseURI of the metadata
