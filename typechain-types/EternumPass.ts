@@ -22,6 +22,7 @@ export interface EternumPassInterface extends utils.Interface {
   contractName: "EternumPass";
   functions: {
     "MONTH()": FunctionFragment;
+    "accessMasterAddress()": FunctionFragment;
     "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -69,6 +70,10 @@ export interface EternumPassInterface extends utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "MONTH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "accessMasterAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "amountRequired",
     values: [BigNumberish, BigNumberish]
@@ -217,6 +222,10 @@ export interface EternumPassInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "MONTH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "accessMasterAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "amountRequired",
     data: BytesLike
@@ -454,6 +463,8 @@ export interface EternumPass extends BaseContract {
   functions: {
     MONTH(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
+
     amountRequired(
       tokenId: BigNumberish,
       time: BigNumberish,
@@ -665,6 +676,8 @@ export interface EternumPass extends BaseContract {
 
   MONTH(overrides?: CallOverrides): Promise<BigNumber>;
 
+  accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
   amountRequired(
     tokenId: BigNumberish,
     time: BigNumberish,
@@ -869,6 +882,8 @@ export interface EternumPass extends BaseContract {
 
   callStatic: {
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
     amountRequired(
       tokenId: BigNumberish,
@@ -1157,6 +1172,8 @@ export interface EternumPass extends BaseContract {
   estimateGas: {
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
 
+    accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     amountRequired(
       tokenId: BigNumberish,
       time: BigNumberish,
@@ -1371,6 +1388,10 @@ export interface EternumPass extends BaseContract {
 
   populateTransaction: {
     MONTH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    accessMasterAddress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     amountRequired(
       tokenId: BigNumberish,

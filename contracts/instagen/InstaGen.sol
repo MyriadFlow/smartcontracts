@@ -37,6 +37,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     // PUBLIC && PRIVATE VARIABLES
     string private baseURI;
     address public tradeHub;
+    address public accessMasterAddress;
     uint256 public salePrice;
 
     struct RentableItems {
@@ -94,7 +95,9 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         maxSupply = _maxSupply;
         baseURI = _baseUri;
         // SET DEFAULT ROYALTY
-        _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS));
+        _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS)); 
+
+        accessMasterAddress = accessControlAddress;
     }
 
     function setSalePrice(uint256 _salePrice) external onlyAdmin {

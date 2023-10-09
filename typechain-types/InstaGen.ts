@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface InstaGenInterface extends utils.Interface {
   contractName: "InstaGen";
   functions: {
+    "accessMasterAddress()": FunctionFragment;
     "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -55,6 +56,10 @@ export interface InstaGenInterface extends utils.Interface {
     "withdraw()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "accessMasterAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "amountRequired",
     values: [BigNumberish, BigNumberish]
@@ -154,6 +159,10 @@ export interface InstaGenInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "accessMasterAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "amountRequired",
     data: BytesLike
@@ -337,6 +346,8 @@ export interface InstaGen extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
+
     amountRequired(
       tokenId: BigNumberish,
       time: BigNumberish,
@@ -493,6 +504,8 @@ export interface InstaGen extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
   amountRequired(
     tokenId: BigNumberish,
     time: BigNumberish,
@@ -643,6 +656,8 @@ export interface InstaGen extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
     amountRequired(
       tokenId: BigNumberish,
       time: BigNumberish,
@@ -878,6 +893,8 @@ export interface InstaGen extends BaseContract {
   };
 
   estimateGas: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     amountRequired(
       tokenId: BigNumberish,
       time: BigNumberish,
@@ -1031,6 +1048,10 @@ export interface InstaGen extends BaseContract {
   };
 
   populateTransaction: {
+    accessMasterAddress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     amountRequired(
       tokenId: BigNumberish,
       time: BigNumberish,

@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface EternalSoulInterface extends utils.Interface {
   contractName: "EternalSoul";
   functions: {
+    "accessMasterAddress()": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "baseURI()": FunctionFragment;
@@ -43,6 +44,10 @@ export interface EternalSoulInterface extends utils.Interface {
     "version()": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "accessMasterAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
@@ -107,6 +112,10 @@ export interface EternalSoulInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
+  decodeFunctionResult(
+    functionFragment: "accessMasterAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
@@ -240,6 +249,8 @@ export interface EternalSoul extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -345,6 +356,8 @@ export interface EternalSoul extends BaseContract {
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
+  accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
   approve(
     to: string,
     tokenId: BigNumberish,
@@ -444,6 +457,8 @@ export interface EternalSoul extends BaseContract {
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -593,6 +608,8 @@ export interface EternalSoul extends BaseContract {
   };
 
   estimateGas: {
+    accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     approve(
       to: string,
       tokenId: BigNumberish,
@@ -699,6 +716,10 @@ export interface EternalSoul extends BaseContract {
   };
 
   populateTransaction: {
+    accessMasterAddress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     approve(
       to: string,
       tokenId: BigNumberish,

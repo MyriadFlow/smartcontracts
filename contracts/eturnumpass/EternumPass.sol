@@ -42,6 +42,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     uint256 private _tokenIdCounter;
     string public baseURI;
     address tradeHubAddress;
+    address public accessMasterAddress;
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -120,6 +121,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         _setDefaultRoyalty(_msgSender(), royaltyBasisPoint);
         tradeHubAddress = _tradeHubAddrr;
         flowRoles = IACCESSMASTER(flowContract);
+        accessMasterAddress = flowContract;
     }
 
     ///@notice Function to update the plateformFeeBasisPoint

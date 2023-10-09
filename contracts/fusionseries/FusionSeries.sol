@@ -32,6 +32,7 @@ contract FusionSeries is Context, ERC1155Supply {
     string public symbol;
 
     address public tradeHub;
+    address public accessMasterAddress;
     uint8 public version = 1;
 
     // Optional mapping for token URIs
@@ -58,7 +59,8 @@ contract FusionSeries is Context, ERC1155Supply {
     event FusionSeriesAssetCreated(
         uint256 indexed tokenID,
         address indexed creator,
-        uint256 indexed amount
+        uint256 indexed amount,
+        string metadataUri
     );
     event FusionSeriesAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
@@ -79,6 +81,7 @@ contract FusionSeries is Context, ERC1155Supply {
         symbol = _symbol;
         tradeHub = tradeHubAddress;
         flowRoles = IACCESSMASTER(flowContract);
+        accessMasterAddress = flowContract;
     }
 
     /**
@@ -103,7 +106,7 @@ contract FusionSeries is Context, ERC1155Supply {
         _mint(_msgSender(), currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount);
+        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount,_uri);
         return currentTokenID;
     }
 
@@ -129,7 +132,7 @@ contract FusionSeries is Context, ERC1155Supply {
         _mint(creator, currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount);
+        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount,_uri);
         return currentTokenID;
     }
 

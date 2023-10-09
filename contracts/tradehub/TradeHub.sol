@@ -31,6 +31,7 @@ contract TradeHub is
     Counters.Counter private _itemIds;
 
     address public marketplacePayoutAddress;
+    address public accessMasterAddress;
     uint96 public platformFeeBasisPoint;
     uint8 public version = 1;
 
@@ -105,7 +106,8 @@ contract TradeHub is
         string metadataURI,
         address seller,
         address buyer,
-        uint256 price
+        uint256 price,
+        uint256 quantity
     );
 
     event ItemRemoved(
@@ -168,6 +170,7 @@ contract TradeHub is
         platformFeeBasisPoint = _platformFee;
         marketplacePayoutAddress = _msgSender();
         name = _name;
+        accessMasterAddress = flowContract;
     }
 
     /** @dev Change the Platform fees along with the payout address
@@ -188,7 +191,7 @@ contract TradeHub is
     function _getItemId(
         address nftContract,
         uint256 tokenId
-    ) private returns (uint256 itemId) {
+    ) public returns (uint256 itemId) {
         uint256 marketItemId = _marketItem[nftContract][tokenId];
         if (checkERC1155(nftContract)) {
             _itemIds.increment();
@@ -480,6 +483,7 @@ contract TradeHub is
                 idToMarketItem[itemId].status = ItemStatus.SOLD;
             }
         } else {
+            quantity = 1;
             _paymentSplit(itemId, msg.value, _msgSender(), 1);
         }
 
@@ -490,7 +494,8 @@ contract TradeHub is
             metadataURI,
             _item.seller,
             _msgSender(),
-            _item.price
+            _item.price,
+            quantity
         );
     }
 
