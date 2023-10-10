@@ -60,7 +60,8 @@ contract TradeHub is
 
     mapping(uint256 => MarketItem) public idToMarketItem;
 
-    mapping(address => mapping(uint256 => uint256)) private _marketItem;
+    mapping(address => mapping(uint256 => uint256)) public marketItemERC721;
+    mapping(address => mapping(address => mapping(uint256 => uint256))) public marketItemERC1155;
 
     IACCESSMASTER flowRoles;
 
@@ -191,16 +192,28 @@ contract TradeHub is
     function _getItemId(
         address nftContract,
         uint256 tokenId
-    ) public returns (uint256 itemId) {
-        uint256 marketItemId = _marketItem[nftContract][tokenId];
+    ) private returns (uint256 itemId) {
         if (checkERC1155(nftContract)) {
-            _itemIds.increment();
-            itemId = _itemIds.current();
-        } else {
+            uint256 marketItemId = marketItemERC1155[_msgSender()][nftContract][tokenId];
             if (marketItemId == 0) {
                 _itemIds.increment();
                 itemId = _itemIds.current();
-                _marketItem[nftContract][tokenId] = itemId;
+                marketItemERC1155[_msgSender()][nftContract][tokenId] = itemId;
+            } else if (
+                marketItemId != 0 &&
+                (idToMarketItem[marketItemId].status == ItemStatus.SOLD ||
+                    idToMarketItem[marketItemId].status == ItemStatus.REMOVED)
+            ) {
+                itemId = marketItemId;
+            } else {
+                revert ItemExist();
+            }
+        } else {
+            uint256 marketItemId = marketItemERC721[nftContract][tokenId];
+            if (marketItemId == 0) {
+                _itemIds.increment();
+                itemId = _itemIds.current();
+                marketItemERC721[nftContract][tokenId] = itemId;
             } else if (
                 marketItemId != 0 &&
                 (idToMarketItem[marketItemId].status == ItemStatus.SOLD ||
