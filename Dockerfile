@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 RUN go mod download
-COPY main.go .
+COPY main.go api/ .
 RUN go build -o smartcontracts .
 
 
