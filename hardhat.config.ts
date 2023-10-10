@@ -104,26 +104,26 @@ module.exports = {
     arbiGoerli :{
       networkId: 421613,
       url: ARBITRUM_GOERLI_RPC_URL,
-      accounts : [PRIVATE_KEY],
-      // accounts: {
-      //   mnemonic: MNEMONIC,
-      // },      
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },      
     },
     optiGoerli :{
       networkId: 420,
       url: OPTIMISM_GOERLI_RPC_URL,
-      accounts : [PRIVATE_KEY],
-      // accounts: {
-      //   mnemonic: MNEMONIC,
-      // }
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
     },
     baseGoerli :{
       networkId: 84531,
       url: BASE_GOERLI_RPC_URL,
-      // // accounts : [PRIVATE_KEY],
-      // accounts: {
-      //   mnemonic: MNEMONIC,
-      // }
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
     },
     // MAINNET NETWORKS
     ethereum: {
