@@ -23,26 +23,25 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 });
 
 
-// Testnet: sepolia, mumbai, lineaGoerli, fevmCalibration, bnbTest
-// Mainnet: Ethereum, Polygon, Linea, FEVM, Binance 
-
-
-
+// Testnet: sepolia, mumbai, bnbTest , arbGoerli , optiGoerli, baseGoerli
+// Mainnet: Ethereum, Polygon,, Binance ,Arbitrum, Optimism,Base
 // API_KEY & PRIVATE_KEY
 
 // TESTNET
 const MATICMUM_RPC_URL = process.env.MATICMUM_RPC_URL || "https://polygon-mumbai.g.alchemy.com/v2/api-key"
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || "https://ETH-RPC-URL"
-const LINEA_GOERLI_RPC_URL = process.env.LINEA_GOERLI_RPC_URL || "https://linea-goerli.infura.io/v3/api-key"
-const FILECOIN_CALIBARATION_RPC_URL = process.env.FILECOIN_CALIBARATION_RPC_URL || "https://rpc.ankr.com/filecoin_testnet"
 const BNB_TESTNET_RPC_URL = process.env.BNB_TESTNET_RPC_URL || "https://bsc-testnet.public.blastapi.io"
+const ARBITRUM_GOERLI_RPC_URL = process.env.ARBITRUM_GOERLI_RPC_URL || "https://arbitrum-goerli.infura.io/v3/api-key"
+const OPTIMISM_GOERLI_RPC_URL = process.env.OPTIMISM_GOERLI_RPC_URL || "https://optimism-goerli.infura.io/v3/api-key"
+const BASE_GOERLI_RPC_URL = process.env.BASE_GOERLI_RPC_URL || "https://goerli.base.org"
 
 // MAINNET
 const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL || "https://mainnet.infura.io/v3/api-key"
 const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL || "https://polygon-mainnet.g.alchemy.com/v2/api-key"
-const LINEA_RPC_URL = process.env.LINEA_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
-const FILECOIN_RPC_URL = process.env.FILECOIN_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
 const BNB_RPC_URL = process.env.BNB_RPC_URL || "https://bsc.blockpi.network/v1/rpc/public"
+const ARBITRUM_RPC_URL = process.env.ARBITRUM_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
+const OPTIMISM_RPC_URL = process.env.OPTIMISM_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
+const BASE_RPC_URL = process.env.BASE_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
 
 const MNEMONIC = process.env.MNEMONIC || "ajkskjfjksjkf ssfaasff asklkfl klfkas dfklhao asfj sfk klsfjs fkjs"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
@@ -50,8 +49,9 @@ const PRIVATE_KEY = process.env.PRIVATE_KEY
 const POLYGONSCAN_API_KEY = process.env.POLYGONSCAN_API_KEY || "lklsdkskldjklgdklkld"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "BSCscan API Key"
-const LINEASCAN_API_KEY = process.env.LINEASCAN_API_KEY || "Lineascan API Key"
-const FILECOINSCAN_API_KEY = process.env.FILECOINSCAN_API_KEY || "filecoinscan API Key"
+const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY || "Arbiscan API Key"
+const OPTISCAN_API_KEY = process.env.OPTISCAN_API_KEY || "Optiscan API Key"
+const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "Basescan API Key"
 
 
 // You need to export an object to set up your config
@@ -92,22 +92,7 @@ module.exports = {
         mnemonic: MNEMONIC,
       },
     },
-     lineaGoerli :{
-      networkId: 59140,
-      url: LINEA_GOERLI_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      },      
-    },
-    filecoinCalibaration :{
-      networkId: 314159,
-      url: FILECOIN_CALIBARATION_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      }
-    },
+     
     bnbTest :{
       networkId: 97,
       url: BNB_TESTNET_RPC_URL,
@@ -115,6 +100,30 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC,
       }
+    },
+    arbiGoerli :{
+      networkId: 421613,
+      url: ARBITRUM_GOERLI_RPC_URL,
+      accounts : [PRIVATE_KEY],
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // },      
+    },
+    optiGoerli :{
+      networkId: 420,
+      url: OPTIMISM_GOERLI_RPC_URL,
+      accounts : [PRIVATE_KEY],
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // }
+    },
+    baseGoerli :{
+      networkId: 84531,
+      url: BASE_GOERLI_RPC_URL,
+      // // accounts : [PRIVATE_KEY],
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // }
     },
     // MAINNET NETWORKS
     ethereum: {
@@ -133,22 +142,6 @@ module.exports = {
         mnemonic: MNEMONIC,
       },
     },
-    linea :{
-      networkId: 59144,
-      url: LINEA_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      },      
-    },
-    filecoin :{
-      networkId: 314,
-      url: FILECOIN_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      }
-    },
     bnb:{
       networkId: 56,
       url: BNB_RPC_URL,
@@ -156,7 +149,32 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC,
       }
+    },
+    arbitrum :{
+      networkId: 42161,
+      url: ARBITRUM_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },      
+    },
+    optimism :{
+      networkId: 10,
+      url: OPTIMISM_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
+    },
+    base :{
+      networkId: 8453,
+      url: BASE_RPC_URL,
+      // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      }
     }
+
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -167,18 +185,20 @@ module.exports = {
       polygonMumbai : POLYGONSCAN_API_KEY,
       sepolia : ETHERSCAN_API_KEY,
       bscTestnet : BSCSCAN_API_KEY,
-      lineaGoerli: LINEASCAN_API_KEY,
+      optimisticGoerli: OPTISCAN_API_KEY,
+      arbitrumGoerli: ARBISCAN_API_KEY,
+      baseGoerli: BASESCAN_API_KEY
     },
-      customChains: [
-    {
-      network: "lineaGoerli",
-      chainId: 59140,
-      urls: {
-        apiURL: "https://api-testnet.lineascan.build/api",
-        browserURL: "https://goerli.lineascan.build/"
+    customChains: [
+      {
+        network: "baseGoerli",
+        chainId: 84531,
+        urls: {
+          apiURL: "https://api-goerli.basescan.org/api",
+          browserURL: "https://goerli.basescan.org"
+        }
       }
-    }
-  ]
+    ]
   },
   paths: {
     sources: "./contracts",
