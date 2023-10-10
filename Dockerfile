@@ -1,11 +1,9 @@
 FROM golang:alpine3.18 AS goBuilder
 WORKDIR /app
-COPY go.mod .
-COPY go.sum .
+COPY src/ .
 RUN go mod download
-COPY main.go api/ .
-RUN go build -o smartcontracts .
-
+RUN go mod verify
+RUN go build -o smartcontracts
 
 FROM node:lts-alpine3.18
 RUN apk update && apk add --no-cache git
