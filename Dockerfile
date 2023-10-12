@@ -1,6 +1,9 @@
 FROM golang:alpine3.18 AS goBuilder
 WORKDIR /app
-COPY src/ .
+COPY main.go .
+COPY go.mod .
+COPY go.sum .
+COPY api/ ./api
 RUN go mod download
 RUN go mod verify
 RUN go build -o smartcontracts
