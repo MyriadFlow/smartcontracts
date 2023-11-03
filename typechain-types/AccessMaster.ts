@@ -24,6 +24,7 @@ export interface AccessMasterInterface extends utils.Interface {
     "FLOW_ADMIN_ROLE()": FunctionFragment;
     "FLOW_CREATOR_ROLE()": FunctionFragment;
     "FLOW_OPERATOR_ROLE()": FunctionFragment;
+    "getPayoutAddress()": FunctionFragment;
     "getRoleAdmin(bytes32)": FunctionFragment;
     "getRoleMember(bytes32,uint256)": FunctionFragment;
     "getRoleMemberCount(bytes32)": FunctionFragment;
@@ -35,6 +36,7 @@ export interface AccessMasterInterface extends utils.Interface {
     "name()": FunctionFragment;
     "renounceRole(bytes32,address)": FunctionFragment;
     "revokeRole(bytes32,address)": FunctionFragment;
+    "setPayoutAddress(address)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "updateName(string)": FunctionFragment;
@@ -56,6 +58,10 @@ export interface AccessMasterInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "FLOW_OPERATOR_ROLE",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPayoutAddress",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -91,6 +97,10 @@ export interface AccessMasterInterface extends utils.Interface {
     values: [BytesLike, string]
   ): string;
   encodeFunctionData(
+    functionFragment: "setPayoutAddress",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "supportsInterface",
     values: [BytesLike]
   ): string;
@@ -119,6 +129,10 @@ export interface AccessMasterInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "getPayoutAddress",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getRoleAdmin",
     data: BytesLike
   ): Result;
@@ -141,6 +155,10 @@ export interface AccessMasterInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setPayoutAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -222,6 +240,8 @@ export interface AccessMaster extends BaseContract {
 
     FLOW_OPERATOR_ROLE(overrides?: CallOverrides): Promise<[string]>;
 
+    getPayoutAddress(overrides?: CallOverrides): Promise<[string]>;
+
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<[string]>;
 
     getRoleMember(
@@ -267,6 +287,11 @@ export interface AccessMaster extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    setPayoutAddress(
+      _payoutAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -294,6 +319,8 @@ export interface AccessMaster extends BaseContract {
   FLOW_CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
   FLOW_OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
+
+  getPayoutAddress(overrides?: CallOverrides): Promise<string>;
 
   getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -340,6 +367,11 @@ export interface AccessMaster extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  setPayoutAddress(
+    _payoutAddress: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   supportsInterface(
     interfaceId: BytesLike,
     overrides?: CallOverrides
@@ -367,6 +399,8 @@ export interface AccessMaster extends BaseContract {
     FLOW_CREATOR_ROLE(overrides?: CallOverrides): Promise<string>;
 
     FLOW_OPERATOR_ROLE(overrides?: CallOverrides): Promise<string>;
+
+    getPayoutAddress(overrides?: CallOverrides): Promise<string>;
 
     getRoleAdmin(role: BytesLike, overrides?: CallOverrides): Promise<string>;
 
@@ -410,6 +444,11 @@ export interface AccessMaster extends BaseContract {
     revokeRole(
       role: BytesLike,
       account: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setPayoutAddress(
+      _payoutAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -471,6 +510,8 @@ export interface AccessMaster extends BaseContract {
 
     FLOW_OPERATOR_ROLE(overrides?: CallOverrides): Promise<BigNumber>;
 
+    getPayoutAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     getRoleAdmin(
       role: BytesLike,
       overrides?: CallOverrides
@@ -519,6 +560,11 @@ export interface AccessMaster extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    setPayoutAddress(
+      _payoutAddress: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     supportsInterface(
       interfaceId: BytesLike,
       overrides?: CallOverrides
@@ -551,6 +597,8 @@ export interface AccessMaster extends BaseContract {
     FLOW_OPERATOR_ROLE(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    getPayoutAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getRoleAdmin(
       role: BytesLike,
@@ -606,6 +654,11 @@ export interface AccessMaster extends BaseContract {
     revokeRole(
       role: BytesLike,
       account: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setPayoutAddress(
+      _payoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

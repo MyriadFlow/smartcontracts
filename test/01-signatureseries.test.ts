@@ -2,6 +2,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { expect , assert } from "chai"
 import { ethers , network} from "hardhat"
 import { SignatureSeries , TradeHub  , AccessMaster} from "../typechain-types"
+import exp from "constants"
 
 describe("TradeHub && SignatureSeries Contract", () => {
                                     
@@ -31,7 +32,7 @@ describe("TradeHub && SignatureSeries Contract", () => {
         tradehub = await TradeHubFactory.deploy(300,"MyMarketplace",accessmaster.address)
 
         const SignatureSeriesFactory = await ethers.getContractFactory("SignatureSeries")
-        signatureseries = await SignatureSeriesFactory.deploy(metadata.name, metadata.symbol, tradehub.address , accessmaster.address)
+        signatureseries = await SignatureSeriesFactory.deploy(metadata.name,metadata.symbol,"Voucher-Domain","1","1000000000000000000",tradehub.address , accessmaster.address)
     })
     it("Should return the right name and symbol of the token once SignatureSeries is deployed", async () => {
         expect(await signatureseries.name()).to.equal(metadata.name)
@@ -281,35 +282,117 @@ describe("TradeHub && SignatureSeries Contract", () => {
         expect(await signatureseries.setUser(5,buyer.address,3000)).to.emit(signatureseries,"UpdateUser")
         /// SET RENT INFO
         expect(signatureseries.connect(creator).rent(5,1,{value : val})).to.be.revertedWith("SignatureSeries: Not available for rent")
+    })
+    it("To check rental for more failing test cases and transfer funds feature",async () => {
+        const rentPrice = ethers.utils.parseEther("1.0")
+        /// Creting a new asset 
+        await signatureseries.connect(creator).createAsset("www.abc.com",300)
+        /// Checking if rental status false item cannot be rented
+        expect(signatureseries.rent(6,1)).to.be.revertedWith("SignatureSeries: Not available for rent")
+        /// Rental Status True and setting the Price
+        await signatureseries.connect(creator).setRentInfo(6,true,rentPrice)
+        /// Invalide tokenId 
+        expect(signatureseries.rent(7,0)).to.be.revertedWith("SignatureSeries: Invalide Token I")
+        /// checking if the rental status can be taken for 0 hours or 4320
+        expect(signatureseries.rent(6,0)).to.be.revertedWith("SignatureSeries: Time can't be less than 1 hour")
+        expect(signatureseries.rent(6,4321)).to.be.revertedWith("SignatureSeries: Time can't be more than 6 months")
+
+        /// Calculate if transfer of Eth is happening after rental
+        // Assert
+        const startingOwnerBalance = await signatureseries.provider.getBalance(
+            creator.address
+        )
+        const startingRentorBalance = await signatureseries.provider.getBalance(
+            owner.address
+        )
+        ///ACT
+        const transactionResponse = await signatureseries.rent(6,1,{value : rentPrice})
+        const transactionReceipt = await transactionResponse.wait()
+        const { gasUsed, effectiveGasPrice } = transactionReceipt
+        const gasCost = gasUsed.mul(effectiveGasPrice)
+
+        const endingOwnerBalance = await signatureseries.provider.getBalance(
+                creator.address
+        )
+        const endingRentorBalance = await signatureseries.provider.getBalance(
+                owner.address
+        )
+        
+        assert.equal(
+                endingOwnerBalance.sub(startingOwnerBalance).toString(),
+                startingRentorBalance.sub(endingRentorBalance).sub(gasCost).toString()
+        )
+        /// TO check the Rented User
+        expect(await signatureseries.userOf(6)).to.be.equal(owner.address)
+        //// checking if user already exists it would throw error
+        expect(signatureseries.connect(operator).rent(6,1,{value : rentPrice})).to.be.reverted
+    })  
+    it("check Lazy Minting",async () => {
+        const price = ethers.utils.parseEther("1.0")
+
+        // const price1 = ethers.BigNumber.from(50)
+        //BigNumber { value: "50" }
+        const uri = "www.abc.com"
+        const SIGNING_DOMAIN_NAME = "Voucher-Domain"
+        const SIGNING_DOMAIN_VERSION = "1"
+        const chainId =  network.config.chainId
+        const contractAddress = signatureseries.address 
+        const signer = owner
+
+        const domain = {
+            name: SIGNING_DOMAIN_NAME,
+            version: SIGNING_DOMAIN_VERSION,
+            verifyingContract: contractAddress,
+            chainId
+        } 
+        /// object content the name inside types
+        // const voucher = {
+        //     price : price2,
+        //     uri
+        // }
+
+        const voucher = {
+            price,
+            uri
+        }
+        const types = {
+                LazyNFTVoucher: [
+                    { name: "price", type: "uint256"},
+                    { name: "uri", type: "string"}
+                ]
+        }
+        const signature = await signer._signTypedData(domain, types, voucher)
+        const voucher1 = {...voucher,signature}
+        // console.log(`The signer is ${await signatureseries.recover(voucher1)}`)  
+        // to check if the correct signer is returning or not 
+        expect(await signatureseries.recover(voucher1)).to.be.equal(owner.address)
+         /// Calculating the transfer of Eth is happening after lazy mitning
+            // Assert
+        const startingOwnerBalance = await signatureseries.provider.getBalance(
+            owner.address
+        )
+        const startingBuyerBalance = await signatureseries.provider.getBalance(
+            buyer.address
+        )
+        ///ACT
+        const transactionResponse = await signatureseries.connect(buyer).lazyAssetCreation(voucher1 , 300,{ value : price})
+        const transactionReceipt = await transactionResponse.wait()
+        const { gasUsed, effectiveGasPrice } = transactionReceipt
+        const gasCost = gasUsed.mul(effectiveGasPrice)
+
+        const endingOwnerBalance = await signatureseries.provider.getBalance(
+                owner.address
+        )
+        const endingBuyerBalance = await signatureseries.provider.getBalance(
+                buyer.address
+        )
+        
+        assert.equal(
+                endingOwnerBalance.sub(startingOwnerBalance).toString(),
+                startingBuyerBalance.sub(endingBuyerBalance).sub(gasCost).toString()
+        )
 
     })
-    it("withdraws ETH from the contract", async () => {
-            // Assert
-            const startingNftBalance = await signatureseries.provider.getBalance(
-                signatureseries.address
-            )
-            const startingDeployerBalance = await signatureseries.provider.getBalance(
-                owner.address
-            )
-            // Act
-            const transactionResponse = await signatureseries.withdraw()
-            const transactionReceipt = await transactionResponse.wait()
-            const { gasUsed, effectiveGasPrice } = transactionReceipt
-            const gasCost = gasUsed.mul(effectiveGasPrice)
-
-            const endingNftBalance = await signatureseries.provider.getBalance(
-                signatureseries.address
-            )
-            const endingDeployerBalance = await signatureseries.provider.getBalance(
-                owner.address
-            )
-            expect(endingNftBalance).to.be.equal(0)
-            assert.equal(
-                startingNftBalance.add(startingDeployerBalance).toString(),
-                endingDeployerBalance.add(gasCost).toString()
-            )
-        })
-
 
 })
 

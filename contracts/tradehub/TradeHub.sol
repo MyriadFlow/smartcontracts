@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
@@ -26,11 +25,8 @@ contract TradeHub is
     bytes4 private constant _INTERFACE_ID_ERC1155 = 0xd9b67a26;
     bytes4 private constant _INTERFACE_ID_ERC721 = 0x80ac58cd;
 
-    using Counters for Counters.Counter;
+    uint256 private Counter;
 
-    Counters.Counter private _itemIds;
-
-    address public marketplacePayoutAddress;
     address public accessMasterAddress;
     uint96 public platformFeeBasisPoint;
     uint8 public version = 1;
@@ -59,7 +55,6 @@ contract TradeHub is
     }
 
     mapping(uint256 => MarketItem) public idToMarketItem;
-
     mapping(address => mapping(uint256 => uint256)) public marketItemERC721;
     mapping(address => mapping(address => mapping(uint256 => uint256))) public marketItemERC1155;
 
@@ -154,10 +149,10 @@ contract TradeHub is
         _;
     }
 
-    modifier onlyAdmin() {
+    modifier onlyOperator() {
         require(
-            flowRoles.isAdmin(_msgSender()),
-            "TradeHub: User is not authorized"
+            flowRoles.isOperator(_msgSender()),
+            "EternumPass: Unauthorized!"
         );
         _;
     }
@@ -169,7 +164,6 @@ contract TradeHub is
     ) {
         flowRoles = IACCESSMASTER(flowContract);
         platformFeeBasisPoint = _platformFee;
-        marketplacePayoutAddress = _msgSender();
         name = _name;
         accessMasterAddress = flowContract;
     }
@@ -177,12 +171,10 @@ contract TradeHub is
     /** @dev Change the Platform fees along with the payout address
      *   Allows only Admins to perform this operation
      */
-    function changeFeeAndPayoutAddress(
-        uint96 newPlatformFee,
-        address newPayoutAddress
-    ) public onlyAdmin {
+    function changeFee(
+        uint96 newPlatformFee
+    ) public onlyOperator {
         platformFeeBasisPoint = newPlatformFee;
-        marketplacePayoutAddress = newPayoutAddress;
     }
 
     /** @dev check if the item already existed , if it
@@ -196,8 +188,8 @@ contract TradeHub is
         if (checkERC1155(nftContract)) {
             uint256 marketItemId = marketItemERC1155[_msgSender()][nftContract][tokenId];
             if (marketItemId == 0) {
-                _itemIds.increment();
-                itemId = _itemIds.current();
+                Counter++;
+                itemId = Counter;
                 marketItemERC1155[_msgSender()][nftContract][tokenId] = itemId;
             } else if (
                 marketItemId != 0 &&
@@ -211,8 +203,8 @@ contract TradeHub is
         } else {
             uint256 marketItemId = marketItemERC721[nftContract][tokenId];
             if (marketItemId == 0) {
-                _itemIds.increment();
-                itemId = _itemIds.current();
+                Counter++;
+                itemId = Counter;
                 marketItemERC721[nftContract][tokenId] = itemId;
             } else if (
                 marketItemId != 0 &&
@@ -278,6 +270,7 @@ contract TradeHub is
 
         uint256 payoutForMarketplace;
         uint256 amountRemaining;
+        address marketplacePayoutAddress = flowRoles.getPayoutAddress();
 
         if (checkERC1155(_item.nftContract)) {
             // Calculate Payout for Platform
@@ -577,12 +570,13 @@ contract TradeHub is
 
     /// @dev end auction and split payment or start sale
     function _endAuction(uint256 itemId) private {
-        address auctioneerAddress = idToMarketItem[itemId].seller;
-        uint256 bidAmount = idToMarketItem[itemId].highestBid;
-        address nftContract = idToMarketItem[itemId].nftContract;
-        uint256 tokenId = idToMarketItem[itemId].tokenId;
-        string memory metadataURI = _getMetaDataURI(nftContract, tokenId);
         if (idToMarketItem[itemId].highestBidder != address(0)) {
+            address auctioneerAddress = idToMarketItem[itemId].seller;
+            uint256 bidAmount = idToMarketItem[itemId].highestBid;
+            address nftContract = idToMarketItem[itemId].nftContract;
+            uint256 tokenId = idToMarketItem[itemId].tokenId;
+            string memory metadataURI = _getMetaDataURI(nftContract, tokenId);
+            
             if (checkERC1155(nftContract)) {
                 uint256 quantity = idToMarketItem[itemId].supply;
                 _paymentSplit(
@@ -680,7 +674,7 @@ contract TradeHub is
 
     function checkERC721(address contractAddress) private view returns (bool) {
         return
-            IERC1155(contractAddress).supportsInterface(_INTERFACE_ID_ERC721);
+            IERC721(contractAddress).supportsInterface(_INTERFACE_ID_ERC721);
     }
 
     function supportsInterface(

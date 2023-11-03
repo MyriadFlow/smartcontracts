@@ -56,7 +56,9 @@ export interface EternumPassInterface extends utils.Interface {
     "subscriptionPricePerMonth()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
+    "timeStamp()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
+    "tokenIdCounter()": FunctionFragment;
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -66,7 +68,6 @@ export interface EternumPassInterface extends utils.Interface {
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
     "version()": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "MONTH", values?: undefined): string;
@@ -185,9 +186,14 @@ export interface EternumPassInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
+  encodeFunctionData(functionFragment: "timeStamp", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "tokenByIndex",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "tokenIdCounter",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "tokenOfOwnerByIndex",
@@ -219,7 +225,6 @@ export interface EternumPassInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "MONTH", data: BytesLike): Result;
   decodeFunctionResult(
@@ -316,8 +321,13 @@ export interface EternumPassInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "timeStamp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokenByIndex",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenIdCounter",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -341,15 +351,15 @@ export interface EternumPassInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "FundTransferred(address,address,uint256,uint256)": EventFragment;
     "NFTBurnt(uint256,address)": EventFragment;
     "NFTMinted(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
-    "RequestedCancelSubscription(uint256,uint256)": EventFragment;
+    "RequestedCancelSubscription(uint256,uint256,bool)": EventFragment;
     "SubscriptionUpdate(uint256,uint64)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "UpdateUser(uint256,address,uint64)": EventFragment;
@@ -357,6 +367,7 @@ export interface EternumPassInterface extends utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTBurnt"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "NFTMinted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
@@ -382,6 +393,13 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
+export type FundTransferredEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber],
+  { sender: string; reciepient: string; tokenId: BigNumber; amount: BigNumber }
+>;
+
+export type FundTransferredEventFilter = TypedEventFilter<FundTransferredEvent>;
+
 export type NFTBurntEvent = TypedEvent<
   [BigNumber, string],
   { tokenId: BigNumber; ownerOrApproved: string }
@@ -404,8 +422,8 @@ export type RentalInfoEvent = TypedEvent<
 export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
 
 export type RequestedCancelSubscriptionEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  { tokenId: BigNumber; Time: BigNumber }
+  [BigNumber, BigNumber, boolean],
+  { tokenId: BigNumber; time: BigNumber; status: boolean }
 >;
 
 export type RequestedCancelSubscriptionEventFilter =
@@ -626,10 +644,14 @@ export interface EternumPass extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
+    timeStamp(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    tokenIdCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -668,10 +690,6 @@ export interface EternumPass extends BaseContract {
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     version(overrides?: CallOverrides): Promise<[number]>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
   MONTH(overrides?: CallOverrides): Promise<BigNumber>;
@@ -836,10 +854,14 @@ export interface EternumPass extends BaseContract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
+  timeStamp(overrides?: CallOverrides): Promise<BigNumber>;
+
   tokenByIndex(
     index: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
+
+  tokenIdCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
   tokenOfOwnerByIndex(
     owner: string,
@@ -875,10 +897,6 @@ export interface EternumPass extends BaseContract {
   userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   version(overrides?: CallOverrides): Promise<number>;
-
-  withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   callStatic: {
     MONTH(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1036,10 +1054,14 @@ export interface EternumPass extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
+    timeStamp(overrides?: CallOverrides): Promise<BigNumber>;
+
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tokenIdCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -1073,8 +1095,6 @@ export interface EternumPass extends BaseContract {
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     version(overrides?: CallOverrides): Promise<number>;
-
-    withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -1099,6 +1119,19 @@ export interface EternumPass extends BaseContract {
       operator?: string | null,
       approved?: null
     ): ApprovalForAllEventFilter;
+
+    "FundTransferred(address,address,uint256,uint256)"(
+      sender?: null,
+      reciepient?: null,
+      tokenId?: null,
+      amount?: null
+    ): FundTransferredEventFilter;
+    FundTransferred(
+      sender?: null,
+      reciepient?: null,
+      tokenId?: null,
+      amount?: null
+    ): FundTransferredEventFilter;
 
     "NFTBurnt(uint256,address)"(
       tokenId?: null,
@@ -1128,13 +1161,15 @@ export interface EternumPass extends BaseContract {
       renter?: string | null
     ): RentalInfoEventFilter;
 
-    "RequestedCancelSubscription(uint256,uint256)"(
+    "RequestedCancelSubscription(uint256,uint256,bool)"(
       tokenId?: BigNumberish | null,
-      Time?: BigNumberish | null
+      time?: BigNumberish | null,
+      status?: boolean | null
     ): RequestedCancelSubscriptionEventFilter;
     RequestedCancelSubscription(
       tokenId?: BigNumberish | null,
-      Time?: BigNumberish | null
+      time?: BigNumberish | null,
+      status?: boolean | null
     ): RequestedCancelSubscriptionEventFilter;
 
     "SubscriptionUpdate(uint256,uint64)"(
@@ -1335,10 +1370,14 @@ export interface EternumPass extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
+    timeStamp(overrides?: CallOverrides): Promise<BigNumber>;
+
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    tokenIdCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -1380,10 +1419,6 @@ export interface EternumPass extends BaseContract {
     ): Promise<BigNumber>;
 
     version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1561,10 +1596,14 @@ export interface EternumPass extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    timeStamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     tokenByIndex(
       index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    tokenIdCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenOfOwnerByIndex(
       owner: string,
@@ -1606,9 +1645,5 @@ export interface EternumPass extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
   };
 }

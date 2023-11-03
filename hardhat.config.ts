@@ -34,6 +34,8 @@ const BNB_TESTNET_RPC_URL = process.env.BNB_TESTNET_RPC_URL || "https://bsc-test
 const ARBITRUM_GOERLI_RPC_URL = process.env.ARBITRUM_GOERLI_RPC_URL || "https://arbitrum-goerli.infura.io/v3/api-key"
 const OPTIMISM_GOERLI_RPC_URL = process.env.OPTIMISM_GOERLI_RPC_URL || "https://optimism-goerli.infura.io/v3/api-key"
 const BASE_GOERLI_RPC_URL = process.env.BASE_GOERLI_RPC_URL || "https://goerli.base.org"
+const SCROLL_SEPOLIA_RPC_URL = process.env.SCROLL_SEPOLIA_RPC_URL || "https://scroll-testnet-public.unifra.io"
+const POLYGON_ZKEVM_TESTNET_RPC_URL  = process.env.POLYGON_ZKEVM_TESTNET_RPC_URL || "https://rpc.public.zkevm-test.net"
 
 // MAINNET
 const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL || "https://mainnet.infura.io/v3/api-key"
@@ -42,6 +44,9 @@ const BNB_RPC_URL = process.env.BNB_RPC_URL || "https://bsc.blockpi.network/v1/r
 const ARBITRUM_RPC_URL = process.env.ARBITRUM_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
 const OPTIMISM_RPC_URL = process.env.OPTIMISM_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
 const BASE_RPC_URL = process.env.BASE_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
+const SCROLL_RPC_URL = process.env.FILECOIN_CALIBARATION_RPC_URL || "scroll url"
+const POLYGON_ZKEVM_RPC_URL = process.env.POLYGON_ZKEVM_RPC_URL || "Zkevm url"
+
 
 const MNEMONIC = process.env.MNEMONIC || "ajkskjfjksjkf ssfaasff asklkfl klfkas dfklhao asfj sfk klsfjs fkjs"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
@@ -52,6 +57,8 @@ const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "BSCscan API Key"
 const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY || "Arbiscan API Key"
 const OPTISCAN_API_KEY = process.env.OPTISCAN_API_KEY || "Optiscan API Key"
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "Basescan API Key"
+const SCROLLSCAN_API_KEY = process.env.SCROLLSCAN_API_KEY || "ScrollScan Api Key"
+const POLYGON_ZKEVM_API_KEY = process.env.SCROLLSCAN_API_KEY || "Polygon Zkevm Api Key"
 
 
 // You need to export an object to set up your config
@@ -125,6 +132,22 @@ module.exports = {
         mnemonic: MNEMONIC,
       }
     },
+    scrollTestnet : {
+        networkId: 534351,
+        url : SCROLL_SEPOLIA_RPC_URL,
+        accounts : [PRIVATE_KEY],
+      //    accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
+    },
+    polygonZkevmTestnet :{
+        networkId: 1442,
+        url : POLYGON_ZKEVM_TESTNET_RPC_URL,
+        accounts : [PRIVATE_KEY],
+      //    accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
+    },
     // MAINNET NETWORKS
     ethereum: {
       networkId: 1,
@@ -173,7 +196,23 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC,
       }
-    }
+    },
+    scroll: {
+        networkId:534352,
+        url : SCROLL_RPC_URL,
+        // accounts : [PRIVATE_KEY],
+         accounts: {
+        mnemonic: MNEMONIC,
+      },
+    },
+    polygonZkevm :{
+        networkId: 1101,
+        url : POLYGON_ZKEVM_RPC_URL,
+        accounts : [PRIVATE_KEY],
+      //    accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
+    },
 
   },
   gasReporter: {
@@ -187,7 +226,9 @@ module.exports = {
       bscTestnet : BSCSCAN_API_KEY,
       optimisticGoerli: OPTISCAN_API_KEY,
       arbitrumGoerli: ARBISCAN_API_KEY,
-      baseGoerli: BASESCAN_API_KEY
+      baseGoerli: BASESCAN_API_KEY,
+      scrollTestnet : SCROLLSCAN_API_KEY,
+      polygonzKevmTestnet : POLYGON_ZKEVM_API_KEY
     },
     customChains: [
       {
@@ -196,6 +237,14 @@ module.exports = {
         urls: {
           apiURL: "https://api-goerli.basescan.org/api",
           browserURL: "https://goerli.basescan.org"
+        }
+      },
+      {
+        network: "scrollTestnet",
+        chainId: 534351,
+        urls: {
+          apiURL: "https://scroll.l2scan.co/api/contract",
+          browserURL: "https://scroll.l2scan.co"
         }
       }
     ]

@@ -57,8 +57,11 @@ The JSON file should have the following format:
     "constructorParams":{
         "param1" : "NFT Baazar", // Name
         "param2" : "NFB",// Symbol
-        "param3" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298", // TradeHub Address
-        "param4" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"// AccessMaster Address
+        "param3" : "Voucher-Domain",// Domain
+        "param4" : "1",// Version
+        "param5" : "1000000000000000000",// NFT Price for Lazy minting 
+        "param6" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298", // TradeHub Address
+        "param7" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"// AccessMaster Address
     }
 }
 
@@ -112,7 +115,10 @@ The JSON file should have the following format:
         "param1" : "Soul Wizard",//Name
         "param2" : "SW",//Symbol
         "param3" : "www.xyz.com", //BaseUri
-        "param4" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"// AccessMaster Address
+        "param4" : "Voucher-Domain", //Domain
+        "param5" : "1", //Version
+        "param6" : "1000000000000000000", //Nft price for Lazyminting
+        "param7" : "0xb4f7ba8C7d818a208Cd89B127a126DD2aa45aDae"// AccessMaster Address
     }
 }
 ```

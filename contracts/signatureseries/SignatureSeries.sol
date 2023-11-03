@@ -2,12 +2,13 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
-
+import "hardhat/console.sol";
 /**
  * @dev {ERC721} token, including:
  *
@@ -15,7 +16,10 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  *  - a creator role that allows for token minting (creation)
  *  - a pauser role that allows to stop all token transfers
  *  - token ID and URI autogeneration
- *  - ability for holders to give for rent
+ *  - ability for holders to give for rent (4907)
+ *  - royalty is present (2981)
+ *  - Lazy Minting is present
+ * 
  *
  * This contract uses {AccessControl} to lock permissioned functions using the
  * different roles - head to its documentation for details.
@@ -24,14 +28,29 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
-    using Counters for Counters.Counter;
-
-    Counters.Counter private _tokenIdTracker;
+contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 , EIP712 {
+    
+     // Set Constants for Interface ID and Roles
+    bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
+    
+    using Strings for uint256;
 
     address public tradeHub;
     address public accessMasterAddress;
+    string public SIGNING_DOMAIN;
+    string public SIGNATURE_VERSION;
+
     uint8 public version = 1;
+
+    uint256 public nftPrice;
+    uint256 public Counter;
+
+    
+    struct LazyNFTVoucher {
+        uint256 price;
+        string uri;
+        bytes signature;
+    }
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -64,14 +83,6 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         _;
     }
 
-    modifier onlyAdmin() {
-        require(
-            flowRoles.isAdmin(_msgSender()),
-            "SignatureSeries: User is not authorized"
-        );
-        _;
-    }
-
     event SignatureSeriesAssetCreated(
         uint256 tokenID,
         address indexed creator,
@@ -85,7 +96,9 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         address indexed renter
     );
 
-    using Strings for uint256;
+    event FundTransferred(address sender,address reciepient , uint256 tokenId,uint256 amount);
+
+   
 
     /**
      * @dev Grants `FLOW_ADMIN_ROLE`, `FLOW_CREATOR_ROLE` and `FLOW_OPERATOR_ROLE` to the
@@ -97,12 +110,39 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     constructor(
         string memory name,
         string memory symbol,
+        string memory domain,
+        string memory _version,
+        uint256 _nftPrice,
         address tradeHubAddress,
         address flowContract
-    ) ERC721(name, symbol) {
+    ) ERC721(name, symbol) EIP712(domain,_version){
         flowRoles = IACCESSMASTER(flowContract);
         tradeHub = tradeHubAddress;
         accessMasterAddress = flowContract;
+
+        SIGNING_DOMAIN = domain;
+        SIGNATURE_VERSION = _version;
+        nftPrice = _nftPrice;
+    }
+
+    /// @notice transferring funds 
+    function _transferFunds(
+        address sender,
+        address recipient,
+        uint256 tokenId,
+        uint256 amount
+    ) private {
+        // get the balance of the contract
+        (bool callSuccess, ) = payable(recipient).call{
+            value: amount
+        }("");
+        require(callSuccess, "SignatureSeries: Transfer failed");
+        emit FundTransferred(sender,recipient,tokenId,amount);
+    }
+
+
+    function setNftPrice(uint256 _nftPrice) external onlyOperator {
+        nftPrice = _nftPrice;
     }
 
     /**
@@ -122,8 +162,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     ) public onlyCreator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        _tokenIdTracker.increment();
-        uint256 currentTokenID = _tokenIdTracker.current();
+        Counter++;
+        uint256 currentTokenID = Counter;
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
         // Set royalty Info
@@ -161,8 +201,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     ) public onlyOperator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        _tokenIdTracker.increment();
-        uint256 currentTokenID = _tokenIdTracker.current();
+        Counter++;
+        uint256 currentTokenID = Counter;
         _safeMint(creator, currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
 
@@ -177,6 +217,37 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         setApprovalForAll(tradeHub, true);
 
         emit SignatureSeriesAssetCreated(currentTokenID, creator, metadataURI);
+        return currentTokenID;
+    }
+
+    function lazyAssetCreation(
+        LazyNFTVoucher calldata voucher,
+         uint96 royaltyPercentBasisPoint
+    ) external payable returns(uint256){   
+        require(flowRoles.isOperator(recover(voucher)),"SignatureSeries: Invalid Signature!");
+        if(nftPrice != 0){
+            require(msg.value >= voucher.price,"Not Enough ether sent.");
+        }
+        Counter++;
+        uint256 currentTokenID = Counter;
+        _safeMint(_msgSender(), currentTokenID);
+        _setTokenURI(currentTokenID, voucher.uri);
+        // Set royalty Info
+        require(
+            royaltyPercentBasisPoint <= 1000,
+            "SignatureSeries: Royalty can't be more than 10%"
+        );
+        _setTokenRoyalty(
+            currentTokenID,
+            _msgSender(),
+            royaltyPercentBasisPoint
+        );
+        // send funds directly to payout Address
+        address recipient = flowRoles.getPayoutAddress();
+        _transferFunds(_msgSender(),recipient,currentTokenID,msg.value);
+        // Approve tradeHub to transfer NFTs
+        setApprovalForAll(tradeHub, true);
+        emit SignatureSeriesAssetCreated(currentTokenID, _msgSender(), voucher.uri);
         return currentTokenID;
     }
 
@@ -212,16 +283,8 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         _tokenURIs[tokenId] = _tokenURI;
     }
 
-    /// @notice only Admin can withdraw the funds collected
-    function withdraw() external onlyAdmin {
-        // get the balance of the contract
-        (bool callSuccess, ) = payable(_msgSender()).call{
-            value: address(this).balance
-        }("");
-        require(callSuccess, "SignatureSeries: Withdrawal failed");
-    }
 
-    /********************* ERC4907 *********************************/
+    /********************* Rental(ERC4907) *********************************/
     /// @notice Owner can set the NFT's rental price and status
     function setRentInfo(
         uint256 tokenId,
@@ -259,12 +322,19 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         emit UpdateUser(tokenId, user, info.expires);
     }
 
-    /// @notice to use for renting an item
-    /// @dev The zero address indicates there is no user
-    /// Throws if `tokenId` is not valid NFT,
-    /// time cannot be less than 1 hour or more than 6 months
-    /// @param _timeInHours  is in hours , Ex- 1,2,3
+    /**
+     * @notice to use for renting an item
+     * We are calculating 1 month equal to 30 days
+     * @dev The zero address indicates there is no user renting the item currently
+     * Throws if `tokenId` is not valid NFT,
+     * time cannot be less than 1 hour or more than 6 months
+     * @param _timeInHours  is in hours , Ex- 1,2,3
+     */ 
+
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
+        require(_exists(_tokenId),
+            "SignatureSeries: Invalide Token Id"
+        );
         require(
             rentables[_tokenId].isRentable,
             "SignatureSeries: Not available for rent"
@@ -285,6 +355,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         uint256 amount = amountRequired(_tokenId, _timeInHours);
 
         require(msg.value >= amount, "SignatureSeries: Insufficient Funds");
+        payable(ownerOf(_tokenId)).transfer(msg.value);
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();
@@ -292,16 +363,18 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         emit UpdateUser(_tokenId, _msgSender(), info.expires);
     }
 
-    /// @dev IERC4907 implementation
-    function userOf(uint256 tokenId) public view returns (address) {
-        if (userExpires(tokenId) >= block.timestamp) {
-            return rentables[tokenId].user;
-        } else {
-            return address(0);
-        }
-    }
-
     /** Getter Functions **/
+
+    ///@dev To recover the singer who has signed
+    function recover(LazyNFTVoucher calldata voucher) public view returns (address) {
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
+            keccak256("LazyNFTVoucher(uint256 price,string uri)"),
+            voucher.price,
+            keccak256(bytes(voucher.uri))
+        )));
+        address signer = ECDSA.recover(digest,voucher.signature);
+        return signer;
+    }
 
     /**
      * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
@@ -313,6 +386,15 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
         string memory _tokenURI = _tokenURIs[tokenId];
 
         return _tokenURI;
+    }
+    /************* Rental(ERC4907) ***************** */
+     /// @dev IERC4907 implementation
+    function userOf(uint256 tokenId) public view returns (address) {
+        if (userExpires(tokenId) >= block.timestamp) {
+            return rentables[tokenId].user;
+        } else {
+            return address(0);
+        }
     }
 
     /// @dev IERC4907 implementation
@@ -350,6 +432,7 @@ contract SignatureSeries is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
+        if (interfaceId == _INTERFACE_ID_ERC2981) return true;
         if (interfaceId == type(IERC4907).interfaceId) return true;
         return super.supportsInterface(interfaceId);
     }

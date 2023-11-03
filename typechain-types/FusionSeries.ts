@@ -20,6 +20,7 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface FusionSeriesInterface extends utils.Interface {
   contractName: "FusionSeries";
   functions: {
+    "Counter()": FunctionFragment;
     "accessMasterAddress()": FunctionFragment;
     "balanceOf(address,uint256)": FunctionFragment;
     "balanceOfBatch(address[],uint256[])": FunctionFragment;
@@ -41,6 +42,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     "version()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "Counter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "accessMasterAddress",
     values?: undefined
@@ -100,6 +102,7 @@ export interface FusionSeriesInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "Counter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "accessMasterAddress",
     data: BytesLike
@@ -259,6 +262,8 @@ export interface FusionSeries extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    Counter(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
 
     balanceOf(
@@ -352,6 +357,8 @@ export interface FusionSeries extends BaseContract {
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
+  Counter(overrides?: CallOverrides): Promise<BigNumber>;
+
   accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
   balanceOf(
@@ -442,6 +449,8 @@ export interface FusionSeries extends BaseContract {
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
+    Counter(overrides?: CallOverrides): Promise<BigNumber>;
+
     accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
     balanceOf(
@@ -604,6 +613,8 @@ export interface FusionSeries extends BaseContract {
   };
 
   estimateGas: {
+    Counter(overrides?: CallOverrides): Promise<BigNumber>;
+
     accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     balanceOf(
@@ -698,6 +709,8 @@ export interface FusionSeries extends BaseContract {
   };
 
   populateTransaction: {
+    Counter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     accessMasterAddress(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

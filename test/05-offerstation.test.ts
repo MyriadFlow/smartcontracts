@@ -31,7 +31,7 @@ describe("FlowOfferStation  contract", () => {
         offerstation = await offerStationFactory.deploy(300 , false , accessMaster.address)
 
         let SignatureSeriesFactory = await ethers.getContractFactory("SignatureSeries")
-        signatureSeries = await SignatureSeriesFactory.deploy(metadata.name, metadata.symbol, offerstation.address ,accessMaster.address)
+        signatureSeries = await SignatureSeriesFactory.deploy(metadata.name, metadata.symbol,"Voucher-Domain","1","1000000000000000000",offerstation.address ,accessMaster.address)
 
         const STOREFRONT_OPERATOR_ROLE = await accessMaster.FLOW_OPERATOR_ROLE()
 

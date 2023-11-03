@@ -21,15 +21,15 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface TradeHubInterface extends utils.Interface {
   contractName: "TradeHub";
   functions: {
-    "_getItemId(address,uint256)": FunctionFragment;
     "acceptBidAndEndAuction(uint256)": FunctionFragment;
     "accessMasterAddress()": FunctionFragment;
     "buyItem(uint256,uint256)": FunctionFragment;
-    "changeFeeAndPayoutAddress(uint96,address)": FunctionFragment;
+    "changeFee(uint96)": FunctionFragment;
     "concludeAuction(uint256)": FunctionFragment;
     "idToMarketItem(uint256)": FunctionFragment;
     "listItem(address,uint256,uint256,uint256,bool,uint256)": FunctionFragment;
-    "marketplacePayoutAddress()": FunctionFragment;
+    "marketItemERC1155(address,address,uint256)": FunctionFragment;
+    "marketItemERC721(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)": FunctionFragment;
     "onERC1155Received(address,address,uint256,uint256,bytes)": FunctionFragment;
@@ -46,10 +46,6 @@ export interface TradeHubInterface extends utils.Interface {
   };
 
   encodeFunctionData(
-    functionFragment: "_getItemId",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "acceptBidAndEndAuction",
     values: [BigNumberish]
   ): string;
@@ -62,8 +58,8 @@ export interface TradeHubInterface extends utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "changeFeeAndPayoutAddress",
-    values: [BigNumberish, string]
+    functionFragment: "changeFee",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "concludeAuction",
@@ -85,8 +81,12 @@ export interface TradeHubInterface extends utils.Interface {
     ]
   ): string;
   encodeFunctionData(
-    functionFragment: "marketplacePayoutAddress",
-    values?: undefined
+    functionFragment: "marketItemERC1155",
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "marketItemERC721",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(
@@ -135,7 +135,6 @@ export interface TradeHubInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "_getItemId", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "acceptBidAndEndAuction",
     data: BytesLike
@@ -145,10 +144,7 @@ export interface TradeHubInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "buyItem", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "changeFeeAndPayoutAddress",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "changeFee", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "concludeAuction",
     data: BytesLike
@@ -159,7 +155,11 @@ export interface TradeHubInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "listItem", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "marketplacePayoutAddress",
+    functionFragment: "marketItemERC1155",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "marketItemERC721",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -346,12 +346,6 @@ export interface TradeHub extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    _getItemId(
-      nftContract: string,
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -365,9 +359,8 @@ export interface TradeHub extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    changeFeeAndPayoutAddress(
+    changeFee(
       newPlatformFee: BigNumberish,
-      newPayoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -415,7 +408,18 @@ export interface TradeHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    marketplacePayoutAddress(overrides?: CallOverrides): Promise<[string]>;
+    marketItemERC1155(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    marketItemERC721(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
@@ -489,12 +493,6 @@ export interface TradeHub extends BaseContract {
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
-  _getItemId(
-    nftContract: string,
-    tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   acceptBidAndEndAuction(
     itemId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -508,9 +506,8 @@ export interface TradeHub extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  changeFeeAndPayoutAddress(
+  changeFee(
     newPlatformFee: BigNumberish,
-    newPayoutAddress: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -558,7 +555,18 @@ export interface TradeHub extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  marketplacePayoutAddress(overrides?: CallOverrides): Promise<string>;
+  marketItemERC1155(
+    arg0: string,
+    arg1: string,
+    arg2: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  marketItemERC721(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
@@ -632,12 +640,6 @@ export interface TradeHub extends BaseContract {
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
-    _getItemId(
-      nftContract: string,
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: CallOverrides
@@ -651,9 +653,8 @@ export interface TradeHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    changeFeeAndPayoutAddress(
+    changeFee(
       newPlatformFee: BigNumberish,
-      newPayoutAddress: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -701,7 +702,18 @@ export interface TradeHub extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    marketplacePayoutAddress(overrides?: CallOverrides): Promise<string>;
+    marketItemERC1155(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    marketItemERC721(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
@@ -886,12 +898,6 @@ export interface TradeHub extends BaseContract {
   };
 
   estimateGas: {
-    _getItemId(
-      nftContract: string,
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -905,9 +911,8 @@ export interface TradeHub extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    changeFeeAndPayoutAddress(
+    changeFee(
       newPlatformFee: BigNumberish,
-      newPayoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -931,7 +936,18 @@ export interface TradeHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    marketplacePayoutAddress(overrides?: CallOverrides): Promise<BigNumber>;
+    marketItemERC1155(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    marketItemERC721(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1006,12 +1022,6 @@ export interface TradeHub extends BaseContract {
   };
 
   populateTransaction: {
-    _getItemId(
-      nftContract: string,
-      tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     acceptBidAndEndAuction(
       itemId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1027,9 +1037,8 @@ export interface TradeHub extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    changeFeeAndPayoutAddress(
+    changeFee(
       newPlatformFee: BigNumberish,
-      newPayoutAddress: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1053,7 +1062,16 @@ export interface TradeHub extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    marketplacePayoutAddress(
+    marketItemERC1155(
+      arg0: string,
+      arg1: string,
+      arg2: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    marketItemERC721(
+      arg0: string,
+      arg1: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
