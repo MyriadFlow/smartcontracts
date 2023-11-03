@@ -18,9 +18,26 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
+export declare namespace SignatureSeries {
+  export type LazyNFTVoucherStruct = {
+    price: BigNumberish;
+    uri: string;
+    signature: BytesLike;
+  };
+
+  export type LazyNFTVoucherStructOutput = [BigNumber, string, string] & {
+    price: BigNumber;
+    uri: string;
+    signature: string;
+  };
+}
+
 export interface SignatureSeriesInterface extends utils.Interface {
   contractName: "SignatureSeries";
   functions: {
+    "Counter()": FunctionFragment;
+    "SIGNATURE_VERSION()": FunctionFragment;
+    "SIGNING_DOMAIN()": FunctionFragment;
     "accessMasterAddress()": FunctionFragment;
     "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
@@ -30,13 +47,17 @@ export interface SignatureSeriesInterface extends utils.Interface {
     "destroyAsset(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "lazyAssetCreation((uint256,string,bytes),uint96)": FunctionFragment;
     "name()": FunctionFragment;
+    "nftPrice()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "recover((uint256,string,bytes))": FunctionFragment;
     "rent(uint256,uint256)": FunctionFragment;
     "rentables(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
+    "setNftPrice(uint256)": FunctionFragment;
     "setRentInfo(uint256,bool,uint256)": FunctionFragment;
     "setUser(uint256,address,uint64)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
@@ -50,9 +71,17 @@ export interface SignatureSeriesInterface extends utils.Interface {
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
     "version()": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "Counter", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "SIGNATURE_VERSION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "SIGNING_DOMAIN",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "accessMasterAddress",
     values?: undefined
@@ -86,10 +115,19 @@ export interface SignatureSeriesInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "lazyAssetCreation",
+    values: [SignatureSeries.LazyNFTVoucherStruct, BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "nftPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "recover",
+    values: [SignatureSeries.LazyNFTVoucherStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "rent",
@@ -110,6 +148,10 @@ export interface SignatureSeriesInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setNftPrice",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "setRentInfo",
@@ -154,8 +196,16 @@ export interface SignatureSeriesInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "Counter", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "SIGNATURE_VERSION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "SIGNING_DOMAIN",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "accessMasterAddress",
     data: BytesLike
@@ -186,8 +236,14 @@ export interface SignatureSeriesInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "lazyAssetCreation",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nftPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
   decodeFunctionResult(
@@ -200,6 +256,10 @@ export interface SignatureSeriesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setApprovalForAll",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setNftPrice",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -236,11 +296,11 @@ export interface SignatureSeriesInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "FundTransferred(address,address,uint256,uint256)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "SignatureSeriesAssetCreated(uint256,address,string)": EventFragment;
     "SignatureSeriesAssetDestroyed(uint256,address)": EventFragment;
@@ -250,6 +310,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(
     nameOrSignatureOrTopic: "SignatureSeriesAssetCreated"
@@ -274,6 +335,13 @@ export type ApprovalForAllEvent = TypedEvent<
 >;
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
+
+export type FundTransferredEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber],
+  { sender: string; reciepient: string; tokenId: BigNumber; amount: BigNumber }
+>;
+
+export type FundTransferredEventFilter = TypedEventFilter<FundTransferredEvent>;
 
 export type RentalInfoEvent = TypedEvent<
   [BigNumber, boolean, BigNumber, string],
@@ -340,6 +408,12 @@ export interface SignatureSeries extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    Counter(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<[string]>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<[string]>;
+
     accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
 
     amountRequired(
@@ -385,10 +459,23 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    lazyAssetCreation(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
+
+    nftPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     ownerOf(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    recover(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -434,6 +521,11 @@ export interface SignatureSeries extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -493,11 +585,13 @@ export interface SignatureSeries extends BaseContract {
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     version(overrides?: CallOverrides): Promise<[number]>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
+
+  Counter(overrides?: CallOverrides): Promise<BigNumber>;
+
+  SIGNATURE_VERSION(overrides?: CallOverrides): Promise<string>;
+
+  SIGNING_DOMAIN(overrides?: CallOverrides): Promise<string>;
 
   accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -544,9 +638,22 @@ export interface SignatureSeries extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  lazyAssetCreation(
+    voucher: SignatureSeries.LazyNFTVoucherStruct,
+    royaltyPercentBasisPoint: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   name(overrides?: CallOverrides): Promise<string>;
 
+  nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  recover(
+    voucher: SignatureSeries.LazyNFTVoucherStruct,
+    overrides?: CallOverrides
+  ): Promise<string>;
 
   rent(
     _tokenId: BigNumberish,
@@ -590,6 +697,11 @@ export interface SignatureSeries extends BaseContract {
   setApprovalForAll(
     operator: string,
     approved: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setNftPrice(
+    _nftPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -647,11 +759,13 @@ export interface SignatureSeries extends BaseContract {
 
   version(overrides?: CallOverrides): Promise<number>;
 
-  withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
+    Counter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<string>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<string>;
+
     accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
     amountRequired(
@@ -697,9 +811,22 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    lazyAssetCreation(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<string>;
 
+    nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
+
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    recover(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     rent(
       _tokenId: BigNumberish,
@@ -743,6 +870,11 @@ export interface SignatureSeries extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -799,8 +931,6 @@ export interface SignatureSeries extends BaseContract {
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     version(overrides?: CallOverrides): Promise<number>;
-
-    withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -825,6 +955,19 @@ export interface SignatureSeries extends BaseContract {
       operator?: string | null,
       approved?: null
     ): ApprovalForAllEventFilter;
+
+    "FundTransferred(address,address,uint256,uint256)"(
+      sender?: null,
+      reciepient?: null,
+      tokenId?: null,
+      amount?: null
+    ): FundTransferredEventFilter;
+    FundTransferred(
+      sender?: null,
+      reciepient?: null,
+      tokenId?: null,
+      amount?: null
+    ): FundTransferredEventFilter;
 
     "RentalInfo(uint256,bool,uint256,address)"(
       tokenId?: null,
@@ -883,6 +1026,12 @@ export interface SignatureSeries extends BaseContract {
   };
 
   estimateGas: {
+    Counter(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<BigNumber>;
+
     accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
     amountRequired(
@@ -928,10 +1077,23 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    lazyAssetCreation(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    recover(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -970,6 +1132,11 @@ export interface SignatureSeries extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1032,13 +1199,15 @@ export interface SignatureSeries extends BaseContract {
     ): Promise<BigNumber>;
 
     version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    Counter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     accessMasterAddress(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -1089,10 +1258,23 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    lazyAssetCreation(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
+      royaltyPercentBasisPoint: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    nftPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    recover(
+      voucher: SignatureSeries.LazyNFTVoucherStruct,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1131,6 +1313,11 @@ export interface SignatureSeries extends BaseContract {
     setApprovalForAll(
       operator: string,
       approved: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1193,9 +1380,5 @@ export interface SignatureSeries extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
   };
 }

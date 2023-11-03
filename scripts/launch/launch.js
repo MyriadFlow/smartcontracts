@@ -99,7 +99,10 @@ async function signatureSeriesDeploy() {
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3,
-        constructorParam.param4
+        constructorParam.param4,
+        constructorParam.param5,
+        constructorParam.param6,
+        constructorParam.param7
     )
     console.log("SignatureSeries Deployed to:", signatureSeries.address)
     contractAddress = signatureSeries.address
@@ -113,6 +116,9 @@ async function signatureSeriesDeploy() {
             constructorParam.param2,
             constructorParam.param3,
             constructorParam.param4,
+            constructorParam.param5,
+            constructorParam.param6,
+            constructorParam.param7,
         ])
     }
 }
@@ -196,7 +202,10 @@ async function eternalSoulDeploy() {
         constructorParam.param1,
         constructorParam.param2,
         constructorParam.param3,
-        constructorParam.param4
+        constructorParam.param4,
+        constructorParam.param5,
+        constructorParam.param6,
+        constructorParam.param7
     )
     await eternalsoul.deployed()
     console.log("EternalSoul Deployed to:", eternalsoul.address)
@@ -210,6 +219,9 @@ async function eternalSoulDeploy() {
             constructorParam.param2,
             constructorParam.param3,
             constructorParam.param4,
+            constructorParam.param5,
+            constructorParam.param6,
+            constructorParam.param7,
         ])
     }
 }

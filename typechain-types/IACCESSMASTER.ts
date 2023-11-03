@@ -17,15 +17,24 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface IACCESSMASTERInterface extends utils.Interface {
   contractName: "IACCESSMASTER";
   functions: {
+    "getPayoutAddress()": FunctionFragment;
     "isAdmin(address)": FunctionFragment;
     "isCreator(address)": FunctionFragment;
     "isOperator(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "getPayoutAddress",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "isAdmin", values: [string]): string;
   encodeFunctionData(functionFragment: "isCreator", values: [string]): string;
   encodeFunctionData(functionFragment: "isOperator", values: [string]): string;
 
+  decodeFunctionResult(
+    functionFragment: "getPayoutAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "isAdmin", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isCreator", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "isOperator", data: BytesLike): Result;
@@ -61,12 +70,16 @@ export interface IACCESSMASTER extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
+    getPayoutAddress(overrides?: CallOverrides): Promise<[string]>;
+
     isAdmin(user: string, overrides?: CallOverrides): Promise<[boolean]>;
 
     isCreator(user: string, overrides?: CallOverrides): Promise<[boolean]>;
 
     isOperator(user: string, overrides?: CallOverrides): Promise<[boolean]>;
   };
+
+  getPayoutAddress(overrides?: CallOverrides): Promise<string>;
 
   isAdmin(user: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -75,6 +88,8 @@ export interface IACCESSMASTER extends BaseContract {
   isOperator(user: string, overrides?: CallOverrides): Promise<boolean>;
 
   callStatic: {
+    getPayoutAddress(overrides?: CallOverrides): Promise<string>;
+
     isAdmin(user: string, overrides?: CallOverrides): Promise<boolean>;
 
     isCreator(user: string, overrides?: CallOverrides): Promise<boolean>;
@@ -85,6 +100,8 @@ export interface IACCESSMASTER extends BaseContract {
   filters: {};
 
   estimateGas: {
+    getPayoutAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
     isAdmin(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     isCreator(user: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -93,6 +110,8 @@ export interface IACCESSMASTER extends BaseContract {
   };
 
   populateTransaction: {
+    getPayoutAddress(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     isAdmin(
       user: string,
       overrides?: CallOverrides

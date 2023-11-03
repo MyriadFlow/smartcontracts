@@ -12,7 +12,9 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  *  - ability for holders to burn (destroy) their tokens
  *  - a creator role that allows for token minting (creation)
  *  - token ID and URI autogeneration
- *  - ability for holders to give for rent
+ *  - ability for holders to give for (4)
+ *  - royalty is present for admin (2981)
+ * 
  *
  * This contract uses {AccessControl} to lock permissioned functions using the
  * different roles - head to its documentation for details.
@@ -21,7 +23,7 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
+contract InstaGen is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
@@ -53,10 +55,10 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     // INTERFACES
     IACCESSMASTER flowRoles;
 
-    modifier onlyAdmin() {
+     modifier onlyOperator() {
         require(
-            flowRoles.isAdmin(_msgSender()),
-            "InstaGen: User is not authorized"
+            flowRoles.isOperator(_msgSender()),
+            "EternumPass: Unauthorized!"
         );
         _;
     }
@@ -66,7 +68,10 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         uint256 quantity,
         address indexed creator
     );
+    
     event InstaGenAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+
+    event FundTransferred(address sender,address reciepient , uint256 tokenId,uint256 amount);
 
     event RentalInfo(
         uint256 tokenId,
@@ -100,7 +105,23 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         accessMasterAddress = accessControlAddress;
     }
 
-    function setSalePrice(uint256 _salePrice) external onlyAdmin {
+    /// @dev transferring funds 
+    function _transferFunds(
+        address sender,
+        address recipient,
+        uint256 tokenId,
+        uint256 amount
+    ) private {
+        // get the balance of the contract
+        (bool callSuccess, ) = payable(recipient).call{
+            value: amount
+        }("");
+        require(callSuccess, "InstaGen: Transfer failed");
+        emit FundTransferred(sender,recipient,tokenId,amount);
+    }
+
+
+    function setSalePrice(uint256 _salePrice) external onlyOperator {
         salePrice = _salePrice;
     }
 
@@ -110,7 +131,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         uint prevQuantity = _totalMinted();
         require(
             _totalMinted() + quantity <= maxSupply,
-            "InstaGen: exceeding max token supply!"
+            "InstaGen: Exceeding max token supply!"
         );
         if (countDownTime > block.timestamp) {
             require(
@@ -125,6 +146,10 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         }
         _safeMint(_msgSender(), quantity);
         setApprovalForAll(tradeHub, true);
+
+        address recipient = flowRoles.getPayoutAddress();
+        _transferFunds(_msgSender(),recipient,quantity,msg.value);
+
         emit InstaGenAssetCreated(_totalMinted(), quantity, _msgSender());
         return (prevQuantity, quantity);
     }
@@ -146,14 +171,6 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         _burn(tokenId, true);
         _resetTokenRoyalty(tokenId);
         emit InstaGenAssetDestroyed(tokenId, _msgSender());
-    }
-
-    function withdraw() external onlyAdmin {
-        // get the balance of the contract
-        (bool callSuccess, ) = payable(_msgSender()).call{
-            value: address(this).balance
-        }("");
-        require(callSuccess, "InstaGen: Withdrawal failed");
     }
 
     /********************* ERC4907 *********************************/
@@ -207,6 +224,9 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
     /// time cannot be less than 1 hour or more than 6 months
     /// @param _timeInHours  is in hours , Ex- 1,2,3
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
+         require(_exists(_tokenId),
+            "SignatureSeries: Invalide Token Id"
+        );
         require(
             rentables[_tokenId].isRentable,
             "InstaGen: Not available for rent"
@@ -224,6 +244,7 @@ contract InstaGen is IERC4907, Context, ERC2981, ERC721A, ERC721ABurnable {
         uint256 amount = amountRequired(_tokenId, _timeInHours);
 
         require(msg.value >= amount, "InstaGen: Insufficient Funds");
+        _transferFunds(_msgSender(),ownerOf(_tokenId),_tokenId,msg.value);
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();

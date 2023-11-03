@@ -2,7 +2,6 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
@@ -24,15 +23,14 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
 // collection URI override
 
 contract FusionSeries is Context, ERC1155Supply {
-    using Counters for Counters.Counter;
-
-    Counters.Counter private _tokenIdTracker;
 
     string public name;
     string public symbol;
 
     address public tradeHub;
     address public accessMasterAddress;
+
+    uint256 public Counter;
     uint8 public version = 1;
 
     // Optional mapping for token URIs
@@ -101,8 +99,8 @@ contract FusionSeries is Context, ERC1155Supply {
     ) public onlyCreator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        _tokenIdTracker.increment();
-        uint256 currentTokenID = _tokenIdTracker.current();
+        Counter++;
+        uint256 currentTokenID = Counter;
         _mint(_msgSender(), currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
@@ -127,8 +125,8 @@ contract FusionSeries is Context, ERC1155Supply {
     ) public onlyOperator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        _tokenIdTracker.increment();
-        uint256 currentTokenID = _tokenIdTracker.current();
+        Counter++;
+        uint256 currentTokenID = Counter;
         _mint(creator, currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);

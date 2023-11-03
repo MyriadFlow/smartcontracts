@@ -2,9 +2,10 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /**
  * @notice This token is a soul bound token
@@ -13,6 +14,7 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  *  - ability for holders to burn (destroy) their tokens
  *  - a creator role that allows for token minting (creation)
  *  - token ID and URI autogeneration
+ *  - Lazy Minting is present
  *
  * This contract uses {AccessControl} to lock permissioned   functions using the
  * different roles - head to its documentation for details.
@@ -21,14 +23,23 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  *
  */
 
-contract EternalSoul is Context, ERC721Enumerable {
-    using Counters for Counters.Counter;
-
-    Counters.Counter private _tokenIdTracker;
+contract EternalSoul is Context, ERC721Enumerable,EIP712 {
+    
+    uint256 public nftPrice;
+    uint256 private Counter;
+    uint8 public version = 1;
 
     address public accessMasterAddress;
+    
     string public baseURI;
-    uint8 public version = 1;
+    string public SIGNING_DOMAIN;
+    string public SIGNATURE_VERSION;
+    
+    struct LazyNFTVoucher {
+        uint256 price;
+        string uri;
+        bytes signature;
+    }
 
     IACCESSMASTER flowRoles;
 
@@ -58,17 +69,42 @@ contract EternalSoul is Context, ERC721Enumerable {
     );
     event AssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
+    event FundTransferred(address sender,address reciepient , uint256 tokenId,uint256 amount);
+    
     using Strings for uint256;
 
     constructor(
         string memory name,
         string memory symbol,
         string memory _intialURI,
+        string memory domain,
+        string memory _version,
+        uint256 _nftPrice,
         address flowContract
-    ) ERC721(name, symbol) {
+    ) ERC721(name, symbol) EIP712(domain,_version){
         baseURI = _intialURI;
         flowRoles = IACCESSMASTER(flowContract);
         accessMasterAddress = flowContract;
+
+        SIGNING_DOMAIN = domain;
+        SIGNATURE_VERSION = _version;
+        nftPrice = _nftPrice;
+    }
+
+    /// @notice transferring funds
+    function _transferFunds(
+        address sender,
+        address recipient,
+        uint256 tokenId,
+        uint256 amount
+    ) private {
+        // get the balance of the contract
+        (bool callSuccess, ) = payable(recipient).call{
+            value: amount
+        }("");
+        require(callSuccess, "EternalSoul: Transfer failed");
+        emit FundTransferred(sender,recipient,tokenId,amount);
+
     }
 
     /// @dev update BaseURI of the metadata
@@ -76,12 +112,16 @@ contract EternalSoul is Context, ERC721Enumerable {
         baseURI = uri;
     }
 
+    function setNFTPrice(uint256 value) external  {
+        nftPrice = value;
+    }
+
     /// @dev only the creator role can issue the token
     function issue(
         string memory metadataURI
     ) public onlyCreator returns (uint256) {
-        _tokenIdTracker.increment();
-        uint256 currentTokenID = _tokenIdTracker.current();
+        Counter++;
+        uint256 currentTokenID = Counter;
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
 
@@ -94,12 +134,29 @@ contract EternalSoul is Context, ERC721Enumerable {
         address creator,
         string memory metadataURI
     ) public onlyOperator returns (uint256) {
-        _tokenIdTracker.increment();
-        uint256 currentTokenID = _tokenIdTracker.current();
+        Counter++;
+        uint256 currentTokenID = Counter;
         _safeMint(creator, currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
 
         emit AssetIssued(currentTokenID, creator, metadataURI);
+        return currentTokenID;
+    }
+    // function safeMint(LazyNFTVoucher calldata voucher) public payable
+    function lazyIssue(LazyNFTVoucher calldata voucher) external payable returns(uint256){   
+        require(flowRoles.isOperator(recover(voucher)),"Wrong signature.");
+        if(nftPrice != 0){
+            require(msg.value >= voucher.price,"Not Enough ether sent.");
+        }
+        Counter++;
+        uint256 currentTokenID = Counter;
+        _safeMint(_msgSender(), currentTokenID);
+        _setTokenURI(currentTokenID,voucher.uri);
+
+        address recipient = flowRoles.getPayoutAddress();
+        _transferFunds(_msgSender(),recipient,currentTokenID,msg.value);
+
+        emit AssetIssued(currentTokenID,_msgSender(),voucher.uri);
         return currentTokenID;
     }
 
@@ -136,6 +193,16 @@ contract EternalSoul is Context, ERC721Enumerable {
 
     /** Getter Functions **/
 
+    ///@dev To recover the singer who has signed
+    function recover(LazyNFTVoucher calldata voucher) public view returns (address) {
+        bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
+            keccak256("LazyNFTVoucher(uint256 price,string uri)"),
+            voucher.price,
+            keccak256(bytes(voucher.uri))
+        )));
+        address signer = ECDSA.recover(digest,voucher.signature);
+        return signer;
+    }
     /**
      * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
      */

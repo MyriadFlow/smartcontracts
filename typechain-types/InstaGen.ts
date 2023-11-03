@@ -53,7 +53,6 @@ export interface InstaGenInterface extends utils.Interface {
     "userExpires(uint256)": FunctionFragment;
     "userOf(uint256)": FunctionFragment;
     "version()": FunctionFragment;
-    "withdraw()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -157,7 +156,6 @@ export interface InstaGenInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
-  encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "accessMasterAddress",
@@ -236,12 +234,12 @@ export interface InstaGenInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
     "ConsecutiveTransfer(uint256,uint256,address,address)": EventFragment;
+    "FundTransferred(address,address,uint256,uint256)": EventFragment;
     "InstaGenAssetCreated(uint256,uint256,address)": EventFragment;
     "InstaGenAssetDestroyed(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
@@ -252,6 +250,7 @@ export interface InstaGenInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ConsecutiveTransfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InstaGenAssetCreated"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "InstaGenAssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
@@ -280,6 +279,13 @@ export type ConsecutiveTransferEvent = TypedEvent<
 
 export type ConsecutiveTransferEventFilter =
   TypedEventFilter<ConsecutiveTransferEvent>;
+
+export type FundTransferredEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber],
+  { sender: string; reciepient: string; tokenId: BigNumber; amount: BigNumber }
+>;
+
+export type FundTransferredEventFilter = TypedEventFilter<FundTransferredEvent>;
 
 export type InstaGenAssetCreatedEvent = TypedEvent<
   [BigNumber, BigNumber, string],
@@ -498,10 +504,6 @@ export interface InstaGen extends BaseContract {
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     version(overrides?: CallOverrides): Promise<[number]>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
   };
 
   accessMasterAddress(overrides?: CallOverrides): Promise<string>;
@@ -651,10 +653,6 @@ export interface InstaGen extends BaseContract {
 
   version(overrides?: CallOverrides): Promise<number>;
 
-  withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   callStatic: {
     accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -796,8 +794,6 @@ export interface InstaGen extends BaseContract {
     userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     version(overrides?: CallOverrides): Promise<number>;
-
-    withdraw(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -835,6 +831,19 @@ export interface InstaGen extends BaseContract {
       from?: string | null,
       to?: string | null
     ): ConsecutiveTransferEventFilter;
+
+    "FundTransferred(address,address,uint256,uint256)"(
+      sender?: null,
+      reciepient?: null,
+      tokenId?: null,
+      amount?: null
+    ): FundTransferredEventFilter;
+    FundTransferred(
+      sender?: null,
+      reciepient?: null,
+      tokenId?: null,
+      amount?: null
+    ): FundTransferredEventFilter;
 
     "InstaGenAssetCreated(uint256,uint256,address)"(
       currentIndex?: null,
@@ -1041,10 +1050,6 @@ export interface InstaGen extends BaseContract {
     ): Promise<BigNumber>;
 
     version(overrides?: CallOverrides): Promise<BigNumber>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1201,9 +1206,5 @@ export interface InstaGen extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
   };
 }

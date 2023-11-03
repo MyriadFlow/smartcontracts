@@ -35,6 +35,7 @@ const ARBITRUM_GOERLI_RPC_URL = process.env.ARBITRUM_GOERLI_RPC_URL || "https://
 const OPTIMISM_GOERLI_RPC_URL = process.env.OPTIMISM_GOERLI_RPC_URL || "https://optimism-goerli.infura.io/v3/api-key"
 const BASE_GOERLI_RPC_URL = process.env.BASE_GOERLI_RPC_URL || "https://goerli.base.org"
 
+
 // MAINNET
 const ETHEREUM_RPC_URL = process.env.ETHEREUM_RPC_URL || "https://mainnet.infura.io/v3/api-key"
 const POLYGON_RPC_URL = process.env.POLYGON_RPC_URL || "https://polygon-mainnet.g.alchemy.com/v2/api-key"
@@ -42,6 +43,8 @@ const BNB_RPC_URL = process.env.BNB_RPC_URL || "https://bsc.blockpi.network/v1/r
 const ARBITRUM_RPC_URL = process.env.ARBITRUM_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
 const OPTIMISM_RPC_URL = process.env.OPTIMISM_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
 const BASE_RPC_URL = process.env.BASE_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
+
+
 
 const MNEMONIC = process.env.MNEMONIC || "ajkskjfjksjkf ssfaasff asklkfl klfkas dfklhao asfj sfk klsfjs fkjs"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
@@ -52,6 +55,7 @@ const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "BSCscan API Key"
 const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY || "Arbiscan API Key"
 const OPTISCAN_API_KEY = process.env.OPTISCAN_API_KEY || "Optiscan API Key"
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "Basescan API Key"
+
 
 
 // You need to export an object to set up your config
@@ -125,6 +129,7 @@ module.exports = {
         mnemonic: MNEMONIC,
       }
     },
+    
     // MAINNET NETWORKS
     ethereum: {
       networkId: 1,
@@ -173,8 +178,7 @@ module.exports = {
       accounts: {
         mnemonic: MNEMONIC,
       }
-    }
-
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -187,7 +191,7 @@ module.exports = {
       bscTestnet : BSCSCAN_API_KEY,
       optimisticGoerli: OPTISCAN_API_KEY,
       arbitrumGoerli: ARBISCAN_API_KEY,
-      baseGoerli: BASESCAN_API_KEY
+      baseGoerli: BASESCAN_API_KEY,
     },
     customChains: [
       {
@@ -197,7 +201,7 @@ module.exports = {
           apiURL: "https://api-goerli.basescan.org/api",
           browserURL: "https://goerli.basescan.org"
         }
-      }
+      },
     ]
   },
   paths: {

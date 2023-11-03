@@ -13,4 +13,11 @@ interface IACCESSMASTER {
 
     /// @dev checks if the address {User} is creator or not.
     function isCreator(address user) external view returns (bool);
+
+    /**
+     * @notice Retrieves the payout address defined by the admin.
+     * @return The payout address for receiving funds.
+     */
+    function getPayoutAddress() external view  returns (address);
+
 }
