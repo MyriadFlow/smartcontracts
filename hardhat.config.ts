@@ -44,8 +44,8 @@ const BNB_RPC_URL = process.env.BNB_RPC_URL || "https://bsc.blockpi.network/v1/r
 const ARBITRUM_RPC_URL = process.env.ARBITRUM_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
 const OPTIMISM_RPC_URL = process.env.OPTIMISM_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
 const BASE_RPC_URL = process.env.BASE_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
-const SCROLL_RPC_URL = process.env.FILECOIN_CALIBARATION_RPC_URL || "scroll url"
-const POLYGON_ZKEVM_RPC_URL = process.env.POLYGON_ZKEVM_RPC_URL || "Zkevm url"
+const SCROLL_RPC_URL = process.env.SCROLL_RPC_URL || "https://rpc.scroll.io"
+const POLYGON_ZKEVM_RPC_URL = process.env.POLYGON_ZKEVM_RPC_URL || "https://zkevm-rpc.com"
 
 
 const MNEMONIC = process.env.MNEMONIC || "ajkskjfjksjkf ssfaasff asklkfl klfkas dfklhao asfj sfk klsfjs fkjs"
@@ -58,7 +58,7 @@ const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY || "Arbiscan API Key"
 const OPTISCAN_API_KEY = process.env.OPTISCAN_API_KEY || "Optiscan API Key"
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "Basescan API Key"
 const SCROLLSCAN_API_KEY = process.env.SCROLLSCAN_API_KEY || "ScrollScan Api Key"
-const POLYGON_ZKEVM_API_KEY = process.env.SCROLLSCAN_API_KEY || "Polygon Zkevm Api Key"
+const POLYGON_ZKEVM_API_KEY = process.env.POLYGON_ZKEVM_API_KEY || "Polygon Zkevm Api Key"
 
 
 // You need to export an object to set up your config
@@ -201,17 +201,17 @@ module.exports = {
         networkId:534352,
         url : SCROLL_RPC_URL,
         // accounts : [PRIVATE_KEY],
-         accounts: {
+        accounts: {
         mnemonic: MNEMONIC,
       },
     },
     polygonZkevm :{
         networkId: 1101,
         url : POLYGON_ZKEVM_RPC_URL,
-        accounts : [PRIVATE_KEY],
-      //    accounts: {
-      //   mnemonic: MNEMONIC,
-      // },
+        // accounts : [PRIVATE_KEY],
+      accounts: {
+        mnemonic: MNEMONIC,
+      },
     },
 
   },
@@ -243,8 +243,16 @@ module.exports = {
         network: "scrollTestnet",
         chainId: 534351,
         urls: {
-          apiURL: "https://scroll.l2scan.co/api/contract",
+          apiURL: "https://scroll.l2scan.co/api",
           browserURL: "https://scroll.l2scan.co"
+        }
+      },
+      {
+        network: "polygonzKevmTestnet",
+        chainId: 1442,
+        urls: {
+          apiURL: "https://rpc.public.zkevm-test.net",
+          browserURL: "https://testnet-zkevm.polygonscan.com"
         }
       }
     ]
