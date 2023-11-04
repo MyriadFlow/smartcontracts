@@ -34,6 +34,7 @@ const BNB_TESTNET_RPC_URL = process.env.BNB_TESTNET_RPC_URL || "https://bsc-test
 const ARBITRUM_GOERLI_RPC_URL = process.env.ARBITRUM_GOERLI_RPC_URL || "https://arbitrum-goerli.infura.io/v3/api-key"
 const OPTIMISM_GOERLI_RPC_URL = process.env.OPTIMISM_GOERLI_RPC_URL || "https://optimism-goerli.infura.io/v3/api-key"
 const BASE_GOERLI_RPC_URL = process.env.BASE_GOERLI_RPC_URL || "https://goerli.base.org"
+const SCROLL_SEPOLIA_RPC_URL = process.env.SCROLL_SEPOLIA_RPC_URL || "https://scroll-testnet-public.unifra.io"
 
 
 // MAINNET
@@ -43,6 +44,7 @@ const BNB_RPC_URL = process.env.BNB_RPC_URL || "https://bsc.blockpi.network/v1/r
 const ARBITRUM_RPC_URL = process.env.ARBITRUM_RPC_URL || "https://linea-mainnet.infura.io/v3/api-key"
 const OPTIMISM_RPC_URL = process.env.OPTIMISM_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
 const BASE_RPC_URL = process.env.BASE_RPC_URL  || "https://filecoin-mainnet.chainstacklabs.com/rpc/v1"
+const SCROLL_RPC_URL = process.env.SCROLL_RPC_URL || "https://rpc.scroll.io"
 
 
 
@@ -55,7 +57,7 @@ const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "BSCscan API Key"
 const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY || "Arbiscan API Key"
 const OPTISCAN_API_KEY = process.env.OPTISCAN_API_KEY || "Optiscan API Key"
 const BASESCAN_API_KEY = process.env.BASESCAN_API_KEY || "Basescan API Key"
-
+const SCROLLSCAN_API_KEY = process.env.SCROLLSCAN_API_KEY || "ScrollScan Api Key"
 
 
 // You need to export an object to set up your config
@@ -129,7 +131,14 @@ module.exports = {
         mnemonic: MNEMONIC,
       }
     },
-    
+    scrollTestnet : {
+        networkId: 534351,
+        url : SCROLL_SEPOLIA_RPC_URL,
+        accounts : [PRIVATE_KEY],
+      //    accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
+    },
     // MAINNET NETWORKS
     ethereum: {
       networkId: 1,
@@ -179,6 +188,14 @@ module.exports = {
         mnemonic: MNEMONIC,
       }
     },
+    scroll: {
+        networkId:534352,
+        url : SCROLL_RPC_URL,
+        // accounts : [PRIVATE_KEY],
+        accounts: {
+        mnemonic: MNEMONIC,
+      },
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,
@@ -192,6 +209,7 @@ module.exports = {
       optimisticGoerli: OPTISCAN_API_KEY,
       arbitrumGoerli: ARBISCAN_API_KEY,
       baseGoerli: BASESCAN_API_KEY,
+      scrollTestnet : SCROLLSCAN_API_KEY,
     },
     customChains: [
       {
@@ -202,6 +220,14 @@ module.exports = {
           browserURL: "https://goerli.basescan.org"
         }
       },
+      {
+        network: "scrollTestnet",
+        chainId: 534351,
+        urls: {
+          apiURL: "https://scroll.l2scan.co/api",
+          browserURL: "https://scroll.l2scan.co"
+        }
+      }
     ]
   },
   paths: {
