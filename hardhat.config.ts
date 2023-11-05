@@ -133,10 +133,10 @@ module.exports = {
     scrollTestnet : {
         networkId: 534351,
         url : SCROLL_SEPOLIA_RPC_URL,
-        accounts : [PRIVATE_KEY],
-      //    accounts: {
-      //   mnemonic: MNEMONIC,
-      // },
+        // accounts : [PRIVATE_KEY],
+         accounts: {
+        mnemonic: MNEMONIC,
+      },
     },
     // MAINNET NETWORKS
     ethereum: {
