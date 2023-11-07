@@ -142,10 +142,10 @@ module.exports = {
     polygonZkevmTestnet :{
         networkId: 1442,
         url : POLYGON_ZKEVM_TESTNET_RPC_URL,
-        accounts : [PRIVATE_KEY],
-      //    accounts: {
-      //   mnemonic: MNEMONIC,
-      // },
+        // accounts : [PRIVATE_KEY],
+         accounts: {
+        mnemonic: MNEMONIC,
+      },
     },
     // MAINNET NETWORKS
     ethereum: {
