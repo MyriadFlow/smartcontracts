@@ -249,7 +249,7 @@ module.exports = {
         network: "polygonzKevmTestnet",
         chainId: 1442,
         urls: {
-          apiURL: "https://rpc.public.zkevm-test.net",
+          apiURL: "https://api-zkevm.polygonscan.com/api",
           browserURL: "https://testnet-zkevm.polygonscan.com"
         }
       }

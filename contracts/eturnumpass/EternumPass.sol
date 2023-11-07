@@ -8,8 +8,6 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "hardhat/console.sol";
-    // delete timestamp
 /// @title Users can only utilise token services after renewing their subscriptions and renting them to others.
 /**
  * @dev {ERC721} token, including:
