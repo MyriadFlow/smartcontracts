@@ -10,9 +10,13 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
+///@dev Define a custom error for when an item already exists
 error ItemExist();
 
-// create a function
+/**
+ * @title TradeHub
+ * @dev This contract implements a decentralized marketplace for buying and selling NFTs.
+ */
 contract TradeHub is
     Context,
     ReentrancyGuard,
@@ -53,8 +57,9 @@ contract TradeHub is
         address highestBidder;
         ItemStatus status;
     }
-
+    /// @dev Mapping to track MarketItem by its ID
     mapping(uint256 => MarketItem) public idToMarketItem;
+    /// @dev Mappings to track NFTs listed for sale and their owners
     mapping(address => mapping(uint256 => uint256)) public marketItemERC721;
     mapping(address => mapping(address => mapping(uint256 => uint256))) public marketItemERC1155;
 
@@ -113,6 +118,8 @@ contract TradeHub is
         string metaDataURI,
         address seller
     );
+    
+    ///@notice Modifier to ensure that an item is currently for sale
     modifier onlyWhenItemIsForSale(uint256 itemId) {
         require(
             idToMarketItem[itemId].status == ItemStatus.SALE,
@@ -120,6 +127,7 @@ contract TradeHub is
         );
         _;
     }
+     ///@notice Modifier to ensure that an item is currently in an auction
     modifier onlyWhenItemIsForAuction(uint256 itemId) {
         require(
             idToMarketItem[itemId].status == ItemStatus.AUCTION,
@@ -127,6 +135,7 @@ contract TradeHub is
         );
         _;
     }
+    /// @notice Modifier to ensure that the sender is the seller of the item
     modifier onlySeller(uint256 itemId) {
         require(
             idToMarketItem[itemId].seller == _msgSender(),
@@ -134,6 +143,7 @@ contract TradeHub is
         );
         _;
     }
+    ///@notice  Modifier to ensure that there are no bidders on the item
     modifier onlyWhenNoBidder(uint256 itemId) {
         require(
             idToMarketItem[itemId].highestBidder == address(0),
@@ -141,6 +151,8 @@ contract TradeHub is
         );
         _;
     }
+    ///@notice Modifier to check if an NFT contract is eligible for listing only
+    /// if it is an ERC721 and ERC1155
     modifier onlyWhenItemIsEligible(address nftContract) {
         require(
             checkERC1155(nftContract) || checkERC721(nftContract),
@@ -149,6 +161,7 @@ contract TradeHub is
         _;
     }
 
+    ///@notice Modifier to ensure that the sender is an operator
     modifier onlyOperator() {
         require(
             flowRoles.isOperator(_msgSender()),
@@ -157,6 +170,12 @@ contract TradeHub is
         _;
     }
 
+     /**
+     * @dev Constructor for TradeHub
+     * @param _platformFee The platform fee in basis points(10%) 
+     * @param _name The name of the marketplace
+     * @param flowContract The address of the Access Master contract
+     */
     constructor(
         uint96 _platformFee,
         string memory _name,
@@ -168,8 +187,11 @@ contract TradeHub is
         accessMasterAddress = flowContract;
     }
 
-    /** @dev Change the Platform fees along with the payout address
-     *   Allows only Admins to perform this operation
+    
+    /**
+     * @dev Change the platform fees along with the payout address
+     * Allows only Admins to perform this operation
+     * @param newPlatformFee The new platform fee in basis points
      */
     function changeFee(
         uint96 newPlatformFee
@@ -177,10 +199,13 @@ contract TradeHub is
         platformFeeBasisPoint = newPlatformFee;
     }
 
-    /** @dev check if the item already existed , if it
-     * does then return the previous value
+    /**
+     * @dev Check if the item already exists in Sale or Auction. 
+     *  If it does, return the previous value ,if not generate new one
+     * @param nftContract The address of the NFT contract
+     * @param tokenId The ID of the NFT
+     * @return itemId The unique item ID for the NFT
      */
-
     function _getItemId(
         address nftContract,
         uint256 tokenId
@@ -218,6 +243,12 @@ contract TradeHub is
         }
     }
 
+     /**
+     * @dev Get the metadata URI of an NFT
+     * @param nftContract The address of the NFT contract
+     * @param tokenId The ID of the NFT
+     * @return metadataURI The metadata URI for the NFT
+     */
     function _getMetaDataURI(
         address nftContract,
         uint256 tokenId
@@ -229,6 +260,14 @@ contract TradeHub is
         }
     }
 
+     /**
+     * @dev Transfer an NFT from one address to another
+     * @param nftContract The address of the NFT contract
+     * @param from The address of the sender
+     * @param to The address of the receiver
+     * @param tokenId The ID of the NFT
+     * @param quantity The quantity of NFTs to transfer (only relevant for ERC1155)
+     */
     function _transferItem(
         address nftContract,
         address from,
@@ -250,8 +289,12 @@ contract TradeHub is
     }
 
     /**
-     * @dev function to split the payment between creator , marketplace & nft Seller
-     *  also tranfer it to the nft buyer who paid for it
+     * @dev Split the payment for an NFT between the creator, marketplace, and NFT seller
+     * Transfer the NFT to the buyer
+     * @param itemId The ID of the item
+     * @param value The total payment amount
+     * @param recieverAddress The address of the NFT buyer
+     * @param quantity The quantity of NFTs being sold
      */
     function _paymentSplit(
         uint256 itemId,
@@ -306,8 +349,26 @@ contract TradeHub is
         }
     }
 
-    /**
-     * @dev only {ERC721} or {ERC1155} token owner can use this function for listing
+   /**
+     * @notice List an NFT item for sale or auction
+     * @dev It can only be called when the item is not currently up for auction or sale on the marketplace.
+     * Or else Error will be thrown ItemExist()
+     * 
+     * Emits a "SaleStarted" or "AuctionStarted" event, depending on the listing type.
+     *
+     * Requirements:
+     * - The price must be greater than 0 wei.
+     * - For auction listings, the auction duration must be at least 1 minute (60 seconds).
+     *  
+     * @param nftContract The address of the NFT contract
+     * @param tokenId The ID of the NFT
+     * @param price The sale price per unit
+     * @param quantity The quantity of NFTs to list (only relevant for ERC1155)
+     * @param forAuction Whether the item is listed for auction
+     * @param time The duration of the auction in seconds (only relevant for auctions)
+     * 
+     * @return itemId The unique item ID for the NFT
+     * 
      */
     function listItem(
         address nftContract,
@@ -410,14 +471,23 @@ contract TradeHub is
     }
 
     /**
-     * @dev Removes/Deletes  the item from marketplace
-     * Transfers ownership of the item back to seller
-     * check if the auction is already ended or not
+     * @notice Allows the owner of an item to remove it from the marketplace.
+     * The ownership of the item is transferred back to the seller.
+     * This function can only be called when there are no active bidders on the item.
      *
+     * @param itemId The unique identifier of the item to be removed.
+     *
+     * Emits an "ItemRemoved" event upon successful removal.
+     *
+     * Requirements:
+     * - The caller must be the seller of the item.
+     * - The item must not have any active bidders.
+     *
+     * @param itemId The unique identifier of the item to be removed.
      */
     function removeItem(
         uint256 itemId
-    ) public onlySeller(itemId) onlyWhenNoBidder(itemId) {
+    ) external onlySeller(itemId) onlyWhenNoBidder(itemId) {
         address nftContract = idToMarketItem[itemId].nftContract;
         address seller = idToMarketItem[itemId].seller;
         uint256 tokenId = idToMarketItem[itemId].tokenId;
@@ -438,8 +508,11 @@ contract TradeHub is
     }
 
     /**
-     * @dev it starts sale automatically after the Auction is ended
-     */
+    * @notice Initiates the sale of an item automatically after an auction has ended.
+    * This function is called internally and transitions the item's status from 'AUCTION' to 'SALE'.
+    *
+    * @param itemId The unique identifier of the item with the ended auction.
+    */
     function _invokeStartSale(uint itemId) private {
         idToMarketItem[itemId].auctioneEndTime = 0;
         idToMarketItem[itemId].status = ItemStatus.SALE;
@@ -459,8 +532,20 @@ contract TradeHub is
     }
 
     /**
-     *  @dev buy nft from a seller , transfer it &&
-     *  check if it's not in auction already
+     * @notice Allows a user to purchase an item listed for sale.
+     * The user must send the correct amount of Ether corresponding to the item's price.
+     * The item can be an ERC721 or ERC1155 token.
+     *
+     * @param itemId The unique identifier of the item to be purchased.
+     * @param quantity The quantity of items to purchase (used for ERC1155 tokens).
+     *
+     * Emits an "ItemSold" event upon a successful purchase.
+     *
+     * Requirements:
+     * - The item must be listed for sale.
+     * - The sent Ether must match the item's price.
+     *
+     * @param itemId The unique identifier of the item to be purchased.
      */
     function buyItem(
         uint256 itemId,
@@ -505,8 +590,27 @@ contract TradeHub is
         );
     }
 
-    /**
-     * @dev start auction for an item
+   /**
+     * @notice Starts an auction for an item, allowing users to place bids.
+     * The duration of the auction is specified in seconds.
+     * 
+     * @dev The default "Auction price" is automatically set to the current "Sale Price" of the item
+     * in the time of conversion occurs. 
+     * In the case of ERC1155 tokens, the entire quantity of tokens for that specific tokenId is made available for auction 
+     * without requiring additional approval from the Seller 
+     *
+     * @param itemId The unique identifier of the item to be auctioned.
+     * @param time The duration of the auction in seconds.
+     *
+     * Emits an "AuctionStarted" event upon successful auction initiation.
+     *
+     * Requirements:
+     * - The caller must be the seller of the item.
+     * - The item must be in Sale already (either ERC721 or ERC1155).
+     * - The auction duration must be at least 1 minute (60 seconds).
+     * -
+     *
+     * @param itemId The unique identifier of the item to be auctioned.
      */
     function startAuction(
         uint256 itemId,
@@ -568,7 +672,12 @@ contract TradeHub is
         emit BidPlaced(itemId, msg.value, _msgSender());
     }
 
-    /// @dev end auction and split payment or start sale
+    /**
+     * @notice Marks the end of the auction for a specific item.
+     * If there are no active bidders, the item is automatically listed for sale.
+     *
+     * @param itemId The unique identifier of the item with the ended auction.
+     */
     function _endAuction(uint256 itemId) private {
         if (idToMarketItem[itemId].highestBidder != address(0)) {
             address auctioneerAddress = idToMarketItem[itemId].seller;
@@ -608,25 +717,32 @@ contract TradeHub is
             _invokeStartSale(itemId);
         }
     }
-
+    
     /**
-     * @dev only Seller can accept the current highest Bid and transfer the NFT concluding the auction,
-     * if no bidder then start sale
-     */
+     * @notice Allows the seller to accept the current highest bid, concluding the auction.
+     * If no bidder exists, the item is automatically listed for sale.
+     * Requirements:
+     * - The caller must be the seller of the item.
+     * - The item must be in Auction State.
+     * 
+     * @param itemId The unique identifier of the item with the ongoing auction.
+    */
     function acceptBidAndEndAuction(
         uint256 itemId
-    ) public onlyWhenItemIsForAuction(itemId) onlySeller(itemId) {
+    ) external onlyWhenItemIsForAuction(itemId) onlySeller(itemId) {
         _endAuction(itemId);
     }
 
     /**
-     *  @dev After the auction's time has run out, anybody can conclude the
-     * bidding by confirming the highest bid and bidder, and
-     * therefore transferring the NFT; otherwise launching Sale automatically
-     */
+    * @notice After the auction's time has run out, anybody can conclude the bidding by
+    * confirming the highest bid and bidder, and therefore transferring the NFT.
+    * If no bidder exists, the item is automatically listed for sale.
+    *
+    * @param itemId The unique identifier of the item with the ongoing auction.
+    */
     function concludeAuction(
         uint256 itemId
-    ) public onlyWhenItemIsForAuction(itemId) {
+    ) external onlyWhenItemIsForAuction(itemId) {
         require(
             idToMarketItem[itemId].auctioneEndTime <= block.timestamp,
             "TradeHub: Auction is still running"
@@ -635,9 +751,13 @@ contract TradeHub is
     }
 
     /**
-     * @dev function to update the price of the auction
-     * by the auctioneer ,if there is no bids available
-     */
+     * @notice Updates the price of an item for sale by the auctioneer.
+     * This function can only be called when there are no active bidders on the item.
+     *
+     * @param itemId The unique identifier of the item with the updated price.
+     * @param pricePerUnit The new price per unit for the item.
+     * @return The updated price per unit.
+    */
     function updatePrice(
         uint256 itemId,
         uint256 pricePerUnit
@@ -667,19 +787,38 @@ contract TradeHub is
         return idToMarketItem[itemId].auctioneEndTime;
     }
 
+    /**
+    * @notice Checks if a contract supports the ERC1155 interface.
+    *
+    * @param contractAddress The address of the contract to check.
+    * @return True if the contract supports ERC1155, otherwise false.
+    */
     function checkERC1155(address contractAddress) private view returns (bool) {
         return
             IERC1155(contractAddress).supportsInterface(_INTERFACE_ID_ERC1155);
     }
 
+    /**
+     * @notice Checks if a contract supports the ERC721 interface.
+     *
+     * @param contractAddress The address of the contract to check.
+     * @return True if the contract supports ERC721, otherwise false.
+    */
     function checkERC721(address contractAddress) private view returns (bool) {
         return
             IERC721(contractAddress).supportsInterface(_INTERFACE_ID_ERC721);
     }
 
+    /**
+    * @notice Overrides the supportsInterface function to include ERC2981 and ERC1155Receiver interfaces.
+    *
+    * @param interfaceId The interface ID to check.
+    * @return True if the contract supports the interface, otherwise false.
+    */
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC2981, ERC1155Receiver) returns (bool) {
+        if (interfaceId == _INTERFACE_ID_ERC2981) return true;
         return super.supportsInterface(interfaceId);
     }
 }

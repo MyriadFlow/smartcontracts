@@ -142,10 +142,10 @@ module.exports = {
     polygonZkevmTestnet :{
         networkId: 1442,
         url : POLYGON_ZKEVM_TESTNET_RPC_URL,
-        // accounts : [PRIVATE_KEY],
-         accounts: {
-        mnemonic: MNEMONIC,
-      },
+        accounts : [PRIVATE_KEY],
+      //    accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
     },
     // MAINNET NETWORKS
     ethereum: {
@@ -249,7 +249,7 @@ module.exports = {
         network: "polygonzKevmTestnet",
         chainId: 1442,
         urls: {
-          apiURL: "https://rpc.public.zkevm-test.net",
+          apiURL: "https://api-zkevm.polygonscan.com/api",
           browserURL: "https://testnet-zkevm.polygonscan.com"
         }
       }
