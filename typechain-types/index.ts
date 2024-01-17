@@ -50,6 +50,8 @@ export type { SFT } from "./SFT";
 export type { Token } from "./Token";
 export type { FusionSeries } from "./FusionSeries";
 export type { InstaGen } from "./InstaGen";
+export type { Phygital } from "./Phygital";
+export type { PhygitalA } from "./PhygitalA";
 export type { SignatureSeries } from "./SignatureSeries";
 export type { TradeHub } from "./TradeHub";
 
@@ -102,5 +104,7 @@ export { SFT__factory } from "./factories/SFT__factory";
 export { Token__factory } from "./factories/Token__factory";
 export { FusionSeries__factory } from "./factories/FusionSeries__factory";
 export { InstaGen__factory } from "./factories/InstaGen__factory";
+export { Phygital__factory } from "./factories/Phygital__factory";
+export { PhygitalA__factory } from "./factories/PhygitalA__factory";
 export { SignatureSeries__factory } from "./factories/SignatureSeries__factory";
 export { TradeHub__factory } from "./factories/TradeHub__factory";

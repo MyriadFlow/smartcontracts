@@ -18,74 +18,66 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export declare namespace EternalSoul {
-  export type LazyNFTVoucherStruct = {
-    price: BigNumberish;
-    uri: string;
-    signature: BytesLike;
-  };
-
-  export type LazyNFTVoucherStructOutput = [BigNumber, string, string] & {
-    price: BigNumber;
-    uri: string;
-    signature: string;
-  };
-}
-
-export interface EternalSoulInterface extends utils.Interface {
-  contractName: "EternalSoul";
+export interface PhygitalInterface extends utils.Interface {
+  contractName: "Phygital";
   functions: {
-    "SIGNATURE_VERSION()": FunctionFragment;
-    "SIGNING_DOMAIN()": FunctionFragment;
+    "Counter()": FunctionFragment;
     "accessMasterAddress()": FunctionFragment;
+    "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "baseURI()": FunctionFragment;
-    "delegateIssue(address,string)": FunctionFragment;
+    "createAsset(string,uint96,bytes16)": FunctionFragment;
+    "delegateAssetCreation(address,string,uint96,bytes16)": FunctionFragment;
     "destroyAsset(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "issue(address,string)": FunctionFragment;
-    "lazyIssue((uint256,string,bytes))": FunctionFragment;
     "name()": FunctionFragment;
+    "nfcCheck(bytes16)": FunctionFragment;
+    "nfcId(uint256)": FunctionFragment;
     "nftPrice()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "recover((uint256,string,bytes))": FunctionFragment;
+    "rent(uint256,uint256)": FunctionFragment;
+    "rentables(uint256)": FunctionFragment;
+    "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setBaseURI(string)": FunctionFragment;
-    "setNFTPrice(uint256)": FunctionFragment;
+    "setNftPrice(uint256)": FunctionFragment;
+    "setRentInfo(uint256,bool,uint256)": FunctionFragment;
+    "setUser(uint256,address,uint64)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
+    "tradeHub()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
+    "userExpires(uint256)": FunctionFragment;
+    "userOf(uint256)": FunctionFragment;
     "version()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "SIGNATURE_VERSION",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "SIGNING_DOMAIN",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "Counter", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "accessMasterAddress",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "amountRequired",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "baseURI", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "delegateIssue",
-    values: [string, string]
+    functionFragment: "createAsset",
+    values: [string, BigNumberish, BytesLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "delegateAssetCreation",
+    values: [string, string, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "destroyAsset",
@@ -99,23 +91,25 @@ export interface EternalSoulInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
-  encodeFunctionData(
-    functionFragment: "issue",
-    values: [string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lazyIssue",
-    values: [EternalSoul.LazyNFTVoucherStruct]
-  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
+  encodeFunctionData(functionFragment: "nfcCheck", values: [BytesLike]): string;
+  encodeFunctionData(functionFragment: "nfcId", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "nftPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "recover",
-    values: [EternalSoul.LazyNFTVoucherStruct]
+    functionFragment: "rent",
+    values: [BigNumberish, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "rentables",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "royaltyInfo",
+    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "safeTransferFrom",
@@ -125,10 +119,17 @@ export interface EternalSoulInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     values: [string, boolean]
   ): string;
-  encodeFunctionData(functionFragment: "setBaseURI", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "setNFTPrice",
+    functionFragment: "setNftPrice",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setRentInfo",
+    values: [BigNumberish, boolean, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setUser",
+    values: [BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -151,29 +152,38 @@ export interface EternalSoulInterface extends utils.Interface {
     functionFragment: "totalSupply",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "tradeHub", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "userExpires",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "userOf",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "SIGNATURE_VERSION",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "SIGNING_DOMAIN",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "Counter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "accessMasterAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "amountRequired",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "baseURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "delegateIssue",
+    functionFragment: "createAsset",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "delegateAssetCreation",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -188,12 +198,17 @@ export interface EternalSoulInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "issue", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "lazyIssue", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nfcCheck", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nfcId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nftPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "royaltyInfo",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "safeTransferFrom",
     data: BytesLike
@@ -202,11 +217,15 @@ export interface EternalSoulInterface extends utils.Interface {
     functionFragment: "setApprovalForAll",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setBaseURI", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setNFTPrice",
+    functionFragment: "setNftPrice",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "setRentInfo",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setUser", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -225,27 +244,37 @@ export interface EternalSoulInterface extends utils.Interface {
     functionFragment: "totalSupply",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "tradeHub", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "userExpires",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
-    "AssetDestroyed(uint256,address)": EventFragment;
-    "AssetIssued(uint256,address,string)": EventFragment;
     "FundTransferred(address,address,uint256,uint256)": EventFragment;
+    "PhygitalAssetCreated(uint256,address,string)": EventFragment;
+    "PhygitalAssetDestroyed(uint256,address)": EventFragment;
+    "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
+    "UpdateUser(uint256,address,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "AssetIssued"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PhygitalAssetCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PhygitalAssetDestroyed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -262,26 +291,35 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
-export type AssetDestroyedEvent = TypedEvent<
-  [BigNumber, string],
-  { tokenId: BigNumber; ownerOrApproved: string }
->;
-
-export type AssetDestroyedEventFilter = TypedEventFilter<AssetDestroyedEvent>;
-
-export type AssetIssuedEvent = TypedEvent<
-  [BigNumber, string, string],
-  { tokenID: BigNumber; creator: string; metaDataURI: string }
->;
-
-export type AssetIssuedEventFilter = TypedEventFilter<AssetIssuedEvent>;
-
 export type FundTransferredEvent = TypedEvent<
   [string, string, BigNumber, BigNumber],
   { sender: string; reciepient: string; tokenId: BigNumber; amount: BigNumber }
 >;
 
 export type FundTransferredEventFilter = TypedEventFilter<FundTransferredEvent>;
+
+export type PhygitalAssetCreatedEvent = TypedEvent<
+  [BigNumber, string, string],
+  { tokenID: BigNumber; creator: string; metaDataURI: string }
+>;
+
+export type PhygitalAssetCreatedEventFilter =
+  TypedEventFilter<PhygitalAssetCreatedEvent>;
+
+export type PhygitalAssetDestroyedEvent = TypedEvent<
+  [BigNumber, string],
+  { tokenId: BigNumber; ownerOrApproved: string }
+>;
+
+export type PhygitalAssetDestroyedEventFilter =
+  TypedEventFilter<PhygitalAssetDestroyedEvent>;
+
+export type RentalInfoEvent = TypedEvent<
+  [BigNumber, boolean, BigNumber, string],
+  { tokenId: BigNumber; isRentable: boolean; price: BigNumber; renter: string }
+>;
+
+export type RentalInfoEventFilter = TypedEventFilter<RentalInfoEvent>;
 
 export type TransferEvent = TypedEvent<
   [string, string, BigNumber],
@@ -290,13 +328,20 @@ export type TransferEvent = TypedEvent<
 
 export type TransferEventFilter = TypedEventFilter<TransferEvent>;
 
-export interface EternalSoul extends BaseContract {
-  contractName: "EternalSoul";
+export type UpdateUserEvent = TypedEvent<
+  [BigNumber, string, BigNumber],
+  { tokenId: BigNumber; user: string; expires: BigNumber }
+>;
+
+export type UpdateUserEventFilter = TypedEventFilter<UpdateUserEvent>;
+
+export interface Phygital extends BaseContract {
+  contractName: "Phygital";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: EternalSoulInterface;
+  interface: PhygitalInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -318,11 +363,15 @@ export interface EternalSoul extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<[string]>;
-
-    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<[string]>;
+    Counter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
+
+    amountRequired(
+      tokenId: BigNumberish,
+      time: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { amount: BigNumber }>;
 
     approve(
       to: string,
@@ -332,11 +381,18 @@ export interface EternalSoul extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    baseURI(overrides?: CallOverrides): Promise<[string]>;
+    createAsset(
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    delegateIssue(
+    delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -356,18 +412,11 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    issue(
-      issuer: string,
-      metadataURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    lazyIssue(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     name(overrides?: CallOverrides): Promise<[string]>;
+
+    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
+
+    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
     nftPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -376,10 +425,29 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    recover(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
+    rent(
+      _tokenId: BigNumberish,
+      _timeInHours: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    rentables(
+      arg0: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[string]>;
+    ): Promise<
+      [boolean, string, BigNumber, BigNumber] & {
+        isRentable: boolean;
+        user: string;
+        expires: BigNumber;
+        hourlyRate: BigNumber;
+      }
+    >;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -402,13 +470,22 @@ export interface EternalSoul extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setBaseURI(
-      uri: string,
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setNFTPrice(
-      value: BigNumberish,
+    setRentInfo(
+      tokenId: BigNumberish,
+      isRentable: boolean,
+      pricePerHour: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    setUser(
+      tokenId: BigNumberish,
+      user: string,
+      expires: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -437,6 +514,8 @@ export interface EternalSoul extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    tradeHub(overrides?: CallOverrides): Promise<[string]>;
+
     transferFrom(
       from: string,
       to: string,
@@ -444,14 +523,25 @@ export interface EternalSoul extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    userExpires(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
+
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
-  SIGNATURE_VERSION(overrides?: CallOverrides): Promise<string>;
-
-  SIGNING_DOMAIN(overrides?: CallOverrides): Promise<string>;
+  Counter(overrides?: CallOverrides): Promise<BigNumber>;
 
   accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
+  amountRequired(
+    tokenId: BigNumberish,
+    time: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   approve(
     to: string,
@@ -461,11 +551,18 @@ export interface EternalSoul extends BaseContract {
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  baseURI(overrides?: CallOverrides): Promise<string>;
+  createAsset(
+    metadataURI: string,
+    royaltyPercentBasisPoint: BigNumberish,
+    _nfcId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  delegateIssue(
+  delegateAssetCreation(
     creator: string,
     metadataURI: string,
+    royaltyPercentBasisPoint: BigNumberish,
+    _nfcId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -485,27 +582,39 @@ export interface EternalSoul extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  issue(
-    issuer: string,
-    metadataURI: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  lazyIssue(
-    voucher: EternalSoul.LazyNFTVoucherStruct,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   name(overrides?: CallOverrides): Promise<string>;
+
+  nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+  nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  recover(
-    voucher: EternalSoul.LazyNFTVoucherStruct,
+  rent(
+    _tokenId: BigNumberish,
+    _timeInHours: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  rentables(
+    arg0: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<string>;
+  ): Promise<
+    [boolean, string, BigNumber, BigNumber] & {
+      isRentable: boolean;
+      user: string;
+      expires: BigNumber;
+      hourlyRate: BigNumber;
+    }
+  >;
+
+  royaltyInfo(
+    _tokenId: BigNumberish,
+    _salePrice: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<[string, BigNumber]>;
 
   "safeTransferFrom(address,address,uint256)"(
     from: string,
@@ -528,13 +637,22 @@ export interface EternalSoul extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setBaseURI(
-    uri: string,
+  setNftPrice(
+    _nftPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setNFTPrice(
-    value: BigNumberish,
+  setRentInfo(
+    tokenId: BigNumberish,
+    isRentable: boolean,
+    pricePerHour: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  setUser(
+    tokenId: BigNumberish,
+    user: string,
+    expires: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -560,6 +678,8 @@ export interface EternalSoul extends BaseContract {
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+  tradeHub(overrides?: CallOverrides): Promise<string>;
+
   transferFrom(
     from: string,
     to: string,
@@ -567,14 +687,25 @@ export interface EternalSoul extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  userExpires(
+    tokenId: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
-    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<string>;
-
-    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<string>;
+    Counter(overrides?: CallOverrides): Promise<BigNumber>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<string>;
+
+    amountRequired(
+      tokenId: BigNumberish,
+      time: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -584,11 +715,18 @@ export interface EternalSoul extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    baseURI(overrides?: CallOverrides): Promise<string>;
+    createAsset(
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    delegateIssue(
+    delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -608,27 +746,39 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    issue(
-      issuer: string,
-      metadataURI: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    lazyIssue(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<string>;
+
+    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
+    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    recover(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
+    rent(
+      _tokenId: BigNumberish,
+      _timeInHours: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<void>;
+
+    rentables(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [boolean, string, BigNumber, BigNumber] & {
+        isRentable: boolean;
+        user: string;
+        expires: BigNumber;
+        hourlyRate: BigNumber;
+      }
+    >;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string, BigNumber]>;
 
     "safeTransferFrom(address,address,uint256)"(
       from: string,
@@ -651,9 +801,24 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setBaseURI(uri: string, overrides?: CallOverrides): Promise<void>;
+    setNftPrice(
+      _nftPrice: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    setNFTPrice(value: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    setRentInfo(
+      tokenId: BigNumberish,
+      isRentable: boolean,
+      pricePerHour: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    setUser(
+      tokenId: BigNumberish,
+      user: string,
+      expires: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     supportsInterface(
       interfaceId: BytesLike,
@@ -677,12 +842,21 @@ export interface EternalSoul extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+    tradeHub(overrides?: CallOverrides): Promise<string>;
+
     transferFrom(
       from: string,
       to: string,
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    userExpires(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     version(overrides?: CallOverrides): Promise<number>;
   };
@@ -710,26 +884,6 @@ export interface EternalSoul extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
-    "AssetDestroyed(uint256,address)"(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-    AssetDestroyed(
-      tokenId?: BigNumberish | null,
-      ownerOrApproved?: null
-    ): AssetDestroyedEventFilter;
-
-    "AssetIssued(uint256,address,string)"(
-      tokenID?: BigNumberish | null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): AssetIssuedEventFilter;
-    AssetIssued(
-      tokenID?: BigNumberish | null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): AssetIssuedEventFilter;
-
     "FundTransferred(address,address,uint256,uint256)"(
       sender?: null,
       reciepient?: null,
@@ -743,6 +897,39 @@ export interface EternalSoul extends BaseContract {
       amount?: null
     ): FundTransferredEventFilter;
 
+    "PhygitalAssetCreated(uint256,address,string)"(
+      tokenID?: null,
+      creator?: string | null,
+      metaDataURI?: null
+    ): PhygitalAssetCreatedEventFilter;
+    PhygitalAssetCreated(
+      tokenID?: null,
+      creator?: string | null,
+      metaDataURI?: null
+    ): PhygitalAssetCreatedEventFilter;
+
+    "PhygitalAssetDestroyed(uint256,address)"(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): PhygitalAssetDestroyedEventFilter;
+    PhygitalAssetDestroyed(
+      tokenId?: BigNumberish | null,
+      ownerOrApproved?: null
+    ): PhygitalAssetDestroyedEventFilter;
+
+    "RentalInfo(uint256,bool,uint256,address)"(
+      tokenId?: null,
+      isRentable?: null,
+      price?: null,
+      renter?: string | null
+    ): RentalInfoEventFilter;
+    RentalInfo(
+      tokenId?: null,
+      isRentable?: null,
+      price?: null,
+      renter?: string | null
+    ): RentalInfoEventFilter;
+
     "Transfer(address,address,uint256)"(
       from?: string | null,
       to?: string | null,
@@ -753,14 +940,29 @@ export interface EternalSoul extends BaseContract {
       to?: string | null,
       tokenId?: BigNumberish | null
     ): TransferEventFilter;
+
+    "UpdateUser(uint256,address,uint64)"(
+      tokenId?: BigNumberish | null,
+      user?: string | null,
+      expires?: null
+    ): UpdateUserEventFilter;
+    UpdateUser(
+      tokenId?: BigNumberish | null,
+      user?: string | null,
+      expires?: null
+    ): UpdateUserEventFilter;
   };
 
   estimateGas: {
-    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
-
-    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<BigNumber>;
+    Counter(overrides?: CallOverrides): Promise<BigNumber>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
+
+    amountRequired(
+      tokenId: BigNumberish,
+      time: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -770,11 +972,18 @@ export interface EternalSoul extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    baseURI(overrides?: CallOverrides): Promise<BigNumber>;
+    createAsset(
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    delegateIssue(
+    delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -794,18 +1003,11 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    issue(
-      issuer: string,
-      metadataURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    lazyIssue(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     name(overrides?: CallOverrides): Promise<BigNumber>;
+
+    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
+    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
     nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -814,8 +1016,20 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    recover(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
+    rent(
+      _tokenId: BigNumberish,
+      _timeInHours: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    rentables(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -840,13 +1054,22 @@ export interface EternalSoul extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setBaseURI(
-      uri: string,
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setNFTPrice(
-      value: BigNumberish,
+    setRentInfo(
+      tokenId: BigNumberish,
+      isRentable: boolean,
+      pricePerHour: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    setUser(
+      tokenId: BigNumberish,
+      user: string,
+      expires: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -875,6 +1098,8 @@ export interface EternalSoul extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
 
+    tradeHub(overrides?: CallOverrides): Promise<BigNumber>;
+
     transferFrom(
       from: string,
       to: string,
@@ -882,15 +1107,29 @@ export interface EternalSoul extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    userExpires(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    userOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     version(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    Counter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     accessMasterAddress(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    amountRequired(
+      tokenId: BigNumberish,
+      time: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -905,11 +1144,18 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    baseURI(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    createAsset(
+      metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    delegateIssue(
+    delegateAssetCreation(
       creator: string,
       metadataURI: string,
+      royaltyPercentBasisPoint: BigNumberish,
+      _nfcId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -929,18 +1175,17 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    issue(
-      issuer: string,
-      metadataURI: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    lazyIssue(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    nfcCheck(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    nfcId(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
 
     nftPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -949,8 +1194,20 @@ export interface EternalSoul extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    recover(
-      voucher: EternalSoul.LazyNFTVoucherStruct,
+    rent(
+      _tokenId: BigNumberish,
+      _timeInHours: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    rentables(
+      arg0: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    royaltyInfo(
+      _tokenId: BigNumberish,
+      _salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -975,13 +1232,22 @@ export interface EternalSoul extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setBaseURI(
-      uri: string,
+    setNftPrice(
+      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setNFTPrice(
-      value: BigNumberish,
+    setRentInfo(
+      tokenId: BigNumberish,
+      isRentable: boolean,
+      pricePerHour: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    setUser(
+      tokenId: BigNumberish,
+      user: string,
+      expires: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1010,11 +1276,23 @@ export interface EternalSoul extends BaseContract {
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    tradeHub(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     transferFrom(
       from: string,
       to: string,
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    userExpires(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    userOf(
+      tokenId: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;
