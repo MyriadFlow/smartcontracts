@@ -38,15 +38,15 @@ describe("Eternal Soul Contract", () => {
 
         expect(await eternalsoul.ownerOf(1)).to.be.equal(creator2.address)
 
-        expect(await eternalsoul.connect(creator).issue("www.Robolox.com")).to.emit(eternalsoul,"AssetIssued")
+        expect(await eternalsoul.connect(creator).issue(creator.address,"www.Robolox.com")).to.emit(eternalsoul,"AssetIssued")
 
         expect(await eternalsoul.ownerOf(2)).to.be.equal(creator.address)
         ///Revert 
-        expect(eternalsoul.connect(buyer).issue("www.abc.com")).to.be.reverted
+        expect(eternalsoul.connect(buyer).issue(buyer.address,"www.abc.com")).to.be.reverted
     })
     it("Should not able to transfer",async() =>{
         ///Revert 
-        expect(eternalsoul.connect(creator).issue("www.abc.com")).to.be.reverted
+        expect(eternalsoul.connect(creator).issue("www.abc.com",buyer.address)).to.be.reverted
     })
     it("only Owner should burn",async() =>{
         expect(await eternalsoul.connect(creator2).destroyAsset(1)).to.emit(eternalsoul,"AssetDestroyed")

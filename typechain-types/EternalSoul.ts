@@ -45,7 +45,7 @@ export interface EternalSoulInterface extends utils.Interface {
     "destroyAsset(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
-    "issue(string,address)": FunctionFragment;
+    "issue(address,string)": FunctionFragment;
     "lazyIssue((uint256,string,bytes))": FunctionFragment;
     "name()": FunctionFragment;
     "nftPrice()": FunctionFragment;
@@ -357,8 +357,8 @@ export interface EternalSoul extends BaseContract {
     ): Promise<[boolean]>;
 
     issue(
-      metadataURI: string,
       issuer: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -486,8 +486,8 @@ export interface EternalSoul extends BaseContract {
   ): Promise<boolean>;
 
   issue(
-    metadataURI: string,
     issuer: string,
+    metadataURI: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -609,8 +609,8 @@ export interface EternalSoul extends BaseContract {
     ): Promise<boolean>;
 
     issue(
-      metadataURI: string,
       issuer: string,
+      metadataURI: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -795,8 +795,8 @@ export interface EternalSoul extends BaseContract {
     ): Promise<BigNumber>;
 
     issue(
-      metadataURI: string,
       issuer: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -930,8 +930,8 @@ export interface EternalSoul extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     issue(
-      metadataURI: string,
       issuer: string,
+      metadataURI: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

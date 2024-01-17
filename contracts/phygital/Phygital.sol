@@ -59,9 +59,9 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    mapping(uint256 => bytes5) public nfcId;
+    mapping(uint256 => bytes16) public nfcId;
 
-    mapping(bytes5 => bool) public nfcCheck;
+    mapping(bytes16 => bool) public nfcCheck;
 
     IACCESSMASTER flowRoles;
 
@@ -152,7 +152,7 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function createAsset(
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
-        bytes5 _nfcId
+        bytes16 _nfcId
     ) public returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
@@ -197,7 +197,7 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         address creator,
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
-        bytes5 _nfcId
+        bytes16 _nfcId
     ) public onlyOperator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.

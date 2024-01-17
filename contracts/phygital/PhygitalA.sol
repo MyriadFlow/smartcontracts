@@ -2,6 +2,8 @@
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../common/ERC721A/extensions/ERC721ABurnable.sol";
+import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
@@ -14,7 +16,7 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  *  - token ID and URI autogeneration
  *  - ability for holders to give for (4)
  *  - royalty is present for admin (2981)
- * 
+ *
  *
  * This contract uses {AccessControl} to lock permissioned functions using the
  * different roles - head to its documentation for details.
@@ -23,15 +25,18 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  * roles, as well as the default admin role, which will let it grant both creator
  * and pauser roles to other accounts.
  */
-contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
+contract PhygitalA is
+    Context,
+    IERC4907,
+    ERC2981,
+    ERC721A,
+    ERC721ABurnable,
+    EIP712
+{
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
     // IMMUTABLE VARIABLES
-    uint256 public immutable preSalePrice;
-    /// @dev The time until presalePrice will be valid
-    uint256 public immutable countDownTime;
-
     uint256 public immutable maxSupply;
 
     uint8 public version = 1;
@@ -40,7 +45,9 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
     string private baseURI;
     address public tradeHub;
     address public accessMasterAddress;
-    uint256 public salePrice;
+
+    string public SIGNING_DOMAIN;
+    string public SIGNATURE_VERSION;
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -49,16 +56,27 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
         uint256 hourlyRate; // amountPerHour
     }
 
+    struct LazyNFTVoucher {
+        string uri;
+        bytes signature;
+    }
+
     ///@dev storing the data of the user who are renting the NFT
     mapping(uint256 => RentableItems) public rentables;
+
+    mapping(uint256 => string) private _tokenURIs;
+
+    mapping(uint256 => bytes16) public nfcId;
+
+    mapping(bytes16 => bool) public nfcCheck;
 
     // INTERFACES
     IACCESSMASTER flowRoles;
 
-     modifier onlyOperator() {
+    modifier onlyCreator() {
         require(
-            flowRoles.isOperator(_msgSender()),
-            "EternumPass: Unauthorized!"
+            flowRoles.isCreator(_msgSender()),
+            "PhygitalA: User is not authorized"
         );
         _;
     }
@@ -68,10 +86,18 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
         uint256 quantity,
         address indexed creator
     );
-    
-    event PhygitalAAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
-    event FundTransferred(address sender,address reciepient , uint256 tokenId,uint256 amount);
+    event PhygitalAAssetDestroyed(
+        uint indexed tokenId,
+        address ownerOrApproved
+    );
+
+    event FundTransferred(
+        address sender,
+        address reciepient,
+        uint256 tokenId,
+        uint256 amount
+    );
 
     event RentalInfo(
         uint256 tokenId,
@@ -85,27 +111,23 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
         string memory symbol,
         address tradeHubAddress,
         address accessControlAddress,
-        uint256 _salePrice,
-        uint256 _preSalePrice,
-        uint256 _countDownTime, // unix time (secs)
+        string memory domain,
+        string memory _version,
         uint256 _maxSupply,
         uint256 _royaltyBPS,
         string memory _baseUri
-    ) ERC721A(name, symbol) {
+    ) ERC721A(name, symbol) EIP712(domain, _version) {
         flowRoles = IACCESSMASTER(accessControlAddress);
         tradeHub = tradeHubAddress;
-        salePrice = _salePrice;
-        preSalePrice = _preSalePrice;
-        countDownTime = block.timestamp + _countDownTime;
         maxSupply = _maxSupply;
         baseURI = _baseUri;
         // SET DEFAULT ROYALTY
-        _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS)); 
+        _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS));
 
         accessMasterAddress = accessControlAddress;
     }
 
-    /// @dev transferring funds 
+    /// @dev transferring funds
     function _transferFunds(
         address sender,
         address recipient,
@@ -113,46 +135,44 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
         uint256 amount
     ) private {
         // get the balance of the contract
-        (bool callSuccess, ) = payable(recipient).call{
-            value: amount
-        }("");
+        (bool callSuccess, ) = payable(recipient).call{value: amount}("");
         require(callSuccess, "PhygitalA: Transfer failed");
-        emit FundTransferred(sender,recipient,tokenId,amount);
-    }
-
-
-    function setSalePrice(uint256 _salePrice) external onlyOperator {
-        salePrice = _salePrice;
+        emit FundTransferred(sender, recipient, tokenId, amount);
     }
 
     function mint(
         uint256 quantity
-    ) external payable returns (uint256, uint256) {
-        
+    ) external payable onlyCreator returns (uint256, uint256) {
         uint prevQuantity = _totalMinted();
         require(
             _totalMinted() + quantity <= maxSupply,
             "PhygitalA: Exceeding max token supply!"
         );
-        if (countDownTime > block.timestamp) {
-            require(
-                msg.value >= quantity * preSalePrice,
-                "PhygitalA: Not enough funds!"
-            );
-        } else {
-            require(
-                msg.value >= quantity * salePrice,
-                "PhygitalA: Not enough funds!"
-            );
-        }
+
         _safeMint(_msgSender(), quantity);
         setApprovalForAll(tradeHub, true);
 
         address recipient = flowRoles.getPayoutAddress();
-        _transferFunds(_msgSender(),recipient,quantity,msg.value);
+        _transferFunds(_msgSender(), recipient, quantity, msg.value);
 
         emit PhygitalAAssetCreated(_totalMinted(), quantity, _msgSender());
         return (prevQuantity, quantity);
+    }
+
+
+    /// @dev to register Asset NFC ID TO the tokenID
+    function registerAssetId(
+        LazyNFTVoucher calldata voucher,
+        uint256 tokenId,
+        bytes16 _nfcId
+    ) external {
+        require(!nfcCheck[_nfcId],"PhygitalA: It's already registerd");
+        require(
+            flowRoles.isCreator(recover(voucher)),
+            "PhygitalA: Invalid Signature!"
+        );
+        _tokenURIs[tokenId] = voucher.uri;
+        nfcId[tokenId] = _nfcId;   
     }
 
     /**
@@ -172,6 +192,22 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
         _burn(tokenId, true);
         _resetTokenRoyalty(tokenId);
         emit PhygitalAAssetDestroyed(tokenId, _msgSender());
+    }
+
+    ///@dev To recover the singer who has signed
+    function recover(
+        LazyNFTVoucher calldata voucher
+    ) public view returns (address) {
+        bytes32 digest = _hashTypedDataV4(
+            keccak256(
+                abi.encode(
+                    keccak256("LazyNFTVoucher(uint256 price,string uri)"),
+                    keccak256(bytes(voucher.uri))
+                )
+            )
+        );
+        address signer = ECDSA.recover(digest, voucher.signature);
+        return signer;
     }
 
     /********************* ERC4907 *********************************/
@@ -225,9 +261,7 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
     /// time cannot be less than 1 hour or more than 6 months
     /// @param _timeInHours  is in hours , Ex- 1,2,3
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-         require(_exists(_tokenId),
-            "SignatureSeries: Invalide Token Id"
-        );
+        require(_exists(_tokenId), "SignatureSeries: Invalide Token Id");
         require(
             rentables[_tokenId].isRentable,
             "PhygitalA: Not available for rent"
@@ -245,7 +279,7 @@ contract PhygitalA is  Context,IERC4907,ERC2981, ERC721A, ERC721ABurnable {
         uint256 amount = amountRequired(_tokenId, _timeInHours);
 
         require(msg.value >= amount, "PhygitalA: Insufficient Funds");
-        _transferFunds(_msgSender(),ownerOf(_tokenId),_tokenId,msg.value);
+        _transferFunds(_msgSender(), ownerOf(_tokenId), _tokenId, msg.value);
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();

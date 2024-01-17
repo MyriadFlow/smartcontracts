@@ -119,8 +119,8 @@ contract EternalSoul is Context, ERC721Enumerable, EIP712 {
 
     /// @dev only the creator role can issue the token
     function issue(
-        string memory metadataURI,
-        address issuer
+        address issuer,
+        string memory metadataURI
     ) public onlyCreator returns (uint256) {
         Counter++;
         uint256 currentTokenID = Counter;

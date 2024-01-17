@@ -18,36 +18,45 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export interface PhygitalInterface extends utils.Interface {
-  contractName: "Phygital";
+export declare namespace PhygitalA {
+  export type LazyNFTVoucherStruct = { uri: string; signature: BytesLike };
+
+  export type LazyNFTVoucherStructOutput = [string, string] & {
+    uri: string;
+    signature: string;
+  };
+}
+
+export interface PhygitalAInterface extends utils.Interface {
+  contractName: "PhygitalA";
   functions: {
-    "Counter()": FunctionFragment;
+    "SIGNATURE_VERSION()": FunctionFragment;
+    "SIGNING_DOMAIN()": FunctionFragment;
     "accessMasterAddress()": FunctionFragment;
     "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "createAsset(string,uint96,bytes16)": FunctionFragment;
-    "delegateAssetCreation(address,string,uint96,bytes16)": FunctionFragment;
-    "destroyAsset(uint256)": FunctionFragment;
+    "burn(uint256)": FunctionFragment;
+    "burnNFT(uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "maxSupply()": FunctionFragment;
+    "mint(uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "nfcCheck(bytes16)": FunctionFragment;
     "nfcId(uint256)": FunctionFragment;
-    "nftPrice()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "recover((string,bytes))": FunctionFragment;
+    "registerAssetId((string,bytes),uint256,bytes16)": FunctionFragment;
     "rent(uint256,uint256)": FunctionFragment;
     "rentables(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
-    "setNftPrice(uint256)": FunctionFragment;
     "setRentInfo(uint256,bool,uint256)": FunctionFragment;
     "setUser(uint256,address,uint64)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "tokenByIndex(uint256)": FunctionFragment;
-    "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
     "tokenURI(uint256)": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "tradeHub()": FunctionFragment;
@@ -57,7 +66,14 @@ export interface PhygitalInterface extends utils.Interface {
     "version()": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "Counter", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "SIGNATURE_VERSION",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "SIGNING_DOMAIN",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "accessMasterAddress",
     values?: undefined
@@ -71,16 +87,9 @@ export interface PhygitalInterface extends utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
+  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "createAsset",
-    values: [string, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "delegateAssetCreation",
-    values: [string, string, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "destroyAsset",
+    functionFragment: "burnNFT",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -91,13 +100,22 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
+  encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
+  encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nfcCheck", values: [BytesLike]): string;
   encodeFunctionData(functionFragment: "nfcId", values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: "nftPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "recover",
+    values: [PhygitalA.LazyNFTVoucherStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "registerAssetId",
+    values: [PhygitalA.LazyNFTVoucherStruct, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "rent",
@@ -120,10 +138,6 @@ export interface PhygitalInterface extends utils.Interface {
     values: [string, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "setNftPrice",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "setRentInfo",
     values: [BigNumberish, boolean, BigNumberish]
   ): string;
@@ -136,14 +150,6 @@ export interface PhygitalInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "tokenByIndex",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "tokenOfOwnerByIndex",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(
     functionFragment: "tokenURI",
     values: [BigNumberish]
@@ -167,7 +173,14 @@ export interface PhygitalInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "Counter", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "SIGNATURE_VERSION",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "SIGNING_DOMAIN",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "accessMasterAddress",
     data: BytesLike
@@ -178,18 +191,8 @@ export interface PhygitalInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "createAsset",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "delegateAssetCreation",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "destroyAsset",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "burnNFT", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
@@ -198,11 +201,17 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfcCheck", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nfcId", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nftPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registerAssetId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
   decodeFunctionResult(
@@ -218,10 +227,6 @@ export interface PhygitalInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setNftPrice",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "setRentInfo",
     data: BytesLike
   ): Result;
@@ -231,14 +236,6 @@ export interface PhygitalInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenByIndex",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "tokenOfOwnerByIndex",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "tokenURI", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -259,9 +256,10 @@ export interface PhygitalInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "ConsecutiveTransfer(uint256,uint256,address,address)": EventFragment;
     "FundTransferred(address,address,uint256,uint256)": EventFragment;
-    "PhygitalAssetCreated(uint256,address,string)": EventFragment;
-    "PhygitalAssetDestroyed(uint256,address)": EventFragment;
+    "PhygitalAAssetCreated(uint256,uint256,address)": EventFragment;
+    "PhygitalAAssetDestroyed(uint256,address)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "UpdateUser(uint256,address,uint64)": EventFragment;
@@ -269,9 +267,10 @@ export interface PhygitalInterface extends utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "ConsecutiveTransfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PhygitalAssetCreated"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PhygitalAssetDestroyed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PhygitalAAssetCreated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PhygitalAAssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
@@ -291,6 +290,14 @@ export type ApprovalForAllEvent = TypedEvent<
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
 
+export type ConsecutiveTransferEvent = TypedEvent<
+  [BigNumber, BigNumber, string, string],
+  { fromTokenId: BigNumber; toTokenId: BigNumber; from: string; to: string }
+>;
+
+export type ConsecutiveTransferEventFilter =
+  TypedEventFilter<ConsecutiveTransferEvent>;
+
 export type FundTransferredEvent = TypedEvent<
   [string, string, BigNumber, BigNumber],
   { sender: string; reciepient: string; tokenId: BigNumber; amount: BigNumber }
@@ -298,21 +305,21 @@ export type FundTransferredEvent = TypedEvent<
 
 export type FundTransferredEventFilter = TypedEventFilter<FundTransferredEvent>;
 
-export type PhygitalAssetCreatedEvent = TypedEvent<
-  [BigNumber, string, string],
-  { tokenID: BigNumber; creator: string; metaDataURI: string }
+export type PhygitalAAssetCreatedEvent = TypedEvent<
+  [BigNumber, BigNumber, string],
+  { currentIndex: BigNumber; quantity: BigNumber; creator: string }
 >;
 
-export type PhygitalAssetCreatedEventFilter =
-  TypedEventFilter<PhygitalAssetCreatedEvent>;
+export type PhygitalAAssetCreatedEventFilter =
+  TypedEventFilter<PhygitalAAssetCreatedEvent>;
 
-export type PhygitalAssetDestroyedEvent = TypedEvent<
+export type PhygitalAAssetDestroyedEvent = TypedEvent<
   [BigNumber, string],
   { tokenId: BigNumber; ownerOrApproved: string }
 >;
 
-export type PhygitalAssetDestroyedEventFilter =
-  TypedEventFilter<PhygitalAssetDestroyedEvent>;
+export type PhygitalAAssetDestroyedEventFilter =
+  TypedEventFilter<PhygitalAAssetDestroyedEvent>;
 
 export type RentalInfoEvent = TypedEvent<
   [BigNumber, boolean, BigNumber, string],
@@ -335,13 +342,13 @@ export type UpdateUserEvent = TypedEvent<
 
 export type UpdateUserEventFilter = TypedEventFilter<UpdateUserEvent>;
 
-export interface Phygital extends BaseContract {
-  contractName: "Phygital";
+export interface PhygitalA extends BaseContract {
+  contractName: "PhygitalA";
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
 
-  interface: PhygitalInterface;
+  interface: PhygitalAInterface;
 
   queryFilter<TEvent extends TypedEvent>(
     event: TypedEventFilter<TEvent>,
@@ -363,7 +370,9 @@ export interface Phygital extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    Counter(overrides?: CallOverrides): Promise<[BigNumber]>;
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<[string]>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<[string]>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
 
@@ -376,27 +385,17 @@ export interface Phygital extends BaseContract {
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+    burn(
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    destroyAsset(
+    burnNFT(
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -412,18 +411,35 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    maxSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    mint(
+      quantity: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     name(overrides?: CallOverrides): Promise<[string]>;
 
     nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
 
     nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
-    nftPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
-
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
+
+    recover(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    registerAssetId(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      tokenId: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     rent(
       _tokenId: BigNumberish,
@@ -453,25 +469,20 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _data: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setNftPrice(
-      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -496,17 +507,6 @@ export interface Phygital extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -520,7 +520,7 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     userExpires(
@@ -533,7 +533,9 @@ export interface Phygital extends BaseContract {
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
-  Counter(overrides?: CallOverrides): Promise<BigNumber>;
+  SIGNATURE_VERSION(overrides?: CallOverrides): Promise<string>;
+
+  SIGNING_DOMAIN(overrides?: CallOverrides): Promise<string>;
 
   accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -546,27 +548,17 @@ export interface Phygital extends BaseContract {
   approve(
     to: string,
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-  createAsset(
-    metadataURI: string,
-    royaltyPercentBasisPoint: BigNumberish,
-    _nfcId: BytesLike,
+  burn(
+    tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  delegateAssetCreation(
-    creator: string,
-    metadataURI: string,
-    royaltyPercentBasisPoint: BigNumberish,
-    _nfcId: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  destroyAsset(
+  burnNFT(
     tokenId: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -582,15 +574,32 @@ export interface Phygital extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+  mint(
+    quantity: BigNumberish,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   name(overrides?: CallOverrides): Promise<string>;
 
   nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
   nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  recover(
+    voucher: PhygitalA.LazyNFTVoucherStruct,
+    overrides?: CallOverrides
+  ): Promise<string>;
+
+  registerAssetId(
+    voucher: PhygitalA.LazyNFTVoucherStruct,
+    tokenId: BigNumberish,
+    _nfcId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   rent(
     _tokenId: BigNumberish,
@@ -620,25 +629,20 @@ export interface Phygital extends BaseContract {
     from: string,
     to: string,
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   "safeTransferFrom(address,address,uint256,bytes)"(
     from: string,
     to: string,
     tokenId: BigNumberish,
-    data: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    _data: BytesLike,
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   setApprovalForAll(
     operator: string,
     approved: boolean,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setNftPrice(
-    _nftPrice: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -663,17 +667,6 @@ export interface Phygital extends BaseContract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  tokenByIndex(
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  tokenOfOwnerByIndex(
-    owner: string,
-    index: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
   tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -684,7 +677,7 @@ export interface Phygital extends BaseContract {
     from: string,
     to: string,
     tokenId: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   userExpires(
@@ -697,7 +690,9 @@ export interface Phygital extends BaseContract {
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
-    Counter(overrides?: CallOverrides): Promise<BigNumber>;
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<string>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<string>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<string>;
 
@@ -715,25 +710,9 @@ export interface Phygital extends BaseContract {
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    destroyAsset(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    burnNFT(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -746,15 +725,32 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mint(
+      quantity: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, BigNumber]>;
+
     name(overrides?: CallOverrides): Promise<string>;
 
     nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
     nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    recover(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      overrides?: CallOverrides
+    ): Promise<string>;
+
+    registerAssetId(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      tokenId: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     rent(
       _tokenId: BigNumberish,
@@ -791,18 +787,13 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
+      _data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setNftPrice(
-      _nftPrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -826,17 +817,6 @@ export interface Phygital extends BaseContract {
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     tokenURI(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -884,6 +864,19 @@ export interface Phygital extends BaseContract {
       approved?: null
     ): ApprovalForAllEventFilter;
 
+    "ConsecutiveTransfer(uint256,uint256,address,address)"(
+      fromTokenId?: BigNumberish | null,
+      toTokenId?: null,
+      from?: string | null,
+      to?: string | null
+    ): ConsecutiveTransferEventFilter;
+    ConsecutiveTransfer(
+      fromTokenId?: BigNumberish | null,
+      toTokenId?: null,
+      from?: string | null,
+      to?: string | null
+    ): ConsecutiveTransferEventFilter;
+
     "FundTransferred(address,address,uint256,uint256)"(
       sender?: null,
       reciepient?: null,
@@ -897,25 +890,25 @@ export interface Phygital extends BaseContract {
       amount?: null
     ): FundTransferredEventFilter;
 
-    "PhygitalAssetCreated(uint256,address,string)"(
-      tokenID?: null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): PhygitalAssetCreatedEventFilter;
-    PhygitalAssetCreated(
-      tokenID?: null,
-      creator?: string | null,
-      metaDataURI?: null
-    ): PhygitalAssetCreatedEventFilter;
+    "PhygitalAAssetCreated(uint256,uint256,address)"(
+      currentIndex?: null,
+      quantity?: null,
+      creator?: string | null
+    ): PhygitalAAssetCreatedEventFilter;
+    PhygitalAAssetCreated(
+      currentIndex?: null,
+      quantity?: null,
+      creator?: string | null
+    ): PhygitalAAssetCreatedEventFilter;
 
-    "PhygitalAssetDestroyed(uint256,address)"(
+    "PhygitalAAssetDestroyed(uint256,address)"(
       tokenId?: BigNumberish | null,
       ownerOrApproved?: null
-    ): PhygitalAssetDestroyedEventFilter;
-    PhygitalAssetDestroyed(
+    ): PhygitalAAssetDestroyedEventFilter;
+    PhygitalAAssetDestroyed(
       tokenId?: BigNumberish | null,
       ownerOrApproved?: null
-    ): PhygitalAssetDestroyedEventFilter;
+    ): PhygitalAAssetDestroyedEventFilter;
 
     "RentalInfo(uint256,bool,uint256,address)"(
       tokenId?: null,
@@ -954,7 +947,9 @@ export interface Phygital extends BaseContract {
   };
 
   estimateGas: {
-    Counter(overrides?: CallOverrides): Promise<BigNumber>;
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<BigNumber>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<BigNumber>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -967,27 +962,17 @@ export interface Phygital extends BaseContract {
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+    burn(
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    destroyAsset(
+    burnNFT(
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1003,17 +988,34 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
+
+    mint(
+      quantity: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
 
     nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
-
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    recover(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    registerAssetId(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      tokenId: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     rent(
@@ -1037,25 +1039,20 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _data: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setNftPrice(
-      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1080,17 +1077,6 @@ export interface Phygital extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1104,7 +1090,7 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     userExpires(
@@ -1121,7 +1107,9 @@ export interface Phygital extends BaseContract {
   };
 
   populateTransaction: {
-    Counter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    SIGNATURE_VERSION(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    SIGNING_DOMAIN(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     accessMasterAddress(
       overrides?: CallOverrides
@@ -1136,7 +1124,7 @@ export interface Phygital extends BaseContract {
     approve(
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     balanceOf(
@@ -1144,22 +1132,12 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    createAsset(
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+    burn(
+      tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    delegateAssetCreation(
-      creator: string,
-      metadataURI: string,
-      royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    destroyAsset(
+    burnNFT(
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1175,6 +1153,13 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    maxSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    mint(
+      quantity: BigNumberish,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nfcCheck(
@@ -1187,11 +1172,21 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    nftPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    recover(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    registerAssetId(
+      voucher: PhygitalA.LazyNFTVoucherStruct,
+      tokenId: BigNumberish,
+      _nfcId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     rent(
@@ -1215,25 +1210,20 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     "safeTransferFrom(address,address,uint256,bytes)"(
       from: string,
       to: string,
       tokenId: BigNumberish,
-      data: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      _data: BytesLike,
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     setApprovalForAll(
       operator: string,
       approved: boolean,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setNftPrice(
-      _nftPrice: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1258,17 +1248,6 @@ export interface Phygital extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    tokenByIndex(
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    tokenOfOwnerByIndex(
-      owner: string,
-      index: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     tokenURI(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1282,7 +1261,7 @@ export interface Phygital extends BaseContract {
       from: string,
       to: string,
       tokenId: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     userExpires(
