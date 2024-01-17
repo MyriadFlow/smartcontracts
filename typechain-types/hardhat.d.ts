@@ -209,6 +209,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.InstaGen__factory>;
     getContractFactory(
+      name: "Phygital",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Phygital__factory>;
+    getContractFactory(
       name: "SignatureSeries",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SignatureSeries__factory>;
@@ -462,6 +466,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.InstaGen>;
+    getContractAt(
+      name: "Phygital",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Phygital>;
     getContractAt(
       name: "SignatureSeries",
       address: string,

@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+
 /// @title Users can only utilise token services after renewing their subscriptions and renting them to others.
 /**
  * @dev {ERC721} token, including:
@@ -26,7 +27,6 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
  * and pauser roles to other accounts.
  */
 contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
-
     using Strings for uint256;
 
     // Set Constants for Interface ID and Roles
@@ -89,7 +89,12 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
 
     event NFTBurnt(uint256 tokenId, address indexed ownerOrApproved);
 
-    event FundTransferred(address sender,address reciepient , uint256 tokenId,uint256 amount);
+    event FundTransferred(
+        address sender,
+        address reciepient,
+        uint256 tokenId,
+        uint256 amount
+    );
 
     event RentalInfo(
         uint256 tokenId,
@@ -134,12 +139,9 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         uint256 amount
     ) private {
         // get the balance of the contract
-        (bool callSuccess, ) = payable(recipient).call{
-            value: amount
-        }("");
+        (bool callSuccess, ) = payable(recipient).call{value: amount}("");
         require(callSuccess, "EternumPass: Transfer failed");
-        emit FundTransferred(sender,recipient,tokenId,amount);
-
+        emit FundTransferred(sender, recipient, tokenId, amount);
     }
 
     ///@notice Function to update the plateformFeeBasisPoint
@@ -168,6 +170,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     ) public onlyOperator {
         subscriptionPricePerMonth = _subscriptionCharges;
     }
+
     /// @notice only operator can set base token URI for the contract
     function setBaseURI(string memory _tokenBaseURI) external onlyOperator {
         baseURI = _tokenBaseURI;
@@ -181,13 +184,13 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         _tokenURI[tokenId] = _tokenUri;
     }
 
-    /// @notice To mint NFTs in bulk 
+    /// @notice To mint NFTs in bulk
     /// @return tokenId
     function subscribe() external payable whenNotpaused returns (uint256) {
         tokenIdCounter++;
         uint256 tokenId = tokenIdCounter;
         require(
-            publicSalePrice >= msg.value,
+            publicSalePrice <= msg.value,
             "EternumPass: Insuffiecient amount!"
         );
         _safeMint(_msgSender(), tokenId);
@@ -195,7 +198,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         setApprovalForAll(tradeHubAddress, true);
 
         address recipient = flowRoles.getPayoutAddress();
-        _transferFunds(_msgSender(),recipient,tokenId,msg.value);
+        _transferFunds(_msgSender(), recipient, tokenId, msg.value);
 
         emit NFTMinted(tokenId, _msgSender());
         return tokenId;
@@ -280,9 +283,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     /// @param _timeInHours  is in hours , Ex- 1,2,3
 
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-        require(_exists(_tokenId),
-            "SignatureSeries: Invalide Token Id"
-        );
+        require(_exists(_tokenId), "SignatureSeries: Invalide Token Id");
         require(
             rentables[_tokenId].isRentable,
             "EternumPass: Not available for rent"
@@ -306,12 +307,17 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         /// Admin takes a miniumum commision for rental issue through there plaform
         // It can be zero
         uint256 payoutForCreator = (msg.value * platFormFeeBasisPoint) / 1000;
-        uint256 payoutForTokenOwner= msg.value - payoutForCreator;
+        uint256 payoutForTokenOwner = msg.value - payoutForCreator;
         // Calculate the Pay out for token Owner
-        _transferFunds(_msgSender(),ownerOf(_tokenId),_tokenId,payoutForTokenOwner);
-         //Calculate Pay out for Admin
+        _transferFunds(
+            _msgSender(),
+            ownerOf(_tokenId),
+            _tokenId,
+            payoutForTokenOwner
+        );
+        //Calculate Pay out for Admin
         address recipient = flowRoles.getPayoutAddress();
-        _transferFunds(_msgSender(),recipient,_tokenId,payoutForCreator);
+        _transferFunds(_msgSender(), recipient, _tokenId, payoutForCreator);
 
         RentableItems storage info = rentables[_tokenId];
         info.user = _msgSender();
@@ -353,7 +359,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         }
 
         address recipient = flowRoles.getPayoutAddress();
-        _transferFunds(_msgSender(),recipient,tokenId,msg.value);
+        _transferFunds(_msgSender(), recipient, tokenId, msg.value);
 
         uint64 newExpiration;
 
@@ -392,10 +398,10 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
             );
             cancellationRequested[tokenId] = true;
             _expirations[tokenId] = uint64(block.timestamp);
-            emit RequestedCancelSubscription(tokenId, block.timestamp,true);
+            emit RequestedCancelSubscription(tokenId, block.timestamp, true);
         } else {
             // When Operator themselves cancelling the request
-            if(cancellationRequested[tokenId] == false){
+            if (cancellationRequested[tokenId] == false) {
                 require(
                     isRenewable(tokenId) == false,
                     "Eternumpass: Subscription is inactive"
@@ -403,11 +409,16 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
                 _expirations[tokenId] = uint64(block.timestamp);
             }
 
-            if(msg.value != 0){
-                _transferFunds(_msgSender(),ownerOf(tokenId),tokenId,msg.value);
+            if (msg.value != 0) {
+                _transferFunds(
+                    _msgSender(),
+                    ownerOf(tokenId),
+                    tokenId,
+                    msg.value
+                );
             }
             cancellationRequested[tokenId] = false;
-            emit RequestedCancelSubscription(tokenId, block.timestamp,false);
+            emit RequestedCancelSubscription(tokenId, block.timestamp, false);
         }
     }
 
@@ -500,9 +511,10 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         }
     }
 
-    function timeStamp()  external view returns (uint256) {
+    function timeStamp() external view returns (uint256) {
         return block.timestamp;
     }
+
     function supportsInterface(
         bytes4 interfaceId
     ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
