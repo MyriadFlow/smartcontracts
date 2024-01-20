@@ -30,8 +30,7 @@ contract PhygitalA is
     IERC4907,
     ERC2981,
     ERC721A,
-    ERC721ABurnable,
-    EIP712
+    ERC721ABurnable
 {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
@@ -81,6 +80,14 @@ contract PhygitalA is
         _;
     }
 
+     modifier onlyOperator() {
+        require(
+            flowRoles.isOperator(_msgSender()),
+            "PhygitalA: User is not authorized "
+        );
+        _;
+    }
+
     event PhygitalAAssetCreated(
         uint256 currentIndex,
         uint256 quantity,
@@ -111,12 +118,10 @@ contract PhygitalA is
         string memory symbol,
         address tradeHubAddress,
         address accessControlAddress,
-        string memory domain,
-        string memory _version,
         uint256 _maxSupply,
         uint256 _royaltyBPS,
         string memory _baseUri
-    ) ERC721A(name, symbol) EIP712(domain, _version) {
+    ) ERC721A(name, symbol)  {
         flowRoles = IACCESSMASTER(accessControlAddress);
         tradeHub = tradeHubAddress;
         maxSupply = _maxSupply;
@@ -159,20 +164,15 @@ contract PhygitalA is
         return (prevQuantity, quantity);
     }
 
-
+    
     /// @dev to register Asset NFC ID TO the tokenID
     function registerAssetId(
-        LazyNFTVoucher calldata voucher,
         uint256 tokenId,
         bytes16 _nfcId
-    ) external {
+    ) external onlyOperator {
         require(!nfcCheck[_nfcId],"PhygitalA: It's already registerd");
-        require(
-            flowRoles.isCreator(recover(voucher)),
-            "PhygitalA: Invalid Signature!"
-        );
-        _tokenURIs[tokenId] = voucher.uri;
         nfcId[tokenId] = _nfcId;   
+        nfcCheck[_nfcId] = true;
     }
 
     /**
@@ -194,21 +194,7 @@ contract PhygitalA is
         emit PhygitalAAssetDestroyed(tokenId, _msgSender());
     }
 
-    ///@dev To recover the singer who has signed
-    function recover(
-        LazyNFTVoucher calldata voucher
-    ) public view returns (address) {
-        bytes32 digest = _hashTypedDataV4(
-            keccak256(
-                abi.encode(
-                    keccak256("LazyNFTVoucher(uint256 price,string uri)"),
-                    keccak256(bytes(voucher.uri))
-                )
-            )
-        );
-        address signer = ECDSA.recover(digest, voucher.signature);
-        return signer;
-    }
+    
 
     /********************* ERC4907 *********************************/
     /// @dev Owner can set the rental status of the token
