@@ -153,7 +153,7 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
         bytes16 _nfcId
-    ) public returns (uint256) {
+    ) public onlyCreator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
         require(!nfcCheck[_nfcId], "Phygital: NFC Tag is already stored!");
