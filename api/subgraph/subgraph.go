@@ -99,7 +99,7 @@ func DeploySubgraph(c *gin.Context) {
 		logrus.Error("Failed run deploy graph")
 		return
 	}
-
+	fmt.Println(outb.String())
 	os.Chdir(config.Dir)
 	os.RemoveAll(nonce)
 
