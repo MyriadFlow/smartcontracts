@@ -123,6 +123,37 @@ The JSON file should have the following format:
 }
 ```
 
+`Phygital`
+
+```shell
+{
+    "contractName" : "Phygital",
+    "constructorParams":{
+        "param1":   "Alice Clothing",
+        "param2" : "AC",
+        "param3" : "0x3A29EA5Ee6AB0326D72b55837dD9fD45b7a867Dd", - TradeHub 
+        "param4" : "0xc3fE1c3bCCE02d7A115Df2d4737137A15ff830F9" - AccessMaster
+    }
+}
+```
+`PhygitalA`
+
+```shell
+{
+    "contractName" : "PhygitalA",
+    "constructorParams":{
+        "param1": "Alice Clothing",
+        "param2" : "AC",
+        "param3" : "0x3A29EA5Ee6AB0326D72b55837dD9fD45b7a867Dd" , //tradehub
+        "param4" : "0xc3fE1c3bCCE02d7A115Df2d4737137A15ff830F9", // accessmaster
+        "param5" : 200, // maxsupply
+        "param6" : 300, // royalty
+        "param7" : "www.xyz.com"
+    }
+}
+```
+
+
 `FlowSubscription Contract`
 
 ```shell

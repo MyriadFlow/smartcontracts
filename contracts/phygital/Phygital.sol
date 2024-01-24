@@ -59,9 +59,9 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    mapping(uint256 => bytes16) public nfcId;
+    mapping(uint256 => bytes16) public phygitalID;
 
-    mapping(bytes16 => bool) public nfcCheck;
+    mapping(bytes16 => bool) public assetStatus;
 
     IACCESSMASTER flowRoles;
 
@@ -111,14 +111,12 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     constructor(
         string memory name,
         string memory symbol,
-        uint256 _nftPrice,
         address tradeHubAddress,
         address flowContract
     ) ERC721(name, symbol) {
         flowRoles = IACCESSMASTER(flowContract);
         tradeHub = tradeHubAddress;
         accessMasterAddress = flowContract;
-        nftPrice = _nftPrice;
     }
 
     /// @notice transferring funds
@@ -152,16 +150,16 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function createAsset(
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
-        bytes16 _nfcId
+        bytes16 _phygitalID
     ) public onlyCreator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        require(!nfcCheck[_nfcId], "Phygital: NFC Tag is already stored!");
+        require(!assetStatus[_phygitalID], "Phygital: NFC Tag is already stored!");
         Counter++;
         uint256 currentTokenID = Counter;
 
-        nfcId[currentTokenID] = _nfcId;
-        nfcCheck[_nfcId] = true;
+        phygitalID[currentTokenID] = _phygitalID;
+        assetStatus[_phygitalID] = true;
 
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
@@ -197,16 +195,16 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         address creator,
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
-        bytes16 _nfcId
+        bytes16 _phygitalID
     ) public onlyOperator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        require(!nfcCheck[_nfcId], "Phygital: NFC Tag is already stored!");
+        require(!assetStatus[_phygitalID], "Phygital: NFC Tag is already stored!");
         Counter++;
         uint256 currentTokenID = Counter;
 
-        nfcId[currentTokenID] = _nfcId;
-        nfcCheck[_nfcId] = true;
+        phygitalID[currentTokenID] = _phygitalID;
+        assetStatus[_phygitalID] = true;
 
         _safeMint(creator, currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
@@ -333,18 +331,6 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
 
     /** Getter Functions **/
 
-    /**
-     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
-     */
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "Phygital: Non-Existent Asset");
-        string memory _tokenURI = _tokenURIs[tokenId];
-
-        return _tokenURI;
-    }
-
     /************* Rental(ERC4907) ***************** */
     /// @dev IERC4907 implementation
     function userOf(uint256 tokenId) public view returns (address) {
@@ -370,6 +356,20 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     }
 
     /////////////////////////////////////////////////
+
+    /**
+     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
+     */
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
+        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
+        string memory _tokenURI = _tokenURIs[tokenId];
+
+        return _tokenURI;
+    }
+
+
 
     function _beforeTokenTransfer(
         address from,

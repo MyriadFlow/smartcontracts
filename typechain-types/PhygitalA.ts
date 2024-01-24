@@ -18,15 +18,6 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
-export declare namespace PhygitalA {
-  export type LazyNFTVoucherStruct = { uri: string; signature: BytesLike };
-
-  export type LazyNFTVoucherStructOutput = [string, string] & {
-    uri: string;
-    signature: string;
-  };
-}
-
 export interface PhygitalAInterface extends utils.Interface {
   contractName: "PhygitalA";
   functions: {
@@ -35,6 +26,7 @@ export interface PhygitalAInterface extends utils.Interface {
     "accessMasterAddress()": FunctionFragment;
     "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
+    "assetStatus(bytes16)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "burnNFT(uint256)": FunctionFragment;
@@ -43,11 +35,9 @@ export interface PhygitalAInterface extends utils.Interface {
     "maxSupply()": FunctionFragment;
     "mint(uint256)": FunctionFragment;
     "name()": FunctionFragment;
-    "nfcCheck(bytes16)": FunctionFragment;
-    "nfcId(uint256)": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
-    "recover((string,bytes))": FunctionFragment;
-    "registerAssetId((string,bytes),uint256,bytes16)": FunctionFragment;
+    "phygitalID(uint256)": FunctionFragment;
+    "registerAssetId(uint256,bytes16)": FunctionFragment;
     "rent(uint256,uint256)": FunctionFragment;
     "rentables(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
@@ -86,6 +76,10 @@ export interface PhygitalAInterface extends utils.Interface {
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "assetStatus",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
@@ -103,19 +97,17 @@ export interface PhygitalAInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
   encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nfcCheck", values: [BytesLike]): string;
-  encodeFunctionData(functionFragment: "nfcId", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "recover",
-    values: [PhygitalA.LazyNFTVoucherStruct]
+    functionFragment: "phygitalID",
+    values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "registerAssetId",
-    values: [PhygitalA.LazyNFTVoucherStruct, BigNumberish, BytesLike]
+    values: [BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "rent",
@@ -190,6 +182,10 @@ export interface PhygitalAInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "assetStatus",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burnNFT", data: BytesLike): Result;
@@ -204,10 +200,8 @@ export interface PhygitalAInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nfcCheck", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nfcId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "recover", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "phygitalID", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "registerAssetId",
     data: BytesLike
@@ -388,6 +382,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     burn(
@@ -420,24 +416,19 @@ export interface PhygitalA extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
-
-    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    recover(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
+    phygitalID(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
     registerAssetId(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
       tokenId: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -551,6 +542,8 @@ export interface PhygitalA extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   burn(
@@ -583,21 +576,13 @@ export interface PhygitalA extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
-
-  nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  recover(
-    voucher: PhygitalA.LazyNFTVoucherStruct,
-    overrides?: CallOverrides
-  ): Promise<string>;
+  phygitalID(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   registerAssetId(
-    voucher: PhygitalA.LazyNFTVoucherStruct,
     tokenId: BigNumberish,
-    _nfcId: BytesLike,
+    _phygitalID: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -708,6 +693,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(tokenId: BigNumberish, overrides?: CallOverrides): Promise<void>;
@@ -734,21 +721,13 @@ export interface PhygitalA extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
-
-    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-    recover(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    phygitalID(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     registerAssetId(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
       tokenId: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -965,6 +944,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
@@ -997,24 +978,19 @@ export interface PhygitalA extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
-
-    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    recover(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
+    phygitalID(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     registerAssetId(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
       tokenId: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1127,6 +1103,11 @@ export interface PhygitalA extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    assetStatus(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       owner: string,
       overrides?: CallOverrides
@@ -1162,30 +1143,19 @@ export interface PhygitalA extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    nfcCheck(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    nfcId(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     ownerOf(
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    recover(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
+    phygitalID(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     registerAssetId(
-      voucher: PhygitalA.LazyNFTVoucherStruct,
       tokenId: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

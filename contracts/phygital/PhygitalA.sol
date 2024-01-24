@@ -65,9 +65,9 @@ contract PhygitalA is
 
     mapping(uint256 => string) private _tokenURIs;
 
-    mapping(uint256 => bytes16) public nfcId;
+    mapping(uint256 => bytes16) public phygitalID;
 
-    mapping(bytes16 => bool) public nfcCheck;
+    mapping(bytes16 => bool) public assetStatus;
 
     // INTERFACES
     IACCESSMASTER flowRoles;
@@ -164,15 +164,14 @@ contract PhygitalA is
         return (prevQuantity, quantity);
     }
 
-    
     /// @dev to register Asset NFC ID TO the tokenID
     function registerAssetId(
         uint256 tokenId,
-        bytes16 _nfcId
+        bytes16 _phygitalID
     ) external onlyOperator {
-        require(!nfcCheck[_nfcId],"PhygitalA: It's already registerd");
-        nfcId[tokenId] = _nfcId;   
-        nfcCheck[_nfcId] = true;
+        require(!assetStatus[_phygitalID],"PhygitalA: It's already registerd");
+        phygitalID[tokenId] = _phygitalID;   
+        assetStatus[_phygitalID] = true;
     }
 
     /**

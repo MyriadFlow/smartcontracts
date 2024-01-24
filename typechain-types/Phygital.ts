@@ -25,6 +25,7 @@ export interface PhygitalInterface extends utils.Interface {
     "accessMasterAddress()": FunctionFragment;
     "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
+    "assetStatus(bytes16)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "createAsset(string,uint96,bytes16)": FunctionFragment;
     "delegateAssetCreation(address,string,uint96,bytes16)": FunctionFragment;
@@ -32,10 +33,9 @@ export interface PhygitalInterface extends utils.Interface {
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "name()": FunctionFragment;
-    "nfcCheck(bytes16)": FunctionFragment;
-    "nfcId(uint256)": FunctionFragment;
     "nftPrice()": FunctionFragment;
     "ownerOf(uint256)": FunctionFragment;
+    "phygitalID(uint256)": FunctionFragment;
     "rent(uint256,uint256)": FunctionFragment;
     "rentables(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
@@ -70,6 +70,10 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "approve",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(
+    functionFragment: "assetStatus",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
   encodeFunctionData(
     functionFragment: "createAsset",
@@ -92,11 +96,13 @@ export interface PhygitalInterface extends utils.Interface {
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nfcCheck", values: [BytesLike]): string;
-  encodeFunctionData(functionFragment: "nfcId", values: [BigNumberish]): string;
   encodeFunctionData(functionFragment: "nftPrice", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "ownerOf",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "phygitalID",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -177,6 +183,10 @@ export interface PhygitalInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "assetStatus",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "createAsset",
@@ -199,10 +209,9 @@ export interface PhygitalInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nfcCheck", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nfcId", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nftPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "ownerOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "phygitalID", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
   decodeFunctionResult(
@@ -379,12 +388,14 @@ export interface Phygital extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     createAsset(
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -392,7 +403,7 @@ export interface Phygital extends BaseContract {
       creator: string,
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -414,14 +425,15 @@ export interface Phygital extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<[boolean]>;
-
-    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
     nftPrice(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     ownerOf(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
+
+    phygitalID(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string]>;
 
@@ -549,12 +561,14 @@ export interface Phygital extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
   balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   createAsset(
     metadataURI: string,
     royaltyPercentBasisPoint: BigNumberish,
-    _nfcId: BytesLike,
+    _phygitalID: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -562,7 +576,7 @@ export interface Phygital extends BaseContract {
     creator: string,
     metadataURI: string,
     royaltyPercentBasisPoint: BigNumberish,
-    _nfcId: BytesLike,
+    _phygitalID: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -584,13 +598,11 @@ export interface Phygital extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
-
-  nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
   nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
   ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+  phygitalID(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
   rent(
     _tokenId: BigNumberish,
@@ -713,12 +725,14 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     createAsset(
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -726,7 +740,7 @@ export interface Phygital extends BaseContract {
       creator: string,
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -748,13 +762,11 @@ export interface Phygital extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
-
-    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
     nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
+
+    phygitalID(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     rent(
       _tokenId: BigNumberish,
@@ -970,12 +982,14 @@ export interface Phygital extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    assetStatus(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
+
     balanceOf(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     createAsset(
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -983,7 +997,7 @@ export interface Phygital extends BaseContract {
       creator: string,
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1005,14 +1019,15 @@ export interface Phygital extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nfcCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<BigNumber>;
-
-    nfcId(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
-
     nftPrice(overrides?: CallOverrides): Promise<BigNumber>;
 
     ownerOf(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    phygitalID(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1139,6 +1154,11 @@ export interface Phygital extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    assetStatus(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     balanceOf(
       owner: string,
       overrides?: CallOverrides
@@ -1147,7 +1167,7 @@ export interface Phygital extends BaseContract {
     createAsset(
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1155,7 +1175,7 @@ export interface Phygital extends BaseContract {
       creator: string,
       metadataURI: string,
       royaltyPercentBasisPoint: BigNumberish,
-      _nfcId: BytesLike,
+      _phygitalID: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1177,20 +1197,15 @@ export interface Phygital extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    nfcCheck(
-      arg0: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    nfcId(
-      arg0: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
     nftPrice(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ownerOf(
       tokenId: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    phygitalID(
+      arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

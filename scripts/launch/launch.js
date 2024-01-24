@@ -226,6 +226,62 @@ async function eternalSoulDeploy() {
     }
 }
 
+async function phygitalDeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const Phygital = await hre.ethers.getContractFactory("Phygital")
+    const phygital = await Phygital.deploy(
+        constructorParam.param1,
+        constructorParam.param2,
+        constructorParam.param3,
+        constructorParam.param4
+    )
+    await phygital.deployed()
+    console.log("Phygital Deployed to:", phygital.address)
+    contractAddress = phygital.address
+    blockNumber = phygital.provider._maxInternalBlockNumber
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await phygital.deployTransaction.wait(6)
+        await verify(phygital.address, [
+            constructorParam.param1,
+            constructorParam.param2,
+            constructorParam.param3,
+            constructorParam.param4,
+        ])
+    }
+}
+
+async function phygitalADeploy() {
+    const constructorParam = jsonContent.constructorParams
+    const PhygitalA = await hre.ethers.getContractFactory("PhygitalA")
+    const phygitala = await PhygitalA.deploy(
+        constructorParam.param1,
+        constructorParam.param2,
+        constructorParam.param3,
+        constructorParam.param4,
+        constructorParam.param5,
+        constructorParam.param6,
+        constructorParam.param7
+    )
+    await phygitala.deployed()
+    console.log("PhygitalA Deployed to:", phygitala.address)
+    contractAddress = phygitala.address
+    blockNumber = phygitala.provider._maxInternalBlockNumber
+    /// VERIFY
+    if (hre.network.name != "hardhat") {
+        await phygitala.deployTransaction.wait(6)
+        await verify(phygitala.address, [
+            constructorParam.param1,
+            constructorParam.param2,
+            constructorParam.param3,
+            constructorParam.param4,
+            constructorParam.param5,
+            constructorParam.param6,
+            constructorParam.param7,
+        ])
+    }
+}
+
 async function flowSubscriptionDeploy() {
     const constructorParam = jsonContent.constructorParams
     const FlowSubscription = await hre.ethers.getContractFactory(
@@ -321,7 +377,14 @@ async function main() {
     if (jsonContent.contractName == "EternalSoul") {
         await eternalSoulDeploy()
     }
-
+    //PHGITAL CONTRACT
+    if (jsonContent.contractName == "Phygital") {
+        await phygitalDeploy()
+    }
+    //PHYGITALA CONTRACT
+    if (jsonContent.contractName == "PhygitalA") {
+        await phygitalADeploy()
+    }
     // FLOWSUBSCRIPTION
     if (jsonContent.contractName == "FlowSubscription") {
         await flowSubscriptionDeploy()
