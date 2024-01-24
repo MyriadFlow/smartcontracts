@@ -81,7 +81,7 @@ func DeploySubgraph(c *gin.Context) {
 		return
 	}
 
-	cmd = exec.Command("yarn", "deploy", "-l", "v1", "-i", req.IpfsUrl)
+	cmd = exec.Command("yarn", "deploy", "-l", req.Contracts[0].Name, "-i", req.IpfsUrl)
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
