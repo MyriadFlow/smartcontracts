@@ -85,27 +85,18 @@ module.exports = {
     maticmum: {
       networkId: 80001,
       url: MATICMUM_RPC_URL,
-      // accounts: [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
+      accounts: [PRIVATE_KEY],
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
     },
     sepolia: {
       networkId: 11155111,
       url: SEPOLIA_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      },
-    },
-     
-    bnbTest :{
-      networkId: 97,
-      url: BNB_TESTNET_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      }
+      accounts : [PRIVATE_KEY],
+      // accounts: {
+      //   mnemonic: MNEMONIC,
+      // },
     },
     arbiGoerli :{
       networkId: 421613,
@@ -164,14 +155,6 @@ module.exports = {
         mnemonic: MNEMONIC,
       },
     },
-    bnb:{
-      networkId: 56,
-      url: BNB_RPC_URL,
-      // accounts : [PRIVATE_KEY],
-      accounts: {
-        mnemonic: MNEMONIC,
-      }
-    },
     arbitrum :{
       networkId: 42161,
       url: ARBITRUM_RPC_URL,
@@ -221,7 +204,6 @@ module.exports = {
     apiKey: {
       polygonMumbai : POLYGONSCAN_API_KEY,
       sepolia : ETHERSCAN_API_KEY,
-      bscTestnet : BSCSCAN_API_KEY,
       optimisticGoerli: OPTISCAN_API_KEY,
       arbitrumGoerli: ARBISCAN_API_KEY,
       baseGoerli: BASESCAN_API_KEY,
