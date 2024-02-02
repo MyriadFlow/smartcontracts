@@ -41,7 +41,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     uint256 public subscriptionPricePerMonth;
     uint256 public tokenIdCounter;
 
-    uint8 public version = 1;
+    uint8 public constant version = 1;
 
     string public baseURI;
 

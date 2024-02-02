@@ -12,8 +12,8 @@ import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 contract AccessMaster is AccessControlEnumerable {
     string public name = "My AccessMaster";
     string public symbol = "AM";
-    uint8 public version = 1;
-    
+    uint8 public constant version = 1;
+
     address private payoutAddress;
 
     bytes32 public constant FLOW_ADMIN_ROLE = keccak256("FLOW_ADMIN_ROLE");
@@ -69,17 +69,19 @@ contract AccessMaster is AccessControlEnumerable {
     /// @dev Sets the payout address.
     /// @param _payoutAddress The new address to receive funds from multiple contracts.
     /// @notice Only the admin can set the payout address.
-    function setPayoutAddress(address _payoutAddress) external  {
-        require(hasRole(FLOW_ADMIN_ROLE,_msgSender()),"AccessMaster: User is not authorized");
+    function setPayoutAddress(address _payoutAddress) external {
+        require(
+            hasRole(FLOW_ADMIN_ROLE, _msgSender()),
+            "AccessMaster: User is not authorized"
+        );
         payoutAddress = _payoutAddress;
     }
 
-     /**
+    /**
      * @notice Retrieves the payout address defined by the admin.
      * @return The payout address for receiving funds.
      */
     function getPayoutAddress() external view returns (address) {
-        return payoutAddress;        
+        return payoutAddress;
     }
-
 }

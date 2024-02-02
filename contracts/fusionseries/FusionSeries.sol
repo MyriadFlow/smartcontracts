@@ -23,7 +23,6 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
 // collection URI override
 
 contract FusionSeries is Context, ERC1155Supply {
-
     string public name;
     string public symbol;
 
@@ -31,8 +30,7 @@ contract FusionSeries is Context, ERC1155Supply {
     address public accessMasterAddress;
 
     uint256 public Counter;
-    uint8 public version = 1;
-
+    uint8 public constant version = 1;
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
@@ -60,7 +58,10 @@ contract FusionSeries is Context, ERC1155Supply {
         uint256 indexed amount,
         string metadataUri
     );
-    event FusionSeriesAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+    event FusionSeriesAssetDestroyed(
+        uint indexed tokenId,
+        address ownerOrApproved
+    );
 
     // tradeHub should be there
     /**
@@ -104,7 +105,12 @@ contract FusionSeries is Context, ERC1155Supply {
         _mint(_msgSender(), currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount,_uri);
+        emit FusionSeriesAssetCreated(
+            currentTokenID,
+            _msgSender(),
+            amount,
+            _uri
+        );
         return currentTokenID;
     }
 
@@ -130,7 +136,12 @@ contract FusionSeries is Context, ERC1155Supply {
         _mint(creator, currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit FusionSeriesAssetCreated(currentTokenID, _msgSender(), amount,_uri);
+        emit FusionSeriesAssetCreated(
+            currentTokenID,
+            _msgSender(),
+            amount,
+            _uri
+        );
         return currentTokenID;
     }
 

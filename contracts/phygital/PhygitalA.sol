@@ -1,52 +1,47 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.17;
+import "../accessmaster/interfaces/IAccessMaster.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../common/ERC721A/extensions/ERC721ABurnable.sol";
-import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
-import "../common/interface/IERC4907.sol";
-import "../accessmaster/interfaces/IAccessMaster.sol";
 
+/// @title PhygitalA: A Smart Contract for Managing Phygital Assets with ERC721 Tokens
 /**
- * @dev {ERC721A} token, including:
- *
- *  - ability for holders to burn (destroy) their tokens
- *  - a creator role that allows for token minting (creation)
- *  - token ID and URI autogeneration
- *  - ability for holders to give for (4)
- *  - royalty is present for admin (2981)
- *
- *
- * This contract uses {AccessControl} to lock permissioned functions using the
- * different roles - head to its documentation for details.
- *
- * The account that deploys the contract will be granted the creator and pauser
- * roles, as well as the default admin role, which will let it grant both creator
- * and pauser roles to other accounts.
+ * @dev This contract manages phygital (physical + digital) assets through NFTs. It supports minting, renting,
+ * and tracking of physical items' digital representations. The contract integrates ERC721A for efficient
+ * batch minting, ERC2981 for royalty management, and IERC4907 for rentable NFTs.
+ * It allows for the immutable registration of NFC IDs to NFTs, ensuring a unique and verifiable link
+ * between a physical item and its digital counterpart.
  */
-contract PhygitalA is
-    Context,
-    IERC4907,
-    ERC2981,
-    ERC721A,
-    ERC721ABurnable
-{
+contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
-    // IMMUTABLE VARIABLES
+    // IMMUTABLE & CONSTANTS VARIABLES
     uint256 public immutable maxSupply;
-
-    uint8 public version = 1;
+    uint8 public constant version = 1;
 
     // PUBLIC && PRIVATE VARIABLES
     string private baseURI;
+    uint256 public nftPrice;
+    uint16 public maxMint; /// @notice how many can be minted by a wallet
     address public tradeHub;
     address public accessMasterAddress;
 
-    string public SIGNING_DOMAIN;
-    string public SIGNATURE_VERSION;
+    enum ItemStatus {
+        DESTROYED,
+        DAMAGED,
+        REPAIRED,
+        RESALE,
+        REGISTERED
+    }
+
+    struct PhygitalInfo {
+        uint256 registerTime; ///< Timestamp of registration
+        bytes phygitalId; ///< Unique NFC ID of the physical item
+        ItemStatus status; ///< Current status of the item
+    }
 
     struct RentableItems {
         bool isRentable; //to check is renting is available
@@ -55,35 +50,36 @@ contract PhygitalA is
         uint256 hourlyRate; // amountPerHour
     }
 
-    struct LazyNFTVoucher {
-        string uri;
-        bytes signature;
-    }
-
     ///@dev storing the data of the user who are renting the NFT
     mapping(uint256 => RentableItems) public rentables;
 
     mapping(uint256 => string) private _tokenURIs;
 
-    mapping(uint256 => bytes16) public phygitalID;
+    ///< Mapping of tokenIds to their phygital information
+    mapping(uint256 => PhygitalInfo) public phygitalAssets;
 
-    mapping(bytes16 => bool) public assetStatus;
+    /// @notice Ensures NFC IDs are unique
+    mapping(bytes => bool) public phygitalIdCheck;
+
+    mapping(address => uint) public userBalance;
 
     // INTERFACES
     IACCESSMASTER flowRoles;
+    IERC20 token;
 
-    modifier onlyCreator() {
+    modifier onlyOperator() {
         require(
-            flowRoles.isCreator(_msgSender()),
+            flowRoles.isOperator(_msgSender()),
             "PhygitalA: User is not authorized"
         );
         _;
     }
 
-     modifier onlyOperator() {
+    modifier onlyOwnerOrOperator(uint256 tokenId) {
         require(
-            flowRoles.isOperator(_msgSender()),
-            "PhygitalA: User is not authorized "
+            ownerOf(tokenId) == _msgSender() ||
+                flowRoles.isOperator(_msgSender()),
+            "PhygitalA:User is not owner or operator"
         );
         _;
     }
@@ -99,79 +95,195 @@ contract PhygitalA is
         address ownerOrApproved
     );
 
-    event FundTransferred(
-        address sender,
-        address reciepient,
+    event FundTransferred(address sender, address reciepient, uint256 amount);
+
+    event UpdateAssetStatus(
+        address user,
         uint256 tokenId,
-        uint256 amount
+        ItemStatus assetStatus,
+        uint256 time
     );
 
-    event RentalInfo(
+    event UpdateAssetPrice(address user, uint256 updatedPrice);
+
+    event UpdateAssetMaxMint(address user, uint256 updatedMaxMint);
+
+    event AssetRegistered(
+        address user,
         uint256 tokenId,
-        bool isRentable,
-        uint256 price,
-        address indexed renter
+        bytes uuid,
+        uint256 time
     );
 
+    /**
+     * contract details :-
+     * 1. NFT PRICE.
+     * 2. maxsupply for the token.
+     * 3.roytaltybps points.
+     * 4. maxmint , is the number tokens can be minted
+     * by any wallet address .
+     *
+     */
     constructor(
         string memory name,
         string memory symbol,
         address tradeHubAddress,
         address accessControlAddress,
-        uint256 _maxSupply,
-        uint256 _royaltyBPS,
+        address _tokenAddr,
+        uint256[] memory contractDetails,
         string memory _baseUri
-    ) ERC721A(name, symbol)  {
+    ) ERC721A(name, symbol) {
         flowRoles = IACCESSMASTER(accessControlAddress);
         tradeHub = tradeHubAddress;
-        maxSupply = _maxSupply;
-        baseURI = _baseUri;
+        token = IERC20(_tokenAddr);
+        require(contractDetails.length == 4, "Phygital: Invalid Input!");
+        nftPrice = contractDetails[0];
+        maxSupply = contractDetails[1];
         // SET DEFAULT ROYALTY
-        _setDefaultRoyalty(_msgSender(), uint96(_royaltyBPS));
+        _setDefaultRoyalty(_msgSender(), uint96(contractDetails[2]));
+        maxMint = uint16(contractDetails[3]);
 
+        baseURI = _baseUri;
         accessMasterAddress = accessControlAddress;
     }
 
-    /// @dev transferring funds
-    function _transferFunds(
-        address sender,
-        address recipient,
-        uint256 tokenId,
-        uint256 amount
-    ) private {
-        // get the balance of the contract
-        (bool callSuccess, ) = payable(recipient).call{value: amount}("");
-        require(callSuccess, "PhygitalA: Transfer failed");
-        emit FundTransferred(sender, recipient, tokenId, amount);
+    function setNFTPrice(uint256 amount) external onlyOperator {
+        nftPrice = amount;
+        emit UpdateAssetPrice(_msgSender(), amount);
     }
 
-    function mint(
-        uint256 quantity
-    ) external payable onlyCreator returns (uint256, uint256) {
+    function setMaxMint(uint16 amount) external onlyOperator {
+        maxMint = amount;
+        emit UpdateAssetMaxMint(_msgSender(), amount);
+    }
+
+    function setItemStatus(
+        uint256 tokenId,
+        ItemStatus _status
+    ) external onlyOwnerOrOperator(tokenId) {
+        phygitalAssets[tokenId].status = _status;
+        emit UpdateAssetStatus(_msgSender(), tokenId, _status, block.timestamp);
+    }
+
+    /// @dev to transfer ERC20/Native token Funds from one address to another
+    function _transferFunds(
+        address from,
+        address to,
+        uint256 amount,
+        bool isNative
+    ) private {
+        bool success;
+        if (isNative) {
+            (success, ) = payable(to).call{value: amount}("");
+        } else {
+            success = token.transferFrom(from, to, amount);
+        }
+
+        require(success, "PhygitalA: Transfer failed");
+
+        emit FundTransferred(from, to, amount);
+    }
+
+    /**
+     * @dev Mints `quantity` number of new NFTs to the caller's address, provided they meet the specified requirements.
+     * The function checks if the caller has enough ERC20 tokens for the minting fee, adheres to the max mint limit per wallet,
+     * and if the total minted NFTs would not exceed the contract's max supply. It transfers the minting fee from the caller
+     * to the payout address and mints the NFTs. The function then sets the trade hub as an approved operator for these NFTs,
+     * facilitating further trading operations. Emits a `PhygitalAAssetCreated` event upon successful minting.
+     *
+     * Requirements:
+     * - The caller must have a sufficient balance of ERC20 tokens to cover the minting fee.
+     * - The quantity to mint must not exceed the per-wallet `maxMint` limit unless `maxMint` is set to 0 (indicating no limit).
+     * - The total supply of minted NFTs after the operation must not exceed the `maxSupply` of the contract.
+     *
+     * @param quantity The number of NFTs the caller wishes to mint.
+     * @return prevQuantity The total number of NFTs minted in the contract before this minting operation.
+     * @return newQuantity The number of NFTs successfully minted in this operation.
+     */
+    function mint(uint256 quantity) external returns (uint256, uint256) {
         uint prevQuantity = _totalMinted();
+        uint256 afterMintReserves = userBalance[_msgSender()] + quantity;
+
+        if (maxMint != 0) {
+            require(
+                afterMintReserves <= maxMint,
+                "PhygitalA: Quantity should be less than max mint"
+            );
+        }
         require(
             _totalMinted() + quantity <= maxSupply,
             "PhygitalA: Exceeding max token supply!"
         );
+        require(
+            token.balanceOf(_msgSender()) >= calculateRequiredPrice(quantity),
+            "PhygitalA: Not enough funds!"
+        );
+        address recipient = flowRoles.getPayoutAddress();
+
+        _transferFunds(
+            _msgSender(),
+            recipient,
+            calculateRequiredPrice(quantity),
+            false
+        );
+
+        userBalance[_msgSender()] += quantity;
 
         _safeMint(_msgSender(), quantity);
         setApprovalForAll(tradeHub, true);
-
-        address recipient = flowRoles.getPayoutAddress();
-        _transferFunds(_msgSender(), recipient, quantity, msg.value);
 
         emit PhygitalAAssetCreated(_totalMinted(), quantity, _msgSender());
         return (prevQuantity, quantity);
     }
 
-    /// @dev to register Asset NFC ID TO the tokenID
+    /// @dev Allows operators to mint tokens on behalf of other addresses.
+    function delegateMint(
+        address reciever,
+        uint256 quantity
+    ) external onlyOperator returns (uint256, uint256) {
+        uint prevQuantity = _totalMinted();
+        require(
+            quantity <= maxMint || maxMint == 0,
+            "Phygital: Quantity should be less than max mint"
+        );
+        require(
+            _totalMinted() + quantity <= maxSupply,
+            "PhygitalA: Exceeding max token supply!"
+        );
+
+        _safeMint(reciever, quantity);
+        setApprovalForAll(tradeHub, true);
+
+        emit PhygitalAAssetCreated(_totalMinted(), quantity, _msgSender());
+        return (prevQuantity, quantity);
+    }
+
+    /// @dev Registers a phygital asset's NFC ID to a tokenId.
     function registerAssetId(
         uint256 tokenId,
-        bytes16 _phygitalID
-    ) external onlyOperator {
-        require(!assetStatus[_phygitalID],"PhygitalA: It's already registerd");
-        phygitalID[tokenId] = _phygitalID;   
-        assetStatus[_phygitalID] = true;
+        bytes memory _phygitalID
+    ) external onlyOwnerOrOperator(tokenId) {
+        require(_exists(tokenId), "PhygitalA: Token does not exists");
+        require(
+            !phygitalIdCheck[_phygitalID] &&
+                phygitalAssets[tokenId].registerTime == 0,
+            "PhygitalA: NFC Tag is already stored!"
+        );
+
+        phygitalAssets[tokenId] = PhygitalInfo(
+            block.timestamp,
+            _phygitalID,
+            ItemStatus.REGISTERED
+        );
+
+        phygitalIdCheck[_phygitalID] = true;
+
+        emit AssetRegistered(
+            _msgSender(),
+            tokenId,
+            _phygitalID,
+            block.timestamp
+        );
     }
 
     /**
@@ -181,123 +293,29 @@ contract PhygitalA is
      *
      * - The caller must own `tokenId` or be an approved operator.
      */
-    function burnNFT(uint256 tokenId) external {
-        address owner = ownerOf(tokenId);
+    function burnAsset(uint256 tokenId) external {
         require(
-            ownerOf(tokenId) == _msgSender() ||
-                isApprovedForAll(owner, _msgSender()),
-            "PhygitalA: Not Owner Or Approved"
+            ownerOf(tokenId) == _msgSender(),
+            "PhygitalA: User is not asset owner!"
+        );
+        require(
+            phygitalAssets[tokenId].status == ItemStatus.DESTROYED,
+            "PhygitalA: Asset cannot be destroyed!"
         );
         _burn(tokenId, true);
         _resetTokenRoyalty(tokenId);
         emit PhygitalAAssetDestroyed(tokenId, _msgSender());
     }
 
-    
-
-    /********************* ERC4907 *********************************/
-    /// @dev Owner can set the rental status of the token
-    function setRentInfo(
-        uint256 tokenId,
-        bool isRentable,
-        uint256 pricePerHour
-    ) external {
-        address owner = ownerOf(tokenId);
-        require(
-            owner == _msgSender() || isApprovedForAll(owner, _msgSender()),
-            "PhygitalA: Caller is not token owner "
-        );
-        rentables[tokenId].isRentable = isRentable;
-        rentables[tokenId].hourlyRate = pricePerHour;
-        emit RentalInfo(
-            tokenId,
-            isRentable,
-            rentables[tokenId].hourlyRate,
-            _msgSender()
-        );
-    }
-
-    /// @notice set the user and expires of an NFT
-    /// @dev This function is used to gift a person by the owner,
-    /// The zero address indicates there is no user
-    /// Throws if `tokenId` is not valid NFT
-    /// @param user  The new user of the NFT
-    /// @param expires  UNIX timestamp, The new user could use the NFT before expires
-
-    function setUser(uint256 tokenId, address user, uint64 expires) public {
-        address owner = ownerOf(tokenId);
-        require(
-            owner == _msgSender() || isApprovedForAll(owner, _msgSender()),
-            "PhygitalA: Caller is not token owner "
-        );
-        require(
-            userOf(tokenId) == address(0),
-            "PhygitalA: Item is already subscribed"
-        );
-        RentableItems storage info = rentables[tokenId];
-        info.user = user;
-        info.expires = uint64(block.timestamp + expires);
-        emit UpdateUser(tokenId, user, expires);
-    }
-
-    /// @notice to use for renting an item
-    /// @dev The zero address indicates there is no user
-    /// Throws if `tokenId` is not valid NFT,
-    /// time cannot be less than 1 hour or more than 6 months
-    /// @param _timeInHours  is in hours , Ex- 1,2,3
-    function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-        require(_exists(_tokenId), "SignatureSeries: Invalide Token Id");
-        require(
-            rentables[_tokenId].isRentable,
-            "PhygitalA: Not available for rent"
-        );
-        require(
-            userOf(_tokenId) == address(0),
-            "PhygitalA: NFT Already Subscribed"
-        );
-        require(_timeInHours > 0, "PhygitalA: Time can't be less than 1 hour");
-        require(
-            _timeInHours <= 4320,
-            "PhygitalA: Time can't be more than 6 months"
-        );
-
-        uint256 amount = amountRequired(_tokenId, _timeInHours);
-
-        require(msg.value >= amount, "PhygitalA: Insufficient Funds");
-        _transferFunds(_msgSender(), ownerOf(_tokenId), _tokenId, msg.value);
-
-        RentableItems storage info = rentables[_tokenId];
-        info.user = _msgSender();
-        info.expires = uint64(block.timestamp + (_timeInHours * 3600));
-        emit UpdateUser(_tokenId, _msgSender(), info.expires);
-    }
-
     /** Getter Functions **/
 
-    /// @dev IERC4907 implementation
-    function userOf(uint256 tokenId) public view returns (address) {
-        if (rentables[tokenId].expires >= block.timestamp) {
-            return rentables[tokenId].user;
-        } else {
-            return address(0);
-        }
-    }
-
-    /// @dev IERC4907 implementation
-    function userExpires(uint256 tokenId) public view returns (uint256) {
-        return rentables[tokenId].expires;
-    }
-
-    /// @notice to calculate the amount of money required
-    /// to rent an item for a certain time
-    function amountRequired(
-        uint256 tokenId,
-        uint256 time
-    ) public view returns (uint256 amount) {
-        amount = rentables[tokenId].hourlyRate * time;
-    }
-
     /////////////////////////////////////////////////
+
+    function calculateRequiredPrice(
+        uint256 quantity
+    ) public view returns (uint256 amount) {
+        amount = quantity * nftPrice;
+    }
 
     function _baseURI() internal view override returns (string memory) {
         return baseURI;
@@ -307,7 +325,6 @@ contract PhygitalA is
         bytes4 interfaceId
     ) public view virtual override(IERC721A, ERC721A, ERC2981) returns (bool) {
         if (interfaceId == _INTERFACE_ID_ERC2981) return true;
-        if (interfaceId == type(IERC4907).interfaceId) return true;
         return super.supportsInterface(interfaceId);
     }
 }

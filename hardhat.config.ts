@@ -107,7 +107,7 @@ module.exports = {
             url: MATICMUM_RPC_URL,
             // accounts: [PRIVATE_KEY],
             accounts: {
-              mnemonic: MNEMONIC,
+                mnemonic: MNEMONIC,
             },
         },
         sepolia: {
@@ -115,7 +115,7 @@ module.exports = {
             url: SEPOLIA_RPC_URL,
             // accounts: [PRIVATE_KEY],
             accounts: {
-              mnemonic: MNEMONIC,
+                mnemonic: MNEMONIC,
             },
         },
         arbiGoerli: {

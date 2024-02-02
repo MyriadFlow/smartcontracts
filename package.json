@@ -11,11 +11,6 @@
     "deploy": "hardhat run scripts/deploy.ts --network $NETWORK",
     "compile": "hardhat compile",
     "launch": "hardhat run scripts/launch/launch.js",
-    "launchMumbai": "hardhat run scripts/launch/launch.js --network maticmum",
-    "launchSepolia": "hardhat run scripts/launch/launch.js --network sepolia",
-    "launchBNBTest": "hardhat run scripts/launch/launch.js --network bnbTest",
-    "launchFilCalibration": "hardhat run scripts/launch/launch.js --network filecoinCalibaration",
-    "launchLineaGoerli": "hardhat run scripts/launch/launch.js --network lineaGoerli",
     "contractAddress": "hardhat run scripts/contractAddress.js",
     "revokeRole": "hardhat run  scripts/revokeRole.js"
   },
