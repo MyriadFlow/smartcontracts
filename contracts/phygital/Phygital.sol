@@ -4,27 +4,17 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
+/// @title PhygitalA: A Smart Contract for Managing Phygital Assets with ERC721 Tokens
 /**
- * @dev {ERC721} token, including:
- *
- *  - ability for holders to burn (destroy) their tokens
- *  - a creator role that allows for token minting (creation)
- *  - a pauser role that allows to stop all token transfers
- *  - token ID and URI autogeneration
- *  - ability for holders to give for rent (4907)
- *  - royalty is present (2981)
- *  - Lazy Minting is present
- *
- *
- * This contract uses {AccessControl} to lock permissioned functions using the
- * different roles - head to its documentation for details.
- *
- * The account that deploys the contract will be granted the creator and pauser
- * roles, as well as the default admin role, which will let it grant both creator
- * and pauser roles to other accounts.
+ * @dev This contract manages phygital (physical + digital) assets through NFTs. It supports minting, renting,
+ * and tracking of physical items' digital representations. The contract integrates ERC721A for efficient
+ * batch minting, ERC2981 for royalty management, and IERC4907 for rentable NFTs.
+ * It allows for the immutable registration of NFC IDs to NFTs, ensuring a unique and verifiable link
+ * between a physical item and its digital counterpart.
  */
 contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     // Set Constants for Interface ID and Roles
@@ -35,15 +25,24 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     address public tradeHub;
     address public accessMasterAddress;
 
-    uint8 public version = 1;
+    uint8 public constant version = 1;
 
     uint256 public nftPrice;
     uint256 public Counter;
 
-    struct LazyNFTVoucher {
-        uint256 price;
-        string uri;
-        bytes signature;
+    enum ItemStatus {
+        DESTROYED,
+        DAMAGED,
+        REPAIRED,
+        RESALE,
+        INUSE,
+        ORIGINAL
+    }
+
+    struct PhygitalInfo {
+        uint256 registerTime;
+        bytes phygitalId;
+        ItemStatus status;
     }
 
     struct RentableItems {
@@ -59,9 +58,9 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
-    mapping(uint256 => bytes16) public phygitalID;
+    mapping(uint256 => PhygitalInfo) public phygitalAssets;
 
-    mapping(bytes16 => bool) public assetStatus;
+    mapping(bytes => bool) public phygitalIdCheck;
 
     IACCESSMASTER flowRoles;
 
@@ -86,7 +85,9 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         address indexed creator,
         string metaDataURI
     );
+
     event PhygitalAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
+
     event RentalInfo(
         uint256 tokenId,
         bool isRentable,
@@ -101,6 +102,8 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         uint256 amount
     );
 
+    event UpdateAssetStatus(address user, ItemStatus assetStatus, uint256 time);
+
     /**
      * @dev Grants `FLOW_ADMIN_ROLE`, `FLOW_CREATOR_ROLE` and `FLOW_OPERATOR_ROLE` to the
      * account that deploys the contract.
@@ -112,28 +115,23 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         string memory name,
         string memory symbol,
         address tradeHubAddress,
-        address flowContract
+        address accessControlAddress
     ) ERC721(name, symbol) {
-        flowRoles = IACCESSMASTER(flowContract);
+        flowRoles = IACCESSMASTER(accessControlAddress);
         tradeHub = tradeHubAddress;
-        accessMasterAddress = flowContract;
+        accessMasterAddress = accessControlAddress;
     }
 
-    /// @notice transferring funds
-    function _transferFunds(
-        address sender,
-        address recipient,
-        uint256 tokenId,
-        uint256 amount
-    ) private {
-        // get the balance of the contract
-        (bool callSuccess, ) = payable(recipient).call{value: amount}("");
-        require(callSuccess, "Phygital: Transfer failed");
-        emit FundTransferred(sender, recipient, tokenId, amount);
-    }
+    function setItemStatus(uint256 tokenId, ItemStatus _status) external {
+        require(
+            flowRoles.isOperator(_msgSender()) ||
+                ownerOf(tokenId) == _msgSender(),
+            "Phygital: User is not authorised!"
+        );
 
-    function setNftPrice(uint256 _nftPrice) external onlyOperator {
-        nftPrice = _nftPrice;
+        phygitalAssets[tokenId].status = _status;
+
+        emit UpdateAssetStatus(_msgSender(), _status, block.timestamp);
     }
 
     /**
@@ -150,16 +148,24 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function createAsset(
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
-        bytes16 _phygitalID
+        bytes memory _phygitalID
     ) public onlyCreator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        require(!assetStatus[_phygitalID], "Phygital: NFC Tag is already stored!");
+        require(
+            !phygitalIdCheck[_phygitalID],
+            "Phygital: Tag is already stored!"
+        ); // instead of phygital use NFC
         Counter++;
         uint256 currentTokenID = Counter;
 
-        phygitalID[currentTokenID] = _phygitalID;
-        assetStatus[_phygitalID] = true;
+        phygitalAssets[currentTokenID] = PhygitalInfo(
+            block.timestamp,
+            _phygitalID,
+            ItemStatus.ORIGINAL
+        );
+
+        phygitalIdCheck[_phygitalID] = true;
 
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
@@ -195,16 +201,24 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         address creator,
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
-        bytes16 _phygitalID
+        bytes memory phygitalID
     ) public onlyOperator returns (uint256) {
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        require(!assetStatus[_phygitalID], "Phygital: NFC Tag is already stored!");
+        require(
+            !phygitalIdCheck[phygitalID],
+            "Phygital: NFC Tag is already stored!"
+        );
         Counter++;
         uint256 currentTokenID = Counter;
 
-        phygitalID[currentTokenID] = _phygitalID;
-        assetStatus[_phygitalID] = true;
+        phygitalAssets[currentTokenID] = PhygitalInfo(
+            block.timestamp,
+            phygitalID,
+            ItemStatus.ORIGINAL
+        );
+
+        phygitalIdCheck[phygitalID] = true;
 
         _safeMint(creator, currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
@@ -232,8 +246,13 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
      */
     function destroyAsset(uint256 tokenId) public {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            ownerOf(tokenId) == _msgSender() ||
+                flowRoles.isOperator(_msgSender()),
             "Phygital: Caller is not token owner or approved"
+        );
+        require(
+            phygitalAssets[tokenId].status == ItemStatus.DESTROYED,
+            "Phygital: Cannot be burned"
         );
         _burn(tokenId);
         emit PhygitalAssetDestroyed(tokenId, _msgSender());
@@ -368,8 +387,6 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
 
         return _tokenURI;
     }
-
-
 
     function _beforeTokenTransfer(
         address from,

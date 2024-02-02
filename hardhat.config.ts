@@ -105,18 +105,18 @@ module.exports = {
         maticmum: {
             networkId: 80001,
             url: MATICMUM_RPC_URL,
-            // accounts: [PRIVATE_KEY],
-            accounts: {
-              mnemonic: MNEMONIC,
-            },
+            accounts: [PRIVATE_KEY],
+            // accounts: {
+            //   mnemonic: MNEMONIC,
+            // },
         },
         sepolia: {
             networkId: 11155111,
             url: SEPOLIA_RPC_URL,
-            // accounts: [PRIVATE_KEY],
-            accounts: {
-              mnemonic: MNEMONIC,
-            },
+            accounts: [PRIVATE_KEY],
+            // accounts: {
+            //   mnemonic: MNEMONIC,
+            // },
         },
         arbiGoerli: {
             networkId: 421613,

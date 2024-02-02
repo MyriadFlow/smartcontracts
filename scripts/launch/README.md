@@ -59,7 +59,7 @@ The JSON file should have the following format:
         "param2" : "NFB",// Symbol
         "param3" : "Voucher-Domain",// Domain
         "param4" : "1",// Version
-        "param5" : "1000000000000000000",// NFT Price for Lazy minting 
+        "param5" : "1000000000000000000",// NFT Price for Lazy minting
         "param6" : "0x1B8683e1885B3ee93524cD58BC10Cf3Ed6af4298", // TradeHub Address
         "param7" : "0xEFf4209584cc2cE0409a5FA06175002537b055DC"// AccessMaster Address
     }
@@ -131,11 +131,12 @@ The JSON file should have the following format:
     "constructorParams":{
         "param1":   "Alice Clothing",
         "param2" : "AC",
-        "param3" : "0x3A29EA5Ee6AB0326D72b55837dD9fD45b7a867Dd", - TradeHub 
+        "param3" : "0x3A29EA5Ee6AB0326D72b55837dD9fD45b7a867Dd", - TradeHub
         "param4" : "0xc3fE1c3bCCE02d7A115Df2d4737137A15ff830F9" - AccessMaster
     }
 }
 ```
+
 `PhygitalA`
 
 ```shell
@@ -146,13 +147,12 @@ The JSON file should have the following format:
         "param2" : "AC",
         "param3" : "0x3A29EA5Ee6AB0326D72b55837dD9fD45b7a867Dd" , //tradehub
         "param4" : "0xc3fE1c3bCCE02d7A115Df2d4737137A15ff830F9", // accessmaster
-        "param5" : 200, // maxsupply
-        "param6" : 300, // royalty
+        "param5" : "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747", // stablecoin address
+        "param6" : "["10000000000000000",100,300,6]", // stablecoin address
         "param7" : "www.xyz.com"
     }
 }
 ```
-
 
 `FlowSubscription Contract`
 

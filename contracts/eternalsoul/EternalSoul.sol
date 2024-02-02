@@ -26,7 +26,8 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 contract EternalSoul is Context, ERC721Enumerable, EIP712 {
     uint256 public nftPrice;
     uint256 private Counter;
-    uint8 public version = 1;
+
+    uint8 public constant version = 1;
 
     address public accessMasterAddress;
 
