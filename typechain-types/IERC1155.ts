@@ -187,7 +187,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -196,7 +196,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -235,7 +235,7 @@ export interface IERC1155 extends BaseContract {
     from: string,
     to: string,
     ids: BigNumberish[],
-    amounts: BigNumberish[],
+    values: BigNumberish[],
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -244,7 +244,7 @@ export interface IERC1155 extends BaseContract {
     from: string,
     to: string,
     id: BigNumberish,
-    amount: BigNumberish,
+    value: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -283,7 +283,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -292,7 +292,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -381,7 +381,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -390,7 +390,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -430,7 +430,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -439,7 +439,7 @@ export interface IERC1155 extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

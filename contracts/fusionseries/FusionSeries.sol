@@ -174,18 +174,6 @@ contract FusionSeries is Context, ERC1155Supply {
     ) public view virtual override returns (string memory) {
         return _tokenURIs[tokenId];
     }
-
-    function _beforeTokenTransfer(
-        address operator,
-        address from,
-        address to,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
-    ) internal virtual override(ERC1155Supply) {
-        super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
-    }
-
     /**
      * @dev See {IERC165-supportsInterface}.
      */

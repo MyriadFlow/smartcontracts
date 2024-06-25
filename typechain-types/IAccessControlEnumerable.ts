@@ -166,7 +166,7 @@ export interface IAccessControlEnumerable extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -204,7 +204,7 @@ export interface IAccessControlEnumerable extends BaseContract {
 
   renounceRole(
     role: BytesLike,
-    account: string,
+    callerConfirmation: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -242,7 +242,7 @@ export interface IAccessControlEnumerable extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -319,7 +319,7 @@ export interface IAccessControlEnumerable extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -361,7 +361,7 @@ export interface IAccessControlEnumerable extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
