@@ -28,7 +28,7 @@ export interface ERC1155SupplyInterface extends utils.Interface {
     "safeTransferFrom(address,address,uint256,uint256,bytes)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
-    "totalSupply(uint256)": FunctionFragment;
+    "totalSupply()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
   };
 
@@ -66,7 +66,7 @@ export interface ERC1155SupplyInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
 
@@ -207,7 +207,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -216,7 +216,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -232,7 +232,9 @@ export interface ERC1155Supply extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -264,7 +266,7 @@ export interface ERC1155Supply extends BaseContract {
     from: string,
     to: string,
     ids: BigNumberish[],
-    amounts: BigNumberish[],
+    values: BigNumberish[],
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -273,7 +275,7 @@ export interface ERC1155Supply extends BaseContract {
     from: string,
     to: string,
     id: BigNumberish,
-    amount: BigNumberish,
+    value: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -289,7 +291,12 @@ export interface ERC1155Supply extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "totalSupply(uint256)"(
+    id: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   uri(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
@@ -318,7 +325,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -327,7 +334,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -343,7 +350,9 @@ export interface ERC1155Supply extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -425,7 +434,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -434,7 +443,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -450,7 +459,9 @@ export interface ERC1155Supply extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -486,7 +497,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -495,7 +506,7 @@ export interface ERC1155Supply extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -511,7 +522,9 @@ export interface ERC1155Supply extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

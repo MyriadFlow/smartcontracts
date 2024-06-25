@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
@@ -811,7 +811,7 @@ contract TradeHub is
      */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC2981, ERC1155Receiver) returns (bool) {
+    ) public view virtual override(ERC2981, ERC1155Holder) returns (bool) {
         if (interfaceId == _INTERFACE_ID_ERC2981) return true;
         return super.supportsInterface(interfaceId);
     }

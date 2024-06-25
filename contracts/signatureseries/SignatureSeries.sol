@@ -3,9 +3,10 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
@@ -278,7 +279,7 @@ contract SignatureSeries is
      */
     function destroyAsset(uint256 tokenId) public {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "SignatureSeries: Caller is not token owner or approved"
         );
         _burn(tokenId);
@@ -297,7 +298,10 @@ contract SignatureSeries is
         uint256 tokenId,
         string memory _tokenURI
     ) internal virtual {
-        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "SignatureSeries: Non-Existent Asset"
+        );
         _tokenURIs[tokenId] = _tokenURI;
     }
 
@@ -309,7 +313,7 @@ contract SignatureSeries is
         uint256 pricePerHour
     ) public {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "SignatureSeries: Caller is not token owner or approved"
         );
         rentables[tokenId].isRentable = isRentable;
@@ -326,7 +330,7 @@ contract SignatureSeries is
 
     function setUser(uint256 tokenId, address user, uint64 expires) public {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "SignatureSeries: Not token owner Or approved"
         );
         require(
@@ -349,7 +353,10 @@ contract SignatureSeries is
      */
 
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-        require(_exists(_tokenId), "SignatureSeries: Invalide Token Id");
+        require(
+            _requireOwned(_tokenId) == _msgSender(),
+            "SignatureSeries: Invalide Token Id"
+        );
         require(
             rentables[_tokenId].isRentable,
             "SignatureSeries: Not available for rent"
@@ -403,7 +410,10 @@ contract SignatureSeries is
     function tokenURI(
         uint256 tokenId
     ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "SignatureSeries: Non-Existent Asset"
+        );
         string memory _tokenURI = _tokenURIs[tokenId];
 
         return _tokenURI;
@@ -434,18 +444,17 @@ contract SignatureSeries is
     }
 
     /////////////////////////////////////////////////
-
-    function _beforeTokenTransfer(
-        address from,
+    function _update(
         address to,
         uint256 tokenId,
-        uint256 batchSize
-    ) internal virtual override(ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        address auth
+    ) internal virtual override returns (address) {
+        address from = super._update(to, tokenId, auth);
         if (from != to && rentables[tokenId].user != address(0)) {
             delete rentables[tokenId];
             emit UpdateUser(tokenId, address(0), 0);
         }
+        return from;
     }
 
     /**

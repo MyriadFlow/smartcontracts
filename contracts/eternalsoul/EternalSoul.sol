@@ -3,8 +3,9 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
-import "@openzeppelin/contracts/utils/cryptography/draft-EIP712.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 /**
@@ -175,7 +176,7 @@ contract EternalSoul is Context, ERC721Enumerable, EIP712 {
      */
     function destroyAsset(uint256 tokenId) public {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "EternalSoul: Caller is not token owner or approved"
         );
         _burn(tokenId);
@@ -193,7 +194,10 @@ contract EternalSoul is Context, ERC721Enumerable, EIP712 {
         uint256 tokenId,
         string memory _tokenURI
     ) internal virtual {
-        require(_exists(tokenId), "EternalSoul: Non-Existent Asset");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "EternalSoul: Non-Existent Asset"
+        );
         _tokenURIs[tokenId] = _tokenURI;
     }
 
@@ -222,7 +226,10 @@ contract EternalSoul is Context, ERC721Enumerable, EIP712 {
     function tokenURI(
         uint256 tokenId
     ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "EternalSoul: Non-Existent Asset");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "EternalSoul: Non-Existent Asset"
+        );
         if (bytes(_tokenURIs[tokenId]).length == 0) {
             string memory _tokenUri = _baseURI(); //ERC721
             return _tokenUri;
@@ -235,19 +242,26 @@ contract EternalSoul is Context, ERC721Enumerable, EIP712 {
         return baseURI;
     }
 
-    /// @dev only minting and burning can happen
-    /// token transfer are restricted
-    function _beforeTokenTransfer(
-        address from,
+    // function _transfer(
+    //     address from,
+    //     address to,
+    //     uint256 tokenId
+    // ) internal override {
+    //     require(
+    //         from == address(0) || to == address(0),
+    //         "EternalSoul : Asset cannot be transferred"
+    //     );
+    //     super._transfer(from, to, tokenId);
+    // }
+
+    function _update(
         address to,
         uint256 tokenId,
-        uint256 batchSize
-    ) internal virtual override(ERC721Enumerable) {
-        require(
-            from == address(0) || to == address(0),
-            "EternalSoul : Asset cannot be transferred"
-        );
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        address auth
+    ) internal virtual override returns (address) {
+        require(to == address(0), "EternalSoul : Asset cannot be transferred");
+        address from = super._update(to, tokenId, auth);
+        return from;
     }
 
     /**

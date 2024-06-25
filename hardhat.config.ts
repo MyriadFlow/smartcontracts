@@ -1,7 +1,7 @@
 require("dotenv").config()
 import dotenv from "dotenv"
 dotenv.config()
-import "@nomiclabs/hardhat-etherscan"
+import "@nomicfoundation/hardhat-verify"
 import "@nomiclabs/hardhat-truffle5"
 import "@nomiclabs/hardhat-waffle"
 import "hardhat-gas-reporter"
@@ -30,21 +30,28 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 const MATICMUM_RPC_URL =
     process.env.MATICMUM_RPC_URL ||
     "https://polygon-mumbai.g.alchemy.com/v2/api-key"
+
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || "https://ETH-RPC-URL"
+
 const ARBITRUM_GOERLI_RPC_URL =
     process.env.ARBITRUM_GOERLI_RPC_URL ||
     "https://arbitrum-goerli.infura.io/v3/api-key"
+
 const OPTIMISM_GOERLI_RPC_URL =
     process.env.OPTIMISM_GOERLI_RPC_URL ||
     "https://optimism-goerli.infura.io/v3/api-key"
-const BASE_GOERLI_RPC_URL =
-    process.env.BASE_GOERLI_RPC_URL || "https://goerli.base.org"
+
+const BASE_TESTNET_RPC_URL =
+    process.env.BASE_TESTNET_RPC_URL || "wss://base-sepolia-rpc.publicnode.com"
+
 const SCROLL_SEPOLIA_RPC_URL =
     process.env.SCROLL_SEPOLIA_RPC_URL ||
     "https://scroll-testnet-public.unifra.io"
+
 const POLYGON_ZKEVM_TESTNET_RPC_URL =
     process.env.POLYGON_ZKEVM_TESTNET_RPC_URL ||
     "https://rpc.public.zkevm-test.net"
+
 // MAINNET
 const ETHEREUM_RPC_URL =
     process.env.ETHEREUM_RPC_URL || "https://mainnet.infura.io/v3/api-key"
@@ -68,6 +75,7 @@ const MNEMONIC =
     "ajkskjfjksjkf ssfaasff asklkfl klfkas dfklhao asfj sfk klsfjs fkjs"
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
+/// EXPLORER API KEYS
 const POLYGONSCAN_API_KEY =
     process.env.POLYGONSCAN_API_KEY || "lklsdkskldjklgdklkld"
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "Etherscan API key"
@@ -88,7 +96,7 @@ const POLYGON_ZKEVM_API_KEY =
  */
 module.exports = {
     solidity: {
-        version: "0.8.17",
+        version: "0.8.24",
         settings: {
             optimizer: {
                 enabled: true,
@@ -134,9 +142,9 @@ module.exports = {
                 mnemonic: MNEMONIC,
             },
         },
-        baseGoerli: {
-            networkId: 84531,
-            url: BASE_GOERLI_RPC_URL,
+        baseTestnet: {
+            networkId: 84532,
+            url: BASE_TESTNET_RPC_URL,
             // accounts : [PRIVATE_KEY],
             accounts: {
                 mnemonic: MNEMONIC,
@@ -226,19 +234,19 @@ module.exports = {
             sepolia: ETHERSCAN_API_KEY,
             optimisticGoerli: OPTISCAN_API_KEY,
             arbitrumGoerli: ARBISCAN_API_KEY,
-            baseGoerli: BASESCAN_API_KEY,
+            baseSepolia: BASESCAN_API_KEY,
             scrollTestnet: SCROLLSCAN_API_KEY,
             polygonzKevmTestnet: POLYGON_ZKEVM_API_KEY,
         },
         customChains: [
-            {
-                network: "baseGoerli",
-                chainId: 84531,
-                urls: {
-                    apiURL: "https://api-goerli.basescan.org/api",
-                    browserURL: "https://goerli.basescan.org",
-                },
-            },
+            // {
+            //     network: "baseTestnet",
+            //     chainId: 84532,
+            //     urls: {
+            //         apiURL: "https://api-goerli.basescan.org/api",
+            //         browserURL: "https://goerli.basescan.org",
+            //     },
+            // },
             {
                 network: "scrollTestnet",
                 chainId: 534351,
@@ -256,6 +264,11 @@ module.exports = {
                 },
             },
         ],
+    },
+    sourcify: {
+        // Disabled by default
+        // Doesn't need an API key
+        enabled: true,
     },
     paths: {
         sources: "./contracts",

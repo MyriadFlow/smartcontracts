@@ -426,8 +426,8 @@ export interface InstaGen extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -577,8 +577,8 @@ export interface InstaGen extends BaseContract {
   >;
 
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -719,8 +719,8 @@ export interface InstaGen extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -969,8 +969,8 @@ export interface InstaGen extends BaseContract {
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1125,8 +1125,8 @@ export interface InstaGen extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

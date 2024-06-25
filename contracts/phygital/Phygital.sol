@@ -5,7 +5,8 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../common/interface/IERC4907.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
+// import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
 /// @title PhygitalA: A Smart Contract for Managing Phygital Assets with ERC721 Tokens
@@ -16,7 +17,8 @@ import "../accessmaster/interfaces/IAccessMaster.sol";
  * It allows for the immutable registration of NFC IDs to NFTs, ensuring a unique and verifiable link
  * between a physical item and its digital counterpart.
  */
-contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
+// contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
+contract Phygital is Context, ERC721Enumerable, ERC2981 {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
 
@@ -270,109 +272,115 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         uint256 tokenId,
         string memory _tokenURI
     ) internal virtual {
-        require(_exists(tokenId), "Phygital: Non-Existent Asset");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "Phygital: Non-Existent Asset"
+        );
         _tokenURIs[tokenId] = _tokenURI;
     }
 
     /********************* Rental(ERC4907) *********************************/
     /// @notice Owner can set the NFT's rental price and status
-    function setRentInfo(
-        uint256 tokenId,
-        bool isRentable,
-        uint256 pricePerHour
-    ) public {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "Phygital: Caller is not token owner or approved"
-        );
-        rentables[tokenId].isRentable = isRentable;
-        rentables[tokenId].hourlyRate = pricePerHour;
-        emit RentalInfo(tokenId, isRentable, pricePerHour, _msgSender());
-    }
+    // function setRentInfo(
+    //     uint256 tokenId,
+    //     bool isRentable,
+    //     uint256 pricePerHour
+    // ) public {
+    //     require(
+    //         _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
+    //         "Phygital: Caller is not token owner or approved"
+    //     );
+    //     rentables[tokenId].isRentable = isRentable;
+    //     rentables[tokenId].hourlyRate = pricePerHour;
+    //     emit RentalInfo(tokenId, isRentable, pricePerHour, _msgSender());
+    // }
 
-    /// @notice set the user and expires of an NFT
-    /// @dev This function is used to gift a person by the owner,
-    /// The zero address indicates there is no user
-    /// Throws if `tokenId` is not valid NFT
-    /// @param user  The new user of the NFT
-    /// @param expires  UNIX timestamp, The new user could use the NFT before expires
+    // /// @notice set the user and expires of an NFT
+    // /// @dev This function is used to gift a person by the owner,
+    // /// The zero address indicates there is no user
+    // /// Throws if `tokenId` is not valid NFT
+    // /// @param user  The new user of the NFT
+    // /// @param expires  UNIX timestamp, The new user could use the NFT before expires
 
-    function setUser(uint256 tokenId, address user, uint64 expires) public {
-        require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
-            "Phygital: Not token owner Or approved"
-        );
-        require(
-            userOf(tokenId) == address(0),
-            "Phygital: item is already subscribed"
-        );
-        RentableItems storage info = rentables[tokenId];
-        info.user = user;
-        info.expires = expires + uint64(block.timestamp);
-        emit UpdateUser(tokenId, user, info.expires);
-    }
+    // function setUser(uint256 tokenId, address user, uint64 expires) public {
+    //     require(
+    //         _requireOwned(tokenId) == _msgSender(),
+    //         "Phygital: Not token owner Or approved"
+    //     );
+    //     require(
+    //         userOf(tokenId) == address(0),
+    //         "Phygital: item is already subscribed"
+    //     );
+    //     RentableItems storage info = rentables[tokenId];
+    //     info.user = user;
+    //     info.expires = expires + uint64(block.timestamp);
+    //     emit UpdateUser(tokenId, user, info.expires);
+    // }
 
-    /**
-     * @notice to use for renting an item
-     * We are calculating 1 month equal to 30 days
-     * @dev The zero address indicates there is no user renting the item currently
-     * Throws if `tokenId` is not valid NFT,
-     * time cannot be less than 1 hour or more than 6 months
-     * @param _timeInHours  is in hours , Ex- 1,2,3
-     */
+    // /**
+    //  * @notice to use for renting an item
+    //  * We are calculating 1 month equal to 30 days
+    //  * @dev The zero address indicates there is no user renting the item currently
+    //  * Throws if `tokenId` is not valid NFT,
+    //  * time cannot be less than 1 hour or more than 6 months
+    //  * @param _timeInHours  is in hours , Ex- 1,2,3
+    //  */
 
-    function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-        require(_exists(_tokenId), "Phygital: Invalide Token Id");
-        require(
-            rentables[_tokenId].isRentable,
-            "Phygital: Not available for rent"
-        );
-        require(
-            userOf(_tokenId) == address(0),
-            "Phygital: NFT Already Subscribed"
-        );
-        require(_timeInHours > 0, "Phygital: Time can't be less than 1 hour");
-        require(
-            _timeInHours <= 4320,
-            "Phygital: Time can't be more than 6 months"
-        );
+    // function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
+    //     require(
+    //         _requireOwned(_tokenId) == _msgSender(),
+    //         "Phygital: Invalide Token Id"
+    //     );
+    //     require(
+    //         rentables[_tokenId].isRentable,
+    //         "Phygital: Not available for rent"
+    //     );
+    //     require(
+    //         userOf(_tokenId) == address(0),
+    //         "Phygital: NFT Already Subscribed"
+    //     );
+    //     require(_timeInHours > 0, "Phygital: Time can't be less than 1 hour");
+    //     require(
+    //         _timeInHours <= 4320,
+    //         "Phygital: Time can't be more than 6 months"
+    //     );
 
-        uint256 amount = amountRequired(_tokenId, _timeInHours);
+    //     uint256 amount = amountRequired(_tokenId, _timeInHours);
 
-        require(msg.value >= amount, "Phygital: Insufficient Funds");
-        payable(ownerOf(_tokenId)).transfer(msg.value);
+    //     require(msg.value >= amount, "Phygital: Insufficient Funds");
+    //     payable(ownerOf(_tokenId)).transfer(msg.value);
 
-        RentableItems storage info = rentables[_tokenId];
-        info.user = _msgSender();
-        info.expires = uint64(block.timestamp + (_timeInHours * 3600));
-        emit UpdateUser(_tokenId, _msgSender(), info.expires);
-    }
+    //     RentableItems storage info = rentables[_tokenId];
+    //     info.user = _msgSender();
+    //     info.expires = uint64(block.timestamp + (_timeInHours * 3600));
+    //     emit UpdateUser(_tokenId, _msgSender(), info.expires);
+    // }
 
     /** Getter Functions **/
 
     /************* Rental(ERC4907) ***************** */
     /// @dev IERC4907 implementation
-    function userOf(uint256 tokenId) public view returns (address) {
-        if (userExpires(tokenId) >= block.timestamp) {
-            return rentables[tokenId].user;
-        } else {
-            return address(0);
-        }
-    }
+    // function userOf(uint256 tokenId) public view returns (address) {
+    //     if (userExpires(tokenId) >= block.timestamp) {
+    //         return rentables[tokenId].user;
+    //     } else {
+    //         return address(0);
+    //     }
+    // }
 
-    /// @dev IERC4907 implementation
-    function userExpires(uint256 tokenId) public view returns (uint256) {
-        return rentables[tokenId].expires;
-    }
+    // /// @dev IERC4907 implementation
+    // function userExpires(uint256 tokenId) public view returns (uint256) {
+    //     return rentables[tokenId].expires;
+    // }
 
-    /// @notice to calculate the amount of money required
-    /// to rent an item for a certain time
-    function amountRequired(
-        uint256 tokenId,
-        uint256 time
-    ) public view returns (uint256 amount) {
-        amount = rentables[tokenId].hourlyRate * time;
-    }
+    // /// @notice to calculate the amount of money required
+    // /// to rent an item for a certain time
+    // function amountRequired(
+    //     uint256 tokenId,
+    //     uint256 time
+    // ) public view returns (uint256 amount) {
+    //     amount = rentables[tokenId].hourlyRate * time;
+    // }
 
     /////////////////////////////////////////////////
 
@@ -382,24 +390,27 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
     function tokenURI(
         uint256 tokenId
     ) public view virtual override returns (string memory) {
-        require(_exists(tokenId), "SignatureSeries: Non-Existent Asset");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "SignatureSeries: Non-Existent Asset"
+        );
         string memory _tokenURI = _tokenURIs[tokenId];
 
         return _tokenURI;
     }
 
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId,
-        uint256 batchSize
-    ) internal virtual override(ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
-        if (from != to && rentables[tokenId].user != address(0)) {
-            delete rentables[tokenId];
-            emit UpdateUser(tokenId, address(0), 0);
-        }
-    }
+    // function _update(
+    //     address to,
+    //     uint256 tokenId,
+    //     address auth
+    // ) internal virtual override returns (address) {
+    //     address from = super._update(to, tokenId, auth);
+    //     if (from != to && rentables[tokenId].user != address(0)) {
+    //         delete rentables[tokenId];
+    //         emit UpdateUser(tokenId, address(0), 0);
+    //     }
+    //     return from;
+    // }
 
     /**
      * @dev See {IERC165-supportsInterface}.
@@ -408,7 +419,7 @@ contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
         bytes4 interfaceId
     ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
         if (interfaceId == _INTERFACE_ID_ERC2981) return true;
-        if (interfaceId == type(IERC4907).interfaceId) return true;
+        // if (interfaceId == type(IERC4907).interfaceId) return true;
         return super.supportsInterface(interfaceId);
     }
 }

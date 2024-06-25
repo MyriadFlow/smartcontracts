@@ -474,8 +474,8 @@ export interface PhygitalA extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -633,8 +633,8 @@ export interface PhygitalA extends BaseContract {
   >;
 
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -786,8 +786,8 @@ export interface PhygitalA extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -1053,8 +1053,8 @@ export interface PhygitalA extends BaseContract {
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1211,8 +1211,8 @@ export interface PhygitalA extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

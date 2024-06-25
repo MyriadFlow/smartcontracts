@@ -36,7 +36,7 @@ export interface FusionSeriesInterface extends utils.Interface {
     "setURI(string)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "totalSupply(uint256)": FunctionFragment;
+    "totalSupply()": FunctionFragment;
     "tradeHub()": FunctionFragment;
     "uri(uint256)": FunctionFragment;
     "version()": FunctionFragment;
@@ -96,7 +96,7 @@ export interface FusionSeriesInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
-    values: [BigNumberish]
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "tradeHub", values?: undefined): string;
   encodeFunctionData(functionFragment: "uri", values: [BigNumberish]): string;
@@ -313,7 +313,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -322,7 +322,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -345,7 +345,9 @@ export interface FusionSeries extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
@@ -408,7 +410,7 @@ export interface FusionSeries extends BaseContract {
     from: string,
     to: string,
     ids: BigNumberish[],
-    amounts: BigNumberish[],
+    values: BigNumberish[],
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -417,7 +419,7 @@ export interface FusionSeries extends BaseContract {
     from: string,
     to: string,
     id: BigNumberish,
-    amount: BigNumberish,
+    value: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -440,7 +442,12 @@ export interface FusionSeries extends BaseContract {
 
   symbol(overrides?: CallOverrides): Promise<string>;
 
-  totalSupply(id: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
+  "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+  "totalSupply(uint256)"(
+    id: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   tradeHub(overrides?: CallOverrides): Promise<string>;
 
@@ -500,7 +507,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -509,7 +516,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -529,7 +536,9 @@ export interface FusionSeries extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<string>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -664,7 +673,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -673,7 +682,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -696,7 +705,9 @@ export interface FusionSeries extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -765,7 +776,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       ids: BigNumberish[],
-      amounts: BigNumberish[],
+      values: BigNumberish[],
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -774,7 +785,7 @@ export interface FusionSeries extends BaseContract {
       from: string,
       to: string,
       id: BigNumberish,
-      amount: BigNumberish,
+      value: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -797,7 +808,9 @@ export interface FusionSeries extends BaseContract {
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    totalSupply(
+    "totalSupply()"(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "totalSupply(uint256)"(
       id: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;

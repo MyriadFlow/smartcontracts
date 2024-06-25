@@ -11,12 +11,76 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "_tokenId",
+        name: "numerator",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "_salePrice",
+        name: "denominator",
+        type: "uint256",
+      },
+    ],
+    name: "ERC2981InvalidDefaultRoyalty",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "ERC2981InvalidDefaultRoyaltyReceiver",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "numerator",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "denominator",
+        type: "uint256",
+      },
+    ],
+    name: "ERC2981InvalidTokenRoyalty",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "receiver",
+        type: "address",
+      },
+    ],
+    name: "ERC2981InvalidTokenRoyaltyReceiver",
+    type: "error",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "tokenId",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "salePrice",
         type: "uint256",
       },
     ],

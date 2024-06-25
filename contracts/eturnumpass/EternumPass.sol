@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.17;
+pragma solidity ^0.8.20;
 
 import "../common/interface/IERC4907.sol";
 import "../common/interface/IERC5643.sol";
@@ -73,7 +73,10 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     }
 
     modifier onlyWhenTokenExist(uint256 tokenId) {
-        require(_exists(tokenId), "EternumPass: Not a valid tokenId");
+        require(
+            _requireOwned(tokenId) == _msgSender(),
+            "EternumPass: Not a valid tokenId"
+        );
         _;
     }
 
@@ -224,7 +227,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
      */
     function revokeSubscription(uint256 _tokenId) public {
         require(
-            _isApprovedOrOwner(_msgSender(), _tokenId),
+            _isAuthorized(_ownerOf(_tokenId), _msgSender(), _tokenId),
             "EternumPass: Not Owner Or Approved"
         );
         _burn(_tokenId);
@@ -247,7 +250,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         uint64 expires
     ) public override {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "EternumPass: Not token owner Or approved"
         );
         require(
@@ -267,7 +270,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         uint256 pricePerHour
     ) public {
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId),
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
             "EternumPass: Caller is not token owner or approved"
         );
         rentables[tokenId].isRentable = isRentable;
@@ -283,7 +286,10 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     /// @param _timeInHours  is in hours , Ex- 1,2,3
 
     function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-        require(_exists(_tokenId), "SignatureSeries: Invalide Token Id");
+        require(
+            _requireOwned(_tokenId) == _msgSender(),
+            "Eternumpass: Invalide Token Id"
+        );
         require(
             rentables[_tokenId].isRentable,
             "EternumPass: Not available for rent"
@@ -339,7 +345,8 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
     ) external payable onlyWhenTokenExist(tokenId) {
         bool isOperator = flowRoles.isOperator(_msgSender());
         require(
-            _isApprovedOrOwner(_msgSender(), tokenId) || isOperator,
+            _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId) ||
+                isOperator,
             "EternumPass: Caller is owner nor approved or the Operator"
         );
         require(
@@ -385,7 +392,7 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         bool isOperator = flowRoles.isOperator(_msgSender());
         if (!isOperator) {
             require(
-                _isApprovedOrOwner(_msgSender(), tokenId),
+                _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
                 "EternumPass: Caller is owner nor approved"
             );
             require(
@@ -498,21 +505,17 @@ contract EternumPass is Context, IERC4907, IERC5643, ERC2981, ERC721Enumerable {
         return baseURI;
     }
 
-    function _beforeTokenTransfer(
-        address from,
+    function _update(
         address to,
         uint256 tokenId,
-        uint256 batchSize
-    ) internal virtual override(ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        address auth
+    ) internal virtual override returns (address) {
+        address from = super._update(to, tokenId, auth);
         if (from != to && rentables[tokenId].user != address(0)) {
             delete rentables[tokenId];
             emit UpdateUser(tokenId, address(0), 0);
         }
-    }
-
-    function timeStamp() external view returns (uint256) {
-        return block.timestamp;
+        return from;
     }
 
     function supportsInterface(

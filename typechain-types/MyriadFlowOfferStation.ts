@@ -246,8 +246,8 @@ export interface MyriadFlowOfferStation extends BaseContract {
     proposalCounter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -309,8 +309,8 @@ export interface MyriadFlowOfferStation extends BaseContract {
   proposalCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -372,8 +372,8 @@ export interface MyriadFlowOfferStation extends BaseContract {
     proposalCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -480,8 +480,8 @@ export interface MyriadFlowOfferStation extends BaseContract {
     proposalCounter(overrides?: CallOverrides): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -538,8 +538,8 @@ export interface MyriadFlowOfferStation extends BaseContract {
     proposalCounter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

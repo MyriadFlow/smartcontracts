@@ -123,6 +123,7 @@ contract CyberMaven is
         }
         _nounce++;
     }
+
     // Put Getter
 
     function getValueFromMyContract(
@@ -260,7 +261,7 @@ contract CyberMaven is
 
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(IERC165, ERC1155Receiver) returns (bool) {
+    ) public view virtual override(IERC165, ERC1155Holder) returns (bool) {
         if (
             interfaceId == type(IERC165).interfaceId ||
             interfaceId == type(IERC6551Account).interfaceId

@@ -56,7 +56,6 @@ export interface EternumPassInterface extends utils.Interface {
     "subscriptionPricePerMonth()": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
-    "timeStamp()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
     "tokenIdCounter()": FunctionFragment;
     "tokenOfOwnerByIndex(address,uint256)": FunctionFragment;
@@ -186,7 +185,6 @@ export interface EternumPassInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
-  encodeFunctionData(functionFragment: "timeStamp", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "tokenByIndex",
     values: [BigNumberish]
@@ -321,7 +319,6 @@ export interface EternumPassInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "timeStamp", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "tokenByIndex",
     data: BytesLike
@@ -570,8 +567,8 @@ export interface EternumPass extends BaseContract {
     ): Promise<ContractTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -643,8 +640,6 @@ export interface EternumPass extends BaseContract {
     ): Promise<[boolean]>;
 
     symbol(overrides?: CallOverrides): Promise<[string]>;
-
-    timeStamp(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     tokenByIndex(
       index: BigNumberish,
@@ -780,8 +775,8 @@ export interface EternumPass extends BaseContract {
   ): Promise<ContractTransaction>;
 
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -853,8 +848,6 @@ export interface EternumPass extends BaseContract {
   ): Promise<boolean>;
 
   symbol(overrides?: CallOverrides): Promise<string>;
-
-  timeStamp(overrides?: CallOverrides): Promise<BigNumber>;
 
   tokenByIndex(
     index: BigNumberish,
@@ -985,8 +978,8 @@ export interface EternumPass extends BaseContract {
     ): Promise<void>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -1053,8 +1046,6 @@ export interface EternumPass extends BaseContract {
     ): Promise<boolean>;
 
     symbol(overrides?: CallOverrides): Promise<string>;
-
-    timeStamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenByIndex(
       index: BigNumberish,
@@ -1296,8 +1287,8 @@ export interface EternumPass extends BaseContract {
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1369,8 +1360,6 @@ export interface EternumPass extends BaseContract {
     ): Promise<BigNumber>;
 
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
-
-    timeStamp(overrides?: CallOverrides): Promise<BigNumber>;
 
     tokenByIndex(
       index: BigNumberish,
@@ -1520,8 +1509,8 @@ export interface EternumPass extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1595,8 +1584,6 @@ export interface EternumPass extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    timeStamp(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     tokenByIndex(
       index: BigNumberish,

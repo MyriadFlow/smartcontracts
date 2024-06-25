@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 
-import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
+import "@openzeppelin/contracts/access/extensions/AccessControlEnumerable.sol";
 
 /**
  * @dev This Contract Module helps to deploy the
@@ -21,22 +21,17 @@ contract AccessMaster is AccessControlEnumerable {
         keccak256("FLOW_OPERATOR_ROLE");
     bytes32 public constant FLOW_CREATOR_ROLE = keccak256("FLOW_CREATOR_ROLE");
 
-    constructor(address storefrontAdmin) {
-        _setupRole(FLOW_ADMIN_ROLE, _msgSender());
-
+    constructor(address _payoutAddress) {
         _setRoleAdmin(FLOW_ADMIN_ROLE, FLOW_ADMIN_ROLE);
         _setRoleAdmin(FLOW_OPERATOR_ROLE, FLOW_ADMIN_ROLE);
         _setRoleAdmin(FLOW_CREATOR_ROLE, FLOW_OPERATOR_ROLE);
-
+        _grantRole(FLOW_ADMIN_ROLE, _msgSender());
         // add Admin to operator and Creator
         grantRole(FLOW_OPERATOR_ROLE, _msgSender());
-
         // assigning storefront publisher Wallet the Admin role
-        grantRole(FLOW_ADMIN_ROLE, storefrontAdmin);
-        grantRole(FLOW_OPERATOR_ROLE, storefrontAdmin);
-        grantRole(FLOW_CREATOR_ROLE, storefrontAdmin);
+        grantRole(FLOW_CREATOR_ROLE, _msgSender());
 
-        payoutAddress = storefrontAdmin;
+        payoutAddress = _payoutAddress;
     }
 
     function updateName(
