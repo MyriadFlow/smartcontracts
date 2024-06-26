@@ -68,6 +68,14 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
     IACCESSMASTER flowRoles;
     IERC20 token;
 
+    modifier onlyAdnin() {
+        require(
+            flowRoles.isAdmin(_msgSender()),
+            "PhygitalA: User is not authorized"
+        );
+        _;
+    }
+
     modifier onlyOperator() {
         require(
             flowRoles.isOperator(_msgSender()),
@@ -143,7 +151,6 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
         // SET DEFAULT ROYALTY
         _setDefaultRoyalty(_msgSender(), uint96(contractDetails[2]));
         maxMint = uint16(contractDetails[3]);
-
         baseURL = _baseUri;
         accessMasterAddress = accessControlAddress;
     }
@@ -287,7 +294,7 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
         );
     }
 
-    function reveal(string memory uri) external {
+    function reveal(string memory uri) external onlyAdnin {
         require(isRevealed == false, "Collection is already revealed!");
         isRevealed = true;
         baseURL = uri;

@@ -5,24 +5,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
-/**
- * @dev {ERC1155} token, including:
- *
- *  - ability for holders to burn (destroy) their tokens
- *  - a creator role that allows for token minting (creation)
- *  - token ID and URI autogeneration
- *
- * This contract uses {AccessControl} to lock permissioned functions using the
- * different roles - head to its documentation for details.
- *
- * The account that deploys the contract will be granted the creator and pauser
- * roles, as well as the default admin role, which will let it grant both creator
- * roles to other accounts.
- */
-
-// collection URI override
-
-contract FusionSeries is Context, ERC1155Supply {
+contract RewardToken is Context, ERC1155Supply {
     string public name;
     string public symbol;
 
@@ -33,15 +16,16 @@ contract FusionSeries is Context, ERC1155Supply {
     uint8 public constant version = 1;
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
+    mapping(address => mapping(uint256 => uint256)) public phygitalToRewardId;
 
-    //// phygitalTokenID  => FusionSeries -- >if it exists +++
+    //// phygitalTokenID  => RewardToken -- >if it exists +++
 
     IACCESSMASTER flowRoles;
 
     modifier onlyOperator() {
         require(
             flowRoles.isOperator(_msgSender()),
-            "FusionSeries: Unauthorized!"
+            "RewardToken: Unauthorized!"
         );
         _;
     }
@@ -49,21 +33,18 @@ contract FusionSeries is Context, ERC1155Supply {
     modifier onlyCreator() {
         require(
             flowRoles.isCreator(_msgSender()),
-            "FusionSeries: Unauthorized!"
+            "RewardToken: Unauthorized!"
         );
         _;
     }
 
-    event FusionSeriesAssetCreated(
+    event RewardTokenCreated(
         uint256 indexed tokenID,
         address indexed creator,
         uint256 indexed amount,
         string metadataUri
     );
-    event FusionSeriesAssetDestroyed(
-        uint indexed tokenId,
-        address ownerOrApproved
-    );
+    event RewardTokenDestroyed(uint indexed tokenId, address ownerOrApproved);
 
     // tradeHub should be there
     /**
@@ -95,26 +76,25 @@ contract FusionSeries is Context, ERC1155Supply {
      *
      * - the caller must have the `FLOW_CREATOR_ROLE`.
      */
-    function createAsset(
-        //contractAddr
-        //tokenID  -> phygitalTokenID = FusionSeries tokenId
+    ///IssueRewardToken
+    function createFanToken(
+        address phygitalcontractAddr,
         uint256 amount,
+        uint256 tokenId,
         bytes memory data,
         string memory _uri
-    ) public onlyCreator returns (uint256) {
-        // We cannot just use balanceOf to create the new tokenId because tokens
-        // can be burned (destroyed), so we need a separate counter.
-        Counter++;
-        uint256 currentTokenID = Counter;
+    ) public returns (uint256) {
+        uint256 currentTokenID;
+        if (phygitalToRewardId[phygitalcontractAddr][tokenId] > 0) {
+            currentTokenID = phygitalToRewardId[phygitalcontractAddr][tokenId];
+        } else {
+            Counter++;
+            currentTokenID = Counter;
+        }
         _mint(_msgSender(), currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit FusionSeriesAssetCreated(
-            currentTokenID,
-            _msgSender(),
-            amount,
-            _uri
-        );
+        emit RewardTokenCreated(currentTokenID, _msgSender(), amount, _uri);
         return currentTokenID;
     }
 
@@ -128,24 +108,26 @@ contract FusionSeries is Context, ERC1155Supply {
      * - the caller must have the `FLOW_CREATOR_ROLE`.
      */
     function delegateAssetCreation(
+        address phygitalcontractAddr,
         address creator,
+        uint256 tokenId,
         uint256 amount,
         bytes memory data,
         string memory _uri
     ) public onlyOperator returns (uint256) {
+        uint256 currentTokenID;
         // We cannot just use balanceOf to create the new tokenId because tokens
         // can be burned (destroyed), so we need a separate counter.
-        Counter++;
-        uint256 currentTokenID = Counter;
+        if (phygitalToRewardId[phygitalcontractAddr][tokenId] > 0) {
+            currentTokenID = phygitalToRewardId[phygitalcontractAddr][tokenId];
+        } else {
+            Counter++;
+            currentTokenID = Counter;
+        }
         _mint(creator, currentTokenID, amount, data);
         _tokenURIs[currentTokenID] = _uri;
         setApprovalForAll(tradeHub, true);
-        emit FusionSeriesAssetCreated(
-            currentTokenID,
-            _msgSender(),
-            amount,
-            _uri
-        );
+        emit RewardTokenCreated(currentTokenID, _msgSender(), amount, _uri);
         return currentTokenID;
     }
 
@@ -159,10 +141,10 @@ contract FusionSeries is Context, ERC1155Supply {
     function destroyAsset(uint256 tokenId, uint256 amount) public {
         require(
             balanceOf(_msgSender(), tokenId) == amount,
-            "FusionSeries: Caller is not token owner or approved"
+            "RewardToken: Caller is not token owner or approved"
         );
         _burn(_msgSender(), tokenId, amount);
-        emit FusionSeriesAssetDestroyed(tokenId, _msgSender());
+        emit RewardTokenDestroyed(tokenId, _msgSender());
     }
 
     /// @dev  ONLY Operator can set the Base URI
@@ -178,6 +160,7 @@ contract FusionSeries is Context, ERC1155Supply {
     ) public view virtual override returns (string memory) {
         return _tokenURIs[tokenId];
     }
+
     /**
      * @dev See {IERC165-supportsInterface}.
      */
