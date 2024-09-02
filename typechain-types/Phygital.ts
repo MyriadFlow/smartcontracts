@@ -9,7 +9,6 @@ import {
   CallOverrides,
   ContractTransaction,
   Overrides,
-  PayableOverrides,
   PopulatedTransaction,
   Signer,
   utils,
@@ -23,7 +22,6 @@ export interface PhygitalInterface extends utils.Interface {
   functions: {
     "Counter()": FunctionFragment;
     "accessMasterAddress()": FunctionFragment;
-    "amountRequired(uint256,uint256)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "createAsset(string,uint96,bytes)": FunctionFragment;
@@ -36,14 +34,11 @@ export interface PhygitalInterface extends utils.Interface {
     "ownerOf(uint256)": FunctionFragment;
     "phygitalAssets(uint256)": FunctionFragment;
     "phygitalIdCheck(bytes)": FunctionFragment;
-    "rent(uint256,uint256)": FunctionFragment;
     "rentables(uint256)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
     "setItemStatus(uint256,uint8)": FunctionFragment;
-    "setRentInfo(uint256,bool,uint256)": FunctionFragment;
-    "setUser(uint256,address,uint64)": FunctionFragment;
     "supportsInterface(bytes4)": FunctionFragment;
     "symbol()": FunctionFragment;
     "tokenByIndex(uint256)": FunctionFragment;
@@ -52,8 +47,6 @@ export interface PhygitalInterface extends utils.Interface {
     "totalSupply()": FunctionFragment;
     "tradeHub()": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
-    "userExpires(uint256)": FunctionFragment;
-    "userOf(uint256)": FunctionFragment;
     "version()": FunctionFragment;
   };
 
@@ -61,10 +54,6 @@ export interface PhygitalInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "accessMasterAddress",
     values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "amountRequired",
-    values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "approve",
@@ -106,10 +95,6 @@ export interface PhygitalInterface extends utils.Interface {
     values: [BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "rent",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
     functionFragment: "rentables",
     values: [BigNumberish]
   ): string;
@@ -128,14 +113,6 @@ export interface PhygitalInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "setItemStatus",
     values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setRentInfo",
-    values: [BigNumberish, boolean, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "setUser",
-    values: [BigNumberish, string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "supportsInterface",
@@ -163,23 +140,11 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "transferFrom",
     values: [string, string, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "userExpires",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "userOf",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "version", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "Counter", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "accessMasterAddress",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "amountRequired",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
@@ -215,7 +180,6 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "phygitalIdCheck",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "rent", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
@@ -233,11 +197,6 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "setItemStatus",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "setRentInfo",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "setUser", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supportsInterface",
     data: BytesLike
@@ -261,11 +220,6 @@ export interface PhygitalInterface extends utils.Interface {
     functionFragment: "transferFrom",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "userExpires",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "userOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "version", data: BytesLike): Result;
 
   events: {
@@ -277,7 +231,6 @@ export interface PhygitalInterface extends utils.Interface {
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
     "UpdateAssetStatus(address,uint8,uint256)": EventFragment;
-    "UpdateUser(uint256,address,uint64)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
@@ -288,7 +241,6 @@ export interface PhygitalInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "UpdateAssetStatus"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "UpdateUser"): EventFragment;
 }
 
 export type ApprovalEvent = TypedEvent<
@@ -350,13 +302,6 @@ export type UpdateAssetStatusEvent = TypedEvent<
 export type UpdateAssetStatusEventFilter =
   TypedEventFilter<UpdateAssetStatusEvent>;
 
-export type UpdateUserEvent = TypedEvent<
-  [BigNumber, string, BigNumber],
-  { tokenId: BigNumber; user: string; expires: BigNumber }
->;
-
-export type UpdateUserEventFilter = TypedEventFilter<UpdateUserEvent>;
-
 export interface Phygital extends BaseContract {
   contractName: "Phygital";
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -388,12 +333,6 @@ export interface Phygital extends BaseContract {
     Counter(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<[string]>;
-
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amount: BigNumber }>;
 
     approve(
       to: string,
@@ -459,12 +398,6 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     rentables(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -478,8 +411,8 @@ export interface Phygital extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -507,20 +440,6 @@ export interface Phygital extends BaseContract {
     setItemStatus(
       tokenId: BigNumberish,
       _status: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -558,25 +477,12 @@ export interface Phygital extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
-
-    userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
-
     version(overrides?: CallOverrides): Promise<[number]>;
   };
 
   Counter(overrides?: CallOverrides): Promise<BigNumber>;
 
   accessMasterAddress(overrides?: CallOverrides): Promise<string>;
-
-  amountRequired(
-    tokenId: BigNumberish,
-    time: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
 
   approve(
     to: string,
@@ -636,12 +542,6 @@ export interface Phygital extends BaseContract {
 
   phygitalIdCheck(arg0: BytesLike, overrides?: CallOverrides): Promise<boolean>;
 
-  rent(
-    _tokenId: BigNumberish,
-    _timeInHours: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   rentables(
     arg0: BigNumberish,
     overrides?: CallOverrides
@@ -655,8 +555,8 @@ export interface Phygital extends BaseContract {
   >;
 
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -684,20 +584,6 @@ export interface Phygital extends BaseContract {
   setItemStatus(
     tokenId: BigNumberish,
     _status: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setRentInfo(
-    tokenId: BigNumberish,
-    isRentable: boolean,
-    pricePerHour: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  setUser(
-    tokenId: BigNumberish,
-    user: string,
-    expires: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -732,25 +618,12 @@ export interface Phygital extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  userExpires(
-    tokenId: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
-
-  userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
   version(overrides?: CallOverrides): Promise<number>;
 
   callStatic: {
     Counter(overrides?: CallOverrides): Promise<BigNumber>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<string>;
-
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -813,12 +686,6 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     rentables(
       arg0: BigNumberish,
       overrides?: CallOverrides
@@ -832,8 +699,8 @@ export interface Phygital extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -861,20 +728,6 @@ export interface Phygital extends BaseContract {
     setItemStatus(
       tokenId: BigNumberish,
       _status: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -908,13 +761,6 @@ export interface Phygital extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    userOf(tokenId: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
     version(overrides?: CallOverrides): Promise<number>;
   };
@@ -1009,29 +855,12 @@ export interface Phygital extends BaseContract {
       assetStatus?: null,
       time?: null
     ): UpdateAssetStatusEventFilter;
-
-    "UpdateUser(uint256,address,uint64)"(
-      tokenId?: BigNumberish | null,
-      user?: string | null,
-      expires?: null
-    ): UpdateUserEventFilter;
-    UpdateUser(
-      tokenId?: BigNumberish | null,
-      user?: string | null,
-      expires?: null
-    ): UpdateUserEventFilter;
   };
 
   estimateGas: {
     Counter(overrides?: CallOverrides): Promise<BigNumber>;
 
     accessMasterAddress(overrides?: CallOverrides): Promise<BigNumber>;
-
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
 
     approve(
       to: string,
@@ -1091,20 +920,14 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     rentables(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1132,20 +955,6 @@ export interface Phygital extends BaseContract {
     setItemStatus(
       tokenId: BigNumberish,
       _status: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -1183,16 +992,6 @@ export interface Phygital extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    userOf(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
     version(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
@@ -1200,12 +999,6 @@ export interface Phygital extends BaseContract {
     Counter(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     accessMasterAddress(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    amountRequired(
-      tokenId: BigNumberish,
-      time: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1270,20 +1063,14 @@ export interface Phygital extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    rent(
-      _tokenId: BigNumberish,
-      _timeInHours: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     rentables(
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -1311,20 +1098,6 @@ export interface Phygital extends BaseContract {
     setItemStatus(
       tokenId: BigNumberish,
       _status: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setRentInfo(
-      tokenId: BigNumberish,
-      isRentable: boolean,
-      pricePerHour: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    setUser(
-      tokenId: BigNumberish,
-      user: string,
-      expires: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1360,16 +1133,6 @@ export interface Phygital extends BaseContract {
       to: string,
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    userExpires(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    userOf(
-      tokenId: BigNumberish,
-      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     version(overrides?: CallOverrides): Promise<PopulatedTransaction>;

@@ -30,6 +30,7 @@ export interface PhygitalAInterface extends utils.Interface {
     "delegateMint(address,uint256)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
+    "isRevealed()": FunctionFragment;
     "maxMint()": FunctionFragment;
     "maxSupply()": FunctionFragment;
     "mint(uint256)": FunctionFragment;
@@ -40,6 +41,7 @@ export interface PhygitalAInterface extends utils.Interface {
     "phygitalIdCheck(bytes)": FunctionFragment;
     "registerAssetId(uint256,bytes)": FunctionFragment;
     "rentables(uint256)": FunctionFragment;
+    "reveal(string)": FunctionFragment;
     "royaltyInfo(uint256,uint256)": FunctionFragment;
     "safeTransferFrom(address,address,uint256)": FunctionFragment;
     "setApprovalForAll(address,bool)": FunctionFragment;
@@ -86,6 +88,10 @@ export interface PhygitalAInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     values: [string, string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "isRevealed",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "maxMint", values?: undefined): string;
   encodeFunctionData(functionFragment: "maxSupply", values?: undefined): string;
   encodeFunctionData(functionFragment: "mint", values: [BigNumberish]): string;
@@ -111,6 +117,7 @@ export interface PhygitalAInterface extends utils.Interface {
     functionFragment: "rentables",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "reveal", values: [string]): string;
   encodeFunctionData(
     functionFragment: "royaltyInfo",
     values: [BigNumberish, BigNumberish]
@@ -180,6 +187,7 @@ export interface PhygitalAInterface extends utils.Interface {
     functionFragment: "isApprovedForAll",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "isRevealed", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "maxMint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "maxSupply", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
@@ -199,6 +207,7 @@ export interface PhygitalAInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "rentables", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "reveal", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "royaltyInfo",
     data: BytesLike
@@ -421,6 +430,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
+    isRevealed(overrides?: CallOverrides): Promise<[boolean]>;
+
     maxMint(overrides?: CallOverrides): Promise<[number]>;
 
     maxSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -473,9 +484,14 @@ export interface PhygitalA extends BaseContract {
       }
     >;
 
+    reveal(
+      uri: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -586,6 +602,8 @@ export interface PhygitalA extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
+  isRevealed(overrides?: CallOverrides): Promise<boolean>;
+
   maxMint(overrides?: CallOverrides): Promise<number>;
 
   maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -632,9 +650,14 @@ export interface PhygitalA extends BaseContract {
     }
   >;
 
+  reveal(
+    uri: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -736,6 +759,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    isRevealed(overrides?: CallOverrides): Promise<boolean>;
+
     maxMint(overrides?: CallOverrides): Promise<number>;
 
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -785,9 +810,11 @@ export interface PhygitalA extends BaseContract {
       }
     >;
 
+    reveal(uri: string, overrides?: CallOverrides): Promise<void>;
+
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -1013,6 +1040,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    isRevealed(overrides?: CallOverrides): Promise<BigNumber>;
+
     maxMint(overrides?: CallOverrides): Promise<BigNumber>;
 
     maxSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1052,9 +1081,14 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    reveal(
+      uri: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1171,6 +1205,8 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    isRevealed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     maxMint(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     maxSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1210,9 +1246,14 @@ export interface PhygitalA extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    reveal(
+      uri: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

@@ -277,7 +277,7 @@ export interface AccessMaster extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -357,7 +357,7 @@ export interface AccessMaster extends BaseContract {
 
   renounceRole(
     role: BytesLike,
-    account: string,
+    callerConfirmation: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -437,7 +437,7 @@ export interface AccessMaster extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -550,7 +550,7 @@ export interface AccessMaster extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -647,7 +647,7 @@ export interface AccessMaster extends BaseContract {
 
     renounceRole(
       role: BytesLike,
-      account: string,
+      callerConfirmation: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

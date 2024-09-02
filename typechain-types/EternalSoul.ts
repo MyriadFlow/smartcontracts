@@ -43,6 +43,7 @@ export interface EternalSoulInterface extends utils.Interface {
     "baseURI()": FunctionFragment;
     "delegateIssue(address,string)": FunctionFragment;
     "destroyAsset(uint256)": FunctionFragment;
+    "eip712Domain()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "issue(address,string)": FunctionFragment;
@@ -90,6 +91,10 @@ export interface EternalSoulInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "destroyAsset",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eip712Domain",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -181,6 +186,10 @@ export interface EternalSoulInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "eip712Domain",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
@@ -236,6 +245,7 @@ export interface EternalSoulInterface extends utils.Interface {
     "ApprovalForAll(address,address,bool)": EventFragment;
     "AssetDestroyed(uint256,address)": EventFragment;
     "AssetIssued(uint256,address,string)": EventFragment;
+    "EIP712DomainChanged()": EventFragment;
     "FundTransferred(address,address,uint256,uint256)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
@@ -244,6 +254,7 @@ export interface EternalSoulInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetDestroyed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "AssetIssued"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EIP712DomainChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -275,6 +286,11 @@ export type AssetIssuedEvent = TypedEvent<
 >;
 
 export type AssetIssuedEventFilter = TypedEventFilter<AssetIssuedEvent>;
+
+export type EIP712DomainChangedEvent = TypedEvent<[], {}>;
+
+export type EIP712DomainChangedEventFilter =
+  TypedEventFilter<EIP712DomainChangedEvent>;
 
 export type FundTransferredEvent = TypedEvent<
   [string, string, BigNumber, BigNumber],
@@ -344,6 +360,20 @@ export interface EternalSoul extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    eip712Domain(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string, string, BigNumber[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: BigNumber;
+        verifyingContract: string;
+        salt: string;
+        extensions: BigNumber[];
+      }
+    >;
 
     getApproved(
       tokenId: BigNumberish,
@@ -474,6 +504,20 @@ export interface EternalSoul extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  eip712Domain(
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, string, BigNumber, string, string, BigNumber[]] & {
+      fields: string;
+      name: string;
+      version: string;
+      chainId: BigNumber;
+      verifyingContract: string;
+      salt: string;
+      extensions: BigNumber[];
+    }
+  >;
+
   getApproved(
     tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -596,6 +640,20 @@ export interface EternalSoul extends BaseContract {
       tokenId: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    eip712Domain(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string, string, BigNumber[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: BigNumber;
+        verifyingContract: string;
+        salt: string;
+        extensions: BigNumber[];
+      }
+    >;
 
     getApproved(
       tokenId: BigNumberish,
@@ -730,6 +788,9 @@ export interface EternalSoul extends BaseContract {
       metaDataURI?: null
     ): AssetIssuedEventFilter;
 
+    "EIP712DomainChanged()"(): EIP712DomainChangedEventFilter;
+    EIP712DomainChanged(): EIP712DomainChangedEventFilter;
+
     "FundTransferred(address,address,uint256,uint256)"(
       sender?: null,
       reciepient?: null,
@@ -782,6 +843,8 @@ export interface EternalSoul extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    eip712Domain(overrides?: CallOverrides): Promise<BigNumber>;
 
     getApproved(
       tokenId: BigNumberish,
@@ -917,6 +980,8 @@ export interface EternalSoul extends BaseContract {
       tokenId: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    eip712Domain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getApproved(
       tokenId: BigNumberish,

@@ -45,6 +45,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
     "createAsset(string,uint96)": FunctionFragment;
     "delegateAssetCreation(address,string,uint96)": FunctionFragment;
     "destroyAsset(uint256)": FunctionFragment;
+    "eip712Domain()": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
     "isApprovedForAll(address,address)": FunctionFragment;
     "lazyAssetCreation((uint256,string,bytes),uint96)": FunctionFragment;
@@ -106,6 +107,10 @@ export interface SignatureSeriesInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "destroyAsset",
     values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "eip712Domain",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getApproved",
@@ -229,6 +234,10 @@ export interface SignatureSeriesInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "eip712Domain",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "getApproved",
     data: BytesLike
   ): Result;
@@ -300,6 +309,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "ApprovalForAll(address,address,bool)": EventFragment;
+    "EIP712DomainChanged()": EventFragment;
     "FundTransferred(address,address,uint256,uint256)": EventFragment;
     "RentalInfo(uint256,bool,uint256,address)": EventFragment;
     "SignatureSeriesAssetCreated(uint256,address,string)": EventFragment;
@@ -310,6 +320,7 @@ export interface SignatureSeriesInterface extends utils.Interface {
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ApprovalForAll"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "EIP712DomainChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "RentalInfo"): EventFragment;
   getEvent(
@@ -335,6 +346,11 @@ export type ApprovalForAllEvent = TypedEvent<
 >;
 
 export type ApprovalForAllEventFilter = TypedEventFilter<ApprovalForAllEvent>;
+
+export type EIP712DomainChangedEvent = TypedEvent<[], {}>;
+
+export type EIP712DomainChangedEventFilter =
+  TypedEventFilter<EIP712DomainChangedEvent>;
 
 export type FundTransferredEvent = TypedEvent<
   [string, string, BigNumber, BigNumber],
@@ -448,6 +464,20 @@ export interface SignatureSeries extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    eip712Domain(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string, string, BigNumber[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: BigNumber;
+        verifyingContract: string;
+        salt: string;
+        extensions: BigNumber[];
+      }
+    >;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -498,8 +528,8 @@ export interface SignatureSeries extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -627,6 +657,20 @@ export interface SignatureSeries extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  eip712Domain(
+    overrides?: CallOverrides
+  ): Promise<
+    [string, string, string, BigNumber, string, string, BigNumber[]] & {
+      fields: string;
+      name: string;
+      version: string;
+      chainId: BigNumber;
+      verifyingContract: string;
+      salt: string;
+      extensions: BigNumber[];
+    }
+  >;
+
   getApproved(
     tokenId: BigNumberish,
     overrides?: CallOverrides
@@ -674,8 +718,8 @@ export interface SignatureSeries extends BaseContract {
   >;
 
   royaltyInfo(
-    _tokenId: BigNumberish,
-    _salePrice: BigNumberish,
+    tokenId: BigNumberish,
+    salePrice: BigNumberish,
     overrides?: CallOverrides
   ): Promise<[string, BigNumber]>;
 
@@ -800,6 +844,20 @@ export interface SignatureSeries extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    eip712Domain(
+      overrides?: CallOverrides
+    ): Promise<
+      [string, string, string, BigNumber, string, string, BigNumber[]] & {
+        fields: string;
+        name: string;
+        version: string;
+        chainId: BigNumber;
+        verifyingContract: string;
+        salt: string;
+        extensions: BigNumber[];
+      }
+    >;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -847,8 +905,8 @@ export interface SignatureSeries extends BaseContract {
     >;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[string, BigNumber]>;
 
@@ -955,6 +1013,9 @@ export interface SignatureSeries extends BaseContract {
       operator?: string | null,
       approved?: null
     ): ApprovalForAllEventFilter;
+
+    "EIP712DomainChanged()"(): EIP712DomainChangedEventFilter;
+    EIP712DomainChanged(): EIP712DomainChangedEventFilter;
 
     "FundTransferred(address,address,uint256,uint256)"(
       sender?: null,
@@ -1066,6 +1127,8 @@ export interface SignatureSeries extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    eip712Domain(overrides?: CallOverrides): Promise<BigNumber>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1109,8 +1172,8 @@ export interface SignatureSeries extends BaseContract {
     ): Promise<BigNumber>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -1247,6 +1310,8 @@ export interface SignatureSeries extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    eip712Domain(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     getApproved(
       tokenId: BigNumberish,
       overrides?: CallOverrides
@@ -1290,8 +1355,8 @@ export interface SignatureSeries extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     royaltyInfo(
-      _tokenId: BigNumberish,
-      _salePrice: BigNumberish,
+      tokenId: BigNumberish,
+      salePrice: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

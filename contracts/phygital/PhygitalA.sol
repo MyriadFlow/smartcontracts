@@ -23,7 +23,8 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
     uint8 public constant version = 1;
 
     // PUBLIC && PRIVATE VARIABLES
-    string private baseURI;
+    string private baseURL;
+    bool public isRevealed;
     uint256 public nftPrice;
     uint16 public maxMint; /// @notice how many can be minted by a wallet
     address public tradeHub;
@@ -66,6 +67,14 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
     // INTERFACES
     IACCESSMASTER flowRoles;
     IERC20 token;
+
+    modifier onlyAdnin() {
+        require(
+            flowRoles.isAdmin(_msgSender()),
+            "PhygitalA: User is not authorized"
+        );
+        _;
+    }
 
     modifier onlyOperator() {
         require(
@@ -142,8 +151,7 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
         // SET DEFAULT ROYALTY
         _setDefaultRoyalty(_msgSender(), uint96(contractDetails[2]));
         maxMint = uint16(contractDetails[3]);
-
-        baseURI = _baseUri;
+        baseURL = _baseUri;
         accessMasterAddress = accessControlAddress;
     }
 
@@ -286,6 +294,12 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
         );
     }
 
+    function reveal(string memory uri) external onlyAdnin {
+        require(isRevealed == false, "Collection is already revealed!");
+        isRevealed = true;
+        baseURL = uri;
+    }
+
     /**
      * @notice Burns `tokenId`. See {ERC721-_burn}.
      *
@@ -317,8 +331,25 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
         amount = quantity * nftPrice;
     }
 
+    /**
+     * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
+     */
+    function tokenURI(
+        uint256 tokenId
+    ) public view override(IERC721A, ERC721A) returns (string memory) {
+        if (!_exists(tokenId)) _revert(URIQueryForNonexistentToken.selector);
+        string memory baseURI = _baseURI();
+        if (isRevealed) {
+            return _baseURI();
+        }
+        return
+            bytes(baseURI).length != 0
+                ? string(abi.encodePacked(baseURI, _toString(tokenId)))
+                : "";
+    }
+
     function _baseURI() internal view override returns (string memory) {
-        return baseURI;
+        return baseURL;
     }
 
     function supportsInterface(
