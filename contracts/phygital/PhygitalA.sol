@@ -214,10 +214,10 @@ contract PhygitalA is Context, ERC2981, ERC721A, ERC721ABurnable {
             _totalMinted() + quantity <= maxSupply,
             "PhygitalA: Exceeding max token supply!"
         );
-        require(
-            token.balanceOf(_msgSender()) >= calculateRequiredPrice(quantity),
-            "PhygitalA: Not enough funds!"
-        );
+        // require(
+        //     token.balanceOf(_msgSender()) >= calculateRequiredPrice(quantity),
+        //     "PhygitalA: Not enough funds!"
+        // );
         address recipient = flowRoles.getPayoutAddress();
 
         _transferFunds(
