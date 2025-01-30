@@ -1,44 +1,51 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.17;
-
+pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
-// import "../common/interface/IERC4907.sol";
 import "../accessmaster/interfaces/IAccessMaster.sol";
 
-/// @title PhygitalA: A Smart Contract for Managing Phygital Assets with ERC721 Tokens
+/// @title Phygital: A Smart Contract for Managing Phygital Assets with ERC721 Tokens
 /**
  * @dev This contract manages phygital (physical + digital) assets through NFTs. It supports minting, renting,
- * and tracking of physical items' digital representations. The contract integrates ERC721A for efficient
- * batch minting, ERC2981 for royalty management, and IERC4907 for rentable NFTs.
+ * and tracking of physical items' digital representations. The contract integrates ERC721 for efficient
+ * ERC2981 for royalty management.
  * It allows for the immutable registration of NFC IDs to NFTs, ensuring a unique and verifiable link
  * between a physical item and its digital counterpart.
  */
-// contract Phygital is Context, ERC721Enumerable, ERC2981, IERC4907 {
-contract Phygital is Context, ERC721Enumerable, ERC2981 {
+interface IVault {
+    function getFeePercentage(address _user) external view returns (uint256);
+}
+
+contract Phygital is Context, ERC721, ERC2981, ReentrancyGuard {
     // Set Constants for Interface ID and Roles
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
+    address public immutable vaultAddress;
+
+    uint256 public immutable MAX_SUPPLY;
 
     using Strings for uint256;
 
-    address public tradeHub;
-    address public accessMasterAddress;
-
-    uint8 public constant version = 1;
+    uint8 public constant version = 2;
 
     uint256 public nftPrice;
     uint256 public Counter;
+    uint256 public publicPrice;
+    uint256 public launchTime;
+    bool public isCancelled;
+    WhitelistInfo public whitelistInfo;
 
+    /// modified this
     enum ItemStatus {
         DESTROYED,
         DAMAGED,
         REPAIRED,
-        RESALE,
-        INUSE,
-        ORIGINAL
+        OWNED,
+        MANUFACTURED,
+        LOST
     }
 
     struct PhygitalInfo {
@@ -46,25 +53,35 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
         bytes phygitalId;
         ItemStatus status;
     }
-
-    struct RentableItems {
-        bool isRentable; //to check is renting is available
-        address user; // address of user role
-        uint64 expires; // unix timestamp, user expires
-        uint256 hourlyRate; // amountPerHour
+    struct WhitelistInfo {
+        // If whitelist is not started , public sale wont happen
+        uint256 startTime;
+        // Unless the Whitelist end , public sale wont happen
+        uint256 endTime;
+        // whitelist price
+        uint256 whitelistPrice;
+        // total allocation for whitelist in MAX SUPPLY
+        uint256 allocation;
+        // Total Whitelist Sales
+        uint256 totalWhitelistSales;
+        // mapping of whitelisted addresses
+        mapping(address => bool) whitelist;
     }
-
-    ///@dev storing the data of the user who are renting the NFT
-    mapping(uint256 => RentableItems) public rentables;
 
     // Optional mapping for token URIs
     mapping(uint256 => string) private _tokenURIs;
 
+    /// @notice Mapping from token ID to its phygital asset information
+    /// @dev Stores the registration time, NFC ID and current status for each token
     mapping(uint256 => PhygitalInfo) public phygitalAssets;
 
+    /// @notice Mapping to track used phygital IDs
+    /// @dev Used to ensure each physical item's NFC ID is only registered once
+    /// @return bool True if the phygital ID has already been registered
     mapping(bytes => bool) public phygitalIdCheck;
 
     IACCESSMASTER flowRoles;
+    IVault vault;
 
     modifier onlyOperator() {
         require(
@@ -74,10 +91,19 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
         _;
     }
 
-    modifier onlyCreator() {
+    modifier onlyWhitelisted() {
         require(
-            flowRoles.isCreator(_msgSender()),
-            "Phygital: User is not authorized"
+            whitelistInfo.whitelist[_msgSender()],
+            "Phygital: Address not whitelisted"
+        );
+        require(
+            block.timestamp >= whitelistInfo.startTime &&
+                block.timestamp <= whitelistInfo.endTime,
+            "Phygital: Minting not active"
+        );
+        require(
+            whitelistInfo.allocation > 0,
+            "Phygital: No allocation remaining"
         );
         _;
     }
@@ -90,13 +116,6 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
 
     event PhygitalAssetDestroyed(uint indexed tokenId, address ownerOrApproved);
 
-    event RentalInfo(
-        uint256 tokenId,
-        bool isRentable,
-        uint256 price,
-        address indexed renter
-    );
-
     event FundTransferred(
         address sender,
         address reciepient,
@@ -106,22 +125,87 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
 
     event UpdateAssetStatus(address user, ItemStatus assetStatus, uint256 time);
 
-    /**
-     * @dev Grants `FLOW_ADMIN_ROLE`, `FLOW_CREATOR_ROLE` and `FLOW_OPERATOR_ROLE` to the
-     * account that deploys the contract.
-     *
-     * Token URIs will be autogenerated based on `baseURI` and their token IDs.
-     * See {ERC721-tokenURI}.
-     */
+    event WhitelistUpdated(address indexed user, bool isWhitelisted);
+
     constructor(
         string memory name,
         string memory symbol,
-        address tradeHubAddress,
-        address accessControlAddress
+        uint256 _maxSupply,
+        uint256[] memory whitelistValues,
+        uint256 _publicPrice,
+        uint256 _launchTime,
+        address accessControlAddress,
+        address _vaultAddress
     ) ERC721(name, symbol) {
+        MAX_SUPPLY = _maxSupply;
+        require(
+            whitelistValues.length == 4,
+            "Phygital: Invalid whitelist values"
+        );
+        whitelistInfo.startTime = whitelistValues[0];
+        whitelistInfo.endTime = whitelistValues[1];
+        whitelistInfo.whitelistPrice = whitelistValues[2];
+        require(
+            whitelistValues[3] <= 100,
+            "Phygital: Allocation cannot exceed 100%"
+        );
+        whitelistInfo.allocation = whitelistValues[3];
+        publicPrice = _publicPrice;
         flowRoles = IACCESSMASTER(accessControlAddress);
-        tradeHub = tradeHubAddress;
-        accessMasterAddress = accessControlAddress;
+        launchTime = _launchTime;
+        vaultAddress = _vaultAddress;
+        vault = IVault(_vaultAddress);
+    }
+
+    ///  We should take fee from the vault address,
+    function _transferFunds(uint256 value) private nonReentrant {
+        uint256 fee = (value * vault.getFeePercentage(address(this))) / 100;
+        uint256 creatorAmount = value - fee;
+        // Transfer payment to MyriadFlow
+        (bool success, ) = vaultAddress.call{value: fee}("");
+        require(success, "Payment transfer failed");
+
+        address creator = flowRoles.getPayoutAddress();
+        (bool success2, ) = creator.call{value: creatorAmount}("");
+        require(success2, "Payment transfer failed");
+    }
+
+    function setWhitelist(address user) external onlyOperator {
+        whitelistInfo.whitelist[user] = true;
+        emit WhitelistUpdated(user, true);
+    }
+
+    function cancelSale() external onlyOperator {
+        isCancelled = true;
+    }
+
+    function updateWhitelistInfo(
+        uint8 option,
+        uint256 startTime,
+        uint256 endTime,
+        uint256 allocation,
+        address user
+    ) external onlyOperator {
+        if (option == 1) {
+            require(
+                whitelistInfo.startTime < block.timestamp,
+                "Whitelist minting already starterd!"
+            );
+            whitelistInfo.startTime = startTime;
+        }
+        if (option == 2) {
+            require(
+                whitelistInfo.endTime < block.timestamp,
+                "Whitelist minting already over!"
+            );
+            whitelistInfo.endTime = endTime;
+        }
+        if (option == 3) {
+            whitelistInfo.allocation = allocation;
+        }
+        if (option == 4) {
+            whitelistInfo.whitelist[user] = false;
+        }
     }
 
     function setItemStatus(uint256 tokenId, ItemStatus _status) external {
@@ -136,42 +220,77 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
         emit UpdateAssetStatus(_msgSender(), _status, block.timestamp);
     }
 
-    /**
-     * @dev Creates a new token for `to`. Its token ID will be automatically
-     * assigned (and available on the emitted {IERC721-Transfer} event), and the token
-     * URI autogenerated based on the base URI passed at construction.
-     *
-     * See {ERC721-_safeMint}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the `FLOW_CREATOR_ROLE`.
-     */
-    function createAsset(
+    /// ONLY CALLED BY WHITELIST ,
+    function buyAssetWhitelist(
         string memory metadataURI,
         uint96 royaltyPercentBasisPoint,
         bytes memory _phygitalID
-    ) public onlyCreator returns (uint256) {
-        // We cannot just use balanceOf to create the new tokenId because tokens
-        // can be burned (destroyed), so we need a separate counter.
+    ) public payable onlyWhitelisted returns (uint256) {
+        /// PUT CANCEL Status here.
+        require(!isCancelled, "Sale is cancelled");
         require(
-            !phygitalIdCheck[_phygitalID],
-            "Phygital: Tag is already stored!"
-        ); // instead of phygital use NFC
+            msg.value >= whitelistInfo.whitelistPrice,
+            "Insufficient payment"
+        );
+        require(!phygitalIdCheck[_phygitalID], "Tag is already stored!");
+        require(Counter <= MAX_SUPPLY, "Max supply reached");
+
+        uint totalsale = whitelistInfo.totalWhitelistSales;
+        uint allocationInNumber = (MAX_SUPPLY * whitelistInfo.allocation) / 100;
+        require(totalsale <= allocationInNumber, "No allocation remaining");
+
         Counter++;
         uint256 currentTokenID = Counter;
 
         phygitalAssets[currentTokenID] = PhygitalInfo(
             block.timestamp,
             _phygitalID,
-            ItemStatus.ORIGINAL
+            ItemStatus.OWNED
         );
-
-        phygitalIdCheck[_phygitalID] = true;
 
         _safeMint(_msgSender(), currentTokenID);
         _setTokenURI(currentTokenID, metadataURI);
-        // Set royalty Info
+
+        whitelistInfo.totalWhitelistSales++;
+        phygitalIdCheck[_phygitalID] = true;
+
+        require(
+            royaltyPercentBasisPoint <= 1000,
+            "Royalty can't be more than 10%"
+        );
+        _setTokenRoyalty(
+            currentTokenID,
+            _msgSender(),
+            royaltyPercentBasisPoint
+        );
+        _transferFunds(msg.value);
+        emit PhygitalAssetCreated(currentTokenID, _msgSender(), metadataURI);
+        return currentTokenID;
+    }
+
+    function buyAsset(
+        address buyer,
+        string memory metadataURI,
+        uint96 royaltyPercentBasisPoint,
+        bytes memory _phygitalID
+    ) public payable returns (uint256) {
+        if (!flowRoles.isOperator(_msgSender())) {
+            require(block.timestamp >= launchTime, "Minting not active");
+            require(msg.value >= publicPrice, "Insufficient payment");
+        }
+        require(!isCancelled, "Sale is cancelled");
+        require(!phygitalIdCheck[_phygitalID], "Tag is already stored!");
+        require(Counter <= MAX_SUPPLY, "Max supply reached");
+        Counter++;
+        uint256 currentTokenID = Counter;
+        phygitalAssets[currentTokenID] = PhygitalInfo(
+            block.timestamp,
+            _phygitalID,
+            ItemStatus.OWNED
+        );
+        phygitalIdCheck[_phygitalID] = true;
+        _safeMint(buyer, currentTokenID);
+        _setTokenURI(currentTokenID, metadataURI);
         require(
             royaltyPercentBasisPoint <= 1000,
             "Phygital: Royalty can't be more than 10%"
@@ -181,61 +300,8 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
             _msgSender(),
             royaltyPercentBasisPoint
         );
-        // Approve tradeHub to transfer NFTs
-        setApprovalForAll(tradeHub, true);
 
         emit PhygitalAssetCreated(currentTokenID, _msgSender(), metadataURI);
-        return currentTokenID;
-    }
-
-    /**
-     * @dev Creates a new token for `to`. Its token ID will be automatically
-     * assigned (and available on the emitted {IERC721-Transfer} event), and the token
-     * URI autogenerated based on the base URI passed at construction.
-     *
-     * See {ERC721-_safeMint}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the `FLOW_CREATOR_ROLE`.
-     */
-    function delegateAssetCreation(
-        address creator,
-        string memory metadataURI,
-        uint96 royaltyPercentBasisPoint,
-        bytes memory phygitalID
-    ) public onlyOperator returns (uint256) {
-        // We cannot just use balanceOf to create the new tokenId because tokens
-        // can be burned (destroyed), so we need a separate counter.
-        require(
-            !phygitalIdCheck[phygitalID],
-            "Phygital: NFC Tag is already stored!"
-        );
-        Counter++;
-        uint256 currentTokenID = Counter;
-
-        phygitalAssets[currentTokenID] = PhygitalInfo(
-            block.timestamp,
-            phygitalID,
-            ItemStatus.ORIGINAL
-        );
-
-        phygitalIdCheck[phygitalID] = true;
-
-        _safeMint(creator, currentTokenID);
-        _setTokenURI(currentTokenID, metadataURI);
-
-        // Set royalty Info
-        require(
-            royaltyPercentBasisPoint <= 1000,
-            "Phygital: Royalty can't be more than 10%"
-        );
-        _setTokenRoyalty(currentTokenID, creator, royaltyPercentBasisPoint);
-
-        // Approve tradeHub to transfer NFTs
-        setApprovalForAll(tradeHub, true);
-
-        emit PhygitalAssetCreated(currentTokenID, creator, metadataURI);
         return currentTokenID;
     }
 
@@ -279,111 +345,6 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
         _tokenURIs[tokenId] = _tokenURI;
     }
 
-    /********************* Rental(ERC4907) *********************************/
-    /// @notice Owner can set the NFT's rental price and status
-    // function setRentInfo(
-    //     uint256 tokenId,
-    //     bool isRentable,
-    //     uint256 pricePerHour
-    // ) public {
-    //     require(
-    //         _isAuthorized(_ownerOf(tokenId), _msgSender(), tokenId),
-    //         "Phygital: Caller is not token owner or approved"
-    //     );
-    //     rentables[tokenId].isRentable = isRentable;
-    //     rentables[tokenId].hourlyRate = pricePerHour;
-    //     emit RentalInfo(tokenId, isRentable, pricePerHour, _msgSender());
-    // }
-
-    // /// @notice set the user and expires of an NFT
-    // /// @dev This function is used to gift a person by the owner,
-    // /// The zero address indicates there is no user
-    // /// Throws if `tokenId` is not valid NFT
-    // /// @param user  The new user of the NFT
-    // /// @param expires  UNIX timestamp, The new user could use the NFT before expires
-
-    // function setUser(uint256 tokenId, address user, uint64 expires) public {
-    //     require(
-    //         _requireOwned(tokenId) == _msgSender(),
-    //         "Phygital: Not token owner Or approved"
-    //     );
-    //     require(
-    //         userOf(tokenId) == address(0),
-    //         "Phygital: item is already subscribed"
-    //     );
-    //     RentableItems storage info = rentables[tokenId];
-    //     info.user = user;
-    //     info.expires = expires + uint64(block.timestamp);
-    //     emit UpdateUser(tokenId, user, info.expires);
-    // }
-
-    // /**
-    //  * @notice to use for renting an item
-    //  * We are calculating 1 month equal to 30 days
-    //  * @dev The zero address indicates there is no user renting the item currently
-    //  * Throws if `tokenId` is not valid NFT,
-    //  * time cannot be less than 1 hour or more than 6 months
-    //  * @param _timeInHours  is in hours , Ex- 1,2,3
-    //  */
-
-    // function rent(uint256 _tokenId, uint256 _timeInHours) external payable {
-    //     require(
-    //         _requireOwned(_tokenId) == _msgSender(),
-    //         "Phygital: Invalide Token Id"
-    //     );
-    //     require(
-    //         rentables[_tokenId].isRentable,
-    //         "Phygital: Not available for rent"
-    //     );
-    //     require(
-    //         userOf(_tokenId) == address(0),
-    //         "Phygital: NFT Already Subscribed"
-    //     );
-    //     require(_timeInHours > 0, "Phygital: Time can't be less than 1 hour");
-    //     require(
-    //         _timeInHours <= 4320,
-    //         "Phygital: Time can't be more than 6 months"
-    //     );
-
-    //     uint256 amount = amountRequired(_tokenId, _timeInHours);
-
-    //     require(msg.value >= amount, "Phygital: Insufficient Funds");
-    //     payable(ownerOf(_tokenId)).transfer(msg.value);
-
-    //     RentableItems storage info = rentables[_tokenId];
-    //     info.user = _msgSender();
-    //     info.expires = uint64(block.timestamp + (_timeInHours * 3600));
-    //     emit UpdateUser(_tokenId, _msgSender(), info.expires);
-    // }
-
-    /** Getter Functions **/
-
-    /************* Rental(ERC4907) ***************** */
-    /// @dev IERC4907 implementation
-    // function userOf(uint256 tokenId) public view returns (address) {
-    //     if (userExpires(tokenId) >= block.timestamp) {
-    //         return rentables[tokenId].user;
-    //     } else {
-    //         return address(0);
-    //     }
-    // }
-
-    // /// @dev IERC4907 implementation
-    // function userExpires(uint256 tokenId) public view returns (uint256) {
-    //     return rentables[tokenId].expires;
-    // }
-
-    // /// @notice to calculate the amount of money required
-    // /// to rent an item for a certain time
-    // function amountRequired(
-    //     uint256 tokenId,
-    //     uint256 time
-    // ) public view returns (uint256 amount) {
-    //     amount = rentables[tokenId].hourlyRate * time;
-    // }
-
-    /////////////////////////////////////////////////
-
     /**
      * @dev Returns the Uniform Resource Identifier (URI) for `tokenId` token.
      */
@@ -399,27 +360,13 @@ contract Phygital is Context, ERC721Enumerable, ERC2981 {
         return _tokenURI;
     }
 
-    // function _update(
-    //     address to,
-    //     uint256 tokenId,
-    //     address auth
-    // ) internal virtual override returns (address) {
-    //     address from = super._update(to, tokenId, auth);
-    //     if (from != to && rentables[tokenId].user != address(0)) {
-    //         delete rentables[tokenId];
-    //         emit UpdateUser(tokenId, address(0), 0);
-    //     }
-    //     return from;
-    // }
-
     /**
      * @dev See {IERC165-supportsInterface}.
      */
     function supportsInterface(
         bytes4 interfaceId
-    ) public view virtual override(ERC721Enumerable, ERC2981) returns (bool) {
+    ) public view virtual override(ERC721, ERC2981) returns (bool) {
         if (interfaceId == _INTERFACE_ID_ERC2981) return true;
-        // if (interfaceId == type(IERC4907).interfaceId) return true;
         return super.supportsInterface(interfaceId);
     }
 }

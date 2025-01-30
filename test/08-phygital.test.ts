@@ -253,4 +253,158 @@ describe("Phygital Contract", () => {
                 .rent(currentTokenID, 1, { value: rentPrice })
         ).to.be.reverted
     })
+
+    // Add these test cases after the existing tests
+    describe("Whitelist and Public Sale Tests", () => {
+        const whitelistValues = [
+            Math.floor(Date.now() / 1000), // startTime (now)
+            Math.floor(Date.now() / 1000) + 3600, // endTime (1 hour from now)
+            ethers.utils.parseEther("0.1"), // whitelistPrice
+            20, // allocation percentage
+        ]
+        const maxSupply = 100
+        const publicPrice = ethers.utils.parseEther("0.2")
+        const launchTime = Math.floor(Date.now() / 1000) + 7200 // 2 hours from now
+
+        beforeEach(async () => {
+            const PhygitalFactory = await ethers.getContractFactory("Phygital")
+            phygital = await PhygitalFactory.deploy(
+                metadata.name,
+                metadata.symbol,
+                maxSupply,
+                whitelistValues,
+                publicPrice,
+                launchTime,
+                accessmaster.address,
+                owner.address // Using owner as mock vault address
+            )
+        })
+
+        it("Should set whitelist correctly", async () => {
+            await phygital.connect(operator).setWhitelist(buyer.address)
+            const isWhitelisted = await phygital.whitelistInfo(buyer.address)
+            expect(isWhitelisted).to.be.true
+        })
+
+        it("Should allow whitelisted users to mint", async () => {
+            await phygital.connect(operator).setWhitelist(buyer.address)
+            const metadataURI = "ipfs://test"
+            const royaltyBasisPoints = 500 // 5%
+            const phygitalID = "0x045A7032214B80"
+
+            await expect(
+                phygital
+                    .connect(buyer)
+                    .buyAssetWhitelist(
+                        metadataURI,
+                        royaltyBasisPoints,
+                        phygitalID,
+                        { value: whitelistValues[2] }
+                    )
+            )
+                .to.emit(phygital, "PhygitalAssetCreated")
+                .withArgs(1, buyer.address, metadataURI)
+        })
+
+        it("Should prevent non-whitelisted users from minting during whitelist period", async () => {
+            const metadataURI = "ipfs://test"
+            const royaltyBasisPoints = 500
+            const phygitalID = "0x045A7032214B80"
+
+            await expect(
+                phygital
+                    .connect(buyer)
+                    .buyAssetWhitelist(
+                        metadataURI,
+                        royaltyBasisPoints,
+                        phygitalID,
+                        { value: whitelistValues[2] }
+                    )
+            ).to.be.revertedWith("Phygital: Address not whitelisted")
+        })
+
+        it("Should allow public sale after launch time", async () => {
+            // Fast forward time to after launch
+            await network.provider.send("evm_increaseTime", [7200])
+            await network.provider.send("evm_mine")
+
+            const metadataURI = "ipfs://test"
+            const royaltyBasisPoints = 500
+            const phygitalID = "0x045A7032214B80"
+
+            await expect(
+                phygital
+                    .connect(buyer)
+                    .buyAsset(
+                        buyer.address,
+                        metadataURI,
+                        royaltyBasisPoints,
+                        phygitalID,
+                        { value: publicPrice }
+                    )
+            )
+                .to.emit(phygital, "PhygitalAssetCreated")
+                .withArgs(1, buyer.address, metadataURI)
+        })
+
+        it("Should prevent minting when sale is cancelled", async () => {
+            await phygital.connect(operator).cancelSale()
+
+            const metadataURI = "ipfs://test"
+            const royaltyBasisPoints = 500
+            const phygitalID = "0x045A7032214B80"
+
+            await expect(
+                phygital
+                    .connect(buyer)
+                    .buyAsset(
+                        buyer.address,
+                        metadataURI,
+                        royaltyBasisPoints,
+                        phygitalID,
+                        { value: publicPrice }
+                    )
+            ).to.be.revertedWith("Sale is cancelled")
+        })
+
+        it("Should enforce max supply limit", async () => {
+            // Deploy contract with very small max supply
+            const PhygitalFactory = await ethers.getContractFactory("Phygital")
+            const smallSupplyPhygital = await PhygitalFactory.deploy(
+                metadata.name,
+                metadata.symbol,
+                1, // maxSupply of 1
+                whitelistValues,
+                publicPrice,
+                launchTime,
+                accessmaster.address,
+                owner.address
+            )
+
+            // Mint first token
+            await network.provider.send("evm_increaseTime", [7200])
+            await smallSupplyPhygital
+                .connect(buyer)
+                .buyAsset(
+                    buyer.address,
+                    "ipfs://test1",
+                    500,
+                    "0x045A7032214B80",
+                    { value: publicPrice }
+                )
+
+            // Try to mint second token
+            await expect(
+                smallSupplyPhygital
+                    .connect(buyer)
+                    .buyAsset(
+                        buyer.address,
+                        "ipfs://test2",
+                        500,
+                        "0x045A7032214B81",
+                        { value: publicPrice }
+                    )
+            ).to.be.revertedWith("Max supply reached")
+        })
+    })
 })

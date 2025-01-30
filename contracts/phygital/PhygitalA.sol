@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.20;
 import "../accessmaster/interfaces/IAccessMaster.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 import "../common/ERC721A/extensions/ERC721ABurnable.sol";
