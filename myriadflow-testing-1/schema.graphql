@@ -1,0 +1,8 @@
+type DataChanged @entity(immutable: true) {
+  id: Bytes!
+  time: BigInt! # uint256
+  data: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

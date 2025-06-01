@@ -1,0 +1,8 @@
+{
+  "base-sepolia": {
+    "SimpleStorage": {
+      "address": "0x24631D9a109e4671107044F50D231C5C583759c8",
+      "startBlock": 12160811
+    }
+  }
+}

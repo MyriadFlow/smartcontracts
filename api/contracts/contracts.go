@@ -41,11 +41,12 @@ func DeployContract(c *gin.Context) {
 	}
 	filePath := "scripts/launch/launch.json"
 	_, err = os.ReadFile(filePath)
-
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error(), "message": "failed to read launch.json"})
+		return
+	}
 	c.JSON(http.StatusOK, response)
-
 }
-
 func genResponse(jsonByte []byte, network string) ([]byte, error) {
 	os.Chdir(config.Dir)
 	filePath := "scripts/launch/launch.json"
